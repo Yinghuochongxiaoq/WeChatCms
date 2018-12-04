@@ -1,0 +1,226 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "菜单管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+}
+<div class="page-body">
+    <div class="widget widget-body">
+        <div class="panel panel-default">
+            <form class="panel-body" action="" id="form1">
+                <div class="form-inline">
+                    <button type="button" onclick="newCostContent();" class="btn btn-success" title="新增" value="新增">新增<i class="fa fa-plus"></i></button>
+                </div>
+            </form>
+        </div>
+        <div id="resultTable">
+            <table class="table table-bordered  table-hover ">
+                <thead class="flip-content bordered-palegreen">
+                    <tr class="control-center">
+                        <th>菜单名称</th>
+                        <th>英文名称</th>
+                        <th>菜单编码</th>
+                        <th>菜单地址</th>
+                        <th>菜单排序值</th>
+                        <th>图标</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="control-center" v-for="item of menuList">
+                        <td>{{item.Title}}</td>
+                        <td>{{item.Name}}</td>
+                        <td>{{item.MenuType}}</td>
+                        <td>{{item.Url}}</td>
+                        <td>{{item.OrderNo}}</td>
+                        <td><i class="menu-icon fa " v-bind:class="[item.Icon]"></i></td>
+                        <td>
+                            <button type="button" v-on:click="vueEditContent(item.Id)"
+                                   class="btn btn-success" title="编辑" value="编辑">编辑<i class="fa fa-edit"></i></button>
+                            <button type="button" v-on:click="vueDelCostContent(item.Id)"
+                                   class="btn btn-danger" title="删除" value="删除">删除<i class="fa fa-trash-o"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="pager">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
+        </div>
+    </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal" id="detailWindow" tabindex="100"
+     role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="padding: 0px;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="margin-right: 10px;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+                </button>
+                <h3 class="modal-title">新增菜单</h3>
+            </div>
+            <form id="acForm">
+                <div class="modal-body form-horizontal"
+                     style="padding: 0px; background-color: #fff; min-height: 350px;">
+                    <div class="col-md-12" style="margin-top: 25px;">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">菜单标题：</label>
+                            <div class="col-sm-8">
+                                <input autocomplete="off" type="text" v-model="menu_model.Title" name="Title" class="form-control input-sm" placeholder="菜单标题"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">英文名称：</label>
+                            <div class="col-sm-8">
+                                <input autocomplete="off" type="text" v-model="menu_model.Name" name="Name" class="form-control input-sm" placeholder="英文名称"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">菜单编码：</label>
+                            <div class="col-sm-8">
+                                <input name="MenuType" id="MenuType" class="form-control input-sm"
+                                       type="number" v-model="menu_model.MenuType" placeholder="菜单编码">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">菜单地址：</label>
+                            <div class="col-sm-8">
+                                <input type="text" v-model="menu_model.Url" name="Url"
+                                       placeholder="菜单地址"
+                                       class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">父级菜单：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control input-sm" name="ParentId" v-model="menu_model.ParentId">
+                                    <option v-for="item in all_menu_list" v-bind:value="item.Id">{{item.Title}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">排序值：</label>
+                            <div class="col-sm-8">
+                                <input name="OrderNo" class="form-control input-sm"
+                                       type="number" v-model="menu_model.OrderNo" placeholder="排序值">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">图标：</label>
+                            <div class="col-sm-8">
+                                <div class="bootstrap-tagsinput" onclick="showIconWindow();">
+                                    <div class="fa-hover col-md-3 col-sm-4 padding-5"><i class="fa" v-bind:class="menu_model.Icon"></i>{{menu_model.Icon}}</div>
+                                    <input size="8" name="Icon" hidden="hidden" type="text" v-model="menu_model.Icon" placeholder="图标">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">
+                        <i class="fa fa-close"></i>关闭
+                    </button>
+                    <button type="button" onclick="saveMenuInfo();" class="btn btn-primary">
+                        <i class="fa fa-save"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框end -->
+<!--图标选择框-->
+<div class="modal" id="IconWindow" tabindex="-1"
+     role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-header" style="padding: 0px;">
+            <button type="button" class="close" data-dismiss="modal"
+                    style="margin-right: 10px;">
+                <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+            </button>
+            <h3 class="modal-title">图标选择</h3>
+        </div>
+        <div class="widget-body">
+            <div id="fontawesome-container">
+                <section id="web-application">
+                    <div class="row fontawesome-icon-list">
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-book')"><i class="fa fa-book"></i> fa-book</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-calendar')"><i class="fa fa-calendar"></i> fa-calendar</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-calendar-o')"><i class="fa fa-calendar-o"></i> fa-calendar-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-camera')"><i class="fa fa-camera"></i> fa-camera</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-camera-retro')"><i class="fa fa-camera-retro"></i> fa-camera-retro</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-coffee')"><i class="fa fa-coffee"></i> fa-coffee</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-cog')"><i class="fa fa-cog"></i> fa-cog</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-cogs')"><i class="fa fa-cogs"></i> fa-cogs</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-comment')"><i class="fa fa-comment"></i> fa-comment</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-desktop')"><i class="fa fa-desktop"></i> fa-desktop</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-folder')"><i class="fa fa-folder"></i> fa-folder</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-folder-o')"><i class="fa fa-folder-o"></i> fa-folder-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-folder-open')"><i class="fa fa-folder-open"></i> fa-folder-open</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-folder-open-o')"><i class="fa fa-folder-open-o"></i> fa-folder-open-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-frown-o')"><i class="fa fa-frown-o"></i> fa-frown-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-gamepad')"><i class="fa fa-gamepad"></i> fa-gamepad</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-gavel')"><i class="fa fa-gavel"></i> fa-gavel</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-gear')"><i class="fa fa-gear"></i> fa-gear </div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-gears')"><i class="fa fa-gears"></i> fa-gears </div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-gift')"><i class="fa fa-gift"></i> fa-gift</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-glass')"><i class="fa fa-glass"></i> fa-glass</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-globe')"><i class="fa fa-globe"></i> fa-globe</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-group')"><i class="fa fa-group"></i> fa-group </div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-hdd-o')"><i class="fa fa-hdd-o"></i> fa-hdd-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-headphones')"><i class="fa fa-headphones"></i> fa-headphones</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-heart')"><i class="fa fa-heart"></i> fa-heart</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-heart-o')"><i class="fa fa-heart-o"></i> fa-heart-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-home')"><i class="fa fa-home"></i> fa-home</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-inbox')"><i class="fa fa-inbox"></i> fa-inbox</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-info')"><i class="fa fa-info"></i> fa-info</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-info-circle')"><i class="fa fa-info-circle"></i> fa-info-circle</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-key')"><i class="fa fa-key"></i> fa-key</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-keyboard-o')"><i class="fa fa-keyboard-o"></i> fa-keyboard-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-laptop')"><i class="fa fa-laptop"></i> fa-laptop</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-leaf')"><i class="fa fa-leaf"></i> fa-leaf</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-picture-o')"><i class="fa fa-picture-o"></i> fa-picture-o</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-tachometer')"><i class="fa fa-tachometer"></i> fa-tachometer</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-tags')"><i class="fa fa-tags"></i> fa-tags</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-tasks')"><i class="fa fa-tasks"></i> fa-tasks</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-truck')"><i class="fa fa-truck"></i> fa-truck</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-upload')"><i class="fa fa-upload"></i> fa-upload</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-user')"><i class="fa fa-user"></i> fa-user</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-users')"><i class="fa fa-users"></i> fa-users</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-video-camera')"><i class="fa fa-video-camera"></i> fa-video-camera</div>
+                        <div class="fa-hover col-md-3 col-sm-4" onclick="chooseIcon('fa-wrench')"><i class="fa fa-wrench"></i> fa-wrench</div>
+                    </div>
+                    <hr class="wide">
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+<!--图标选择框end-->
+@section Script{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/SysSet/menuadmin.js"></script>
+}
+

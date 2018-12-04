@@ -1,0 +1,221 @@
+﻿@using WeChatCmsCommon.Unit
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
+<head>
+    <meta charset="utf-8" />
+    <title>用户登录</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <link href="@Url.StaticFile("/assets/css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.StaticFile("/assets/css/font-awesome.min.css")" rel="stylesheet" />
+    <link href="@Url.StaticFile("/assets/css/style.css")" rel="stylesheet" />
+    <link href="@Url.StaticFile("/assets/css/style_responsive.css")" rel="stylesheet" />
+    <link href="@Url.StaticFile("/assets/css/typicons.min.css")" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="@Url.StaticFile("/content/styles/Home/admin.main.css")" />
+    <link href="@Url.StaticFile("/Content/Styles/Home/supersized.css")" rel="stylesheet" />
+</head>
+<!-- END HEAD -->
+<!-- BEGIN BODY -->
+<body class="login" onkeydown="keyLogin();">
+    <!-- BEGIN LOGO -->
+    <div class="logo">
+        <img src="@Url.StaticFile("/content/images/logo.png")" alt="" />
+    </div>
+    <!-- END LOGO -->
+    <!-- BEGIN LOGIN -->
+    <div class="content">
+        <!-- BEGIN LOGIN FORM -->
+        @using (Html.BeginForm())
+        {
+            <h3 class="form-title text-center f-20">请画押验明正身</h3>
+            <div class="alert alert-error hide">
+                <button class="close" data-dismiss="alert"></button>
+                <span>Enter any username and passowrd.</span>
+            </div>
+            <div class="control-group">
+                <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                <label class="control-label visible-ie8 visible-ie9">Username</label>
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="fa fa-user"></i>
+                        @Html.TextBox("username", string.Empty, new { @class = "form-control", placeholder = "用户名", data_val_required = "用户名不能为空", data_val = "true" })
+                    </div>
+                    <span class="help-block">@Html.ValidationMessage("username")</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label visible-ie8 visible-ie9">Password</label>
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="fa fa-key"></i>
+                        @Html.Password("password", string.Empty, new { @class = "form-control", placeholder = "密码", data_val_required = "密码不能为空", data_val = "true" })
+                    </div>
+                    <span class="help-block">@Html.ValidationMessage("password")</span>
+                </div>
+            </div>
+            <div class="form-actions-submit">
+                <button type="submit" id="submitButton" class="btn pull-right btnsubmitlogin">
+                    登 录 <i class="m-icon-swapright m-icon-white"></i>
+                </button>
+                <span>@Html.ValidationMessage("error") </span>
+            </div>
+            @*<div class="forget-password">
+                    <h4>忘记密码 ?</h4>
+                    <p>
+                        请发送邮件 <a href="javascript:;" class="" id="forget-password">guozili@163.com</a>
+                        提出申请重设密码.
+                    </p>
+                </div>*@
+            <div class="create-account dn">
+                <p>
+                    Don't have an account yet ?&nbsp;
+                    <a href="javascript:;" id="register-btn" class="">Create an account</a>
+                </p>
+            </div>
+        }
+        <!-- END LOGIN FORM -->
+        <!-- BEGIN FORGOT PASSWORD FORM -->
+        <form class="form-vertical forget-form" action="index.html">
+            <h3 class="">Forget Password ?</h3>
+            <p>Enter your e-mail address below to reset your password.</p>
+            <div class="control-group">
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="icon-envelope"></i>
+                        <input class="m-wrap placeholder-no-fix" type="text" placeholder="Email" name="email" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="back-btn" class="btn">
+                    <i class="m-icon-swapleft"></i> Back
+                </button>
+                <button type="submit" class="btn green pull-right">
+                    Submit <i class="m-icon-swapright m-icon-white"></i>
+                </button>
+            </div>
+        </form>
+        <!-- END FORGOT PASSWORD FORM -->
+        <!-- BEGIN REGISTRATION FORM -->
+        <form class="form-vertical register-form" action="index.html">
+            <h3 class="">Sign Up</h3>
+            <p>Enter your account details below:</p>
+            <div class="control-group">
+                <label class="control-label visible-ie8 visible-ie9">Username</label>
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="icon-user"></i>
+                        <input class="m-wrap placeholder-no-fix" type="text" placeholder="Username" name="username" />
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label visible-ie8 visible-ie9">Password</label>
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="icon-lock"></i>
+                        <input class="m-wrap placeholder-no-fix" type="password" id="register_password" placeholder="Password" name="password" />
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label visible-ie8 visible-ie9">Re-type Your Password</label>
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="icon-ok"></i>
+                        <input class="m-wrap placeholder-no-fix" type="password" placeholder="Re-type Your Password" name="rpassword" />
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                <label class="control-label visible-ie8 visible-ie9">Email</label>
+                <div class="controls">
+                    <div class="input-icon left">
+                        <i class="icon-envelope"></i>
+                        <input class="m-wrap placeholder-no-fix" type="text" placeholder="Email" name="email" />
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" name="tnc" /> I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </label>
+                    <div id="register_tnc_error"></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button id="register-back-btn" type="button" class="btn">
+                    <i class="m-icon-swapleft"></i>  Back
+                </button>
+                <button type="submit" id="register-submit-btn" class="btn green pull-right">
+                    Sign Up <i class="m-icon-swapright m-icon-white"></i>
+                </button>
+            </div>
+        </form>
+        <!-- END REGISTRATION FORM -->
+    </div>
+    <!-- END LOGIN -->
+    <!-- BEGIN COPYRIGHT -->
+    <div class="copyright">
+        2015 &copy; GMS by qxb09889@ly.com
+    </div>
+    <!-- END COPYRIGHT -->
+    <!-- BEGIN JAVASCRIPTS -->
+    <script src="@Url.StaticFile("/assets/js/jquery-2.0.3.min.js")"></script>
+    <script src="@Url.StaticFile("/assets/js/bootstrap.min.js")"></script>
+    <script src="@Url.StaticFile("/assets/js/jquery.blockui.js")"></script>
+    <script src="@Url.StaticFile("/assets/js/app.js")"></script>
+    <script type="text/javascript" src="@Url.StaticFile("/assets/js/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.StaticFile("/assets/js/jquery.validate.unobtrusive.min.js")"></script>
+    <script src="@Url.StaticFile("/assets/js/supersized.3.2.7.min.js")"></script>
+    <script>
+        jQuery(document).ready(function () {
+            App.initLogin();
+            $.supersized({
+
+                // Functionality
+                slide_interval: 4000,    // Length between transitions
+                transition: 1,    // 0-None, 1-Fade, 2-Slide Top, 3-Slide Right, 4-Slide Bottom, 5-Slide Left, 6-Carousel Right, 7-Carousel Left
+                transition_speed: 1000,    // Speed of transition
+                performance: 1,    // 0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed // (Only works for Firefox/IE, not Webkit)
+
+                // Size & Position
+                min_width: 0,    // Min width allowed (in pixels)
+                min_height: 0,    // Min height allowed (in pixels)
+                vertical_center: 1,    // Vertically center background
+                horizontal_center: 1,    // Horizontally center background
+                fit_always: 0,    // Image will never exceed browser width or height (Ignores min. dimensions)
+                fit_portrait: 1,    // Portrait images will not exceed browser height
+                fit_landscape: 0,    // Landscape images will not exceed browser width
+
+                // Components
+                slide_links: 'blank',    // Individual links for each slide (Options: false, 'num', 'name', 'blank')
+                slides: [    // Slideshow Images
+                                         { image: '@Url.StaticFile("/Content/Images/1.jpg")' },
+                                         { image: '@Url.StaticFile("/Content/Images/2.jpg")' },
+                                         { image: '@Url.StaticFile("/Content/Images/3.jpg")' }
+                ]
+
+            });
+        });
+        function keyLogin() {
+            if (event.keyCode == 13)  //回车键的键值为13
+                document.getElementById("submitButton").click(); //调用登录按钮的登录事件
+        }
+    </script>
+    <!-- END JAVASCRIPTS -->
+</body>
+<!-- END BODY -->
+</html>

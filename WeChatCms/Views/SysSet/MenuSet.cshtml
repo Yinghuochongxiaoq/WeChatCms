@@ -1,0 +1,109 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "菜单权限设置";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="@(ViewBag.RootNote)/Assets/css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <style type="text/css">
+        ul.ztree {
+            margin-top: 10px;
+            border: 1px solid #617775;
+            background: #f8fafb;
+            width: 100%;
+            height: 360px;
+            overflow-y: scroll;
+            overflow-x: auto;
+        }
+    </style>
+}
+<div class="page-body">
+    <div class="widget widget-body">
+        <div id="resultTable">
+            <table class="table table-bordered  table-hover ">
+                <thead class="flip-content bordered-palegreen">
+                    <tr class="control-center">
+                        <th>用户名</th>
+                        <th>用户类型</th>
+                        <th>性别</th>
+                        <th>生日</th>
+                        <th>电话</th>
+                        <th>真实姓名</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="control-center" v-for="item of dataList">
+                        <td>{{item.UserName}}</td>
+                        <td>{{userTypeEnum[item.UserType]}}</td>
+                        <td>{{sexEnum[item.Sex]}}</td>
+                        <td>{{item.Birthday}}</td>
+                        <td>{{item.TelPhone}}</td>
+                        <td>{{item.TrueName}}</td>
+                        <td>
+                            <button type="button" v-on:click="vuePowerContent(item.Id,'user_tree')" class="btn btn-success" title="权限" value="权限">
+                                权限<i class="fa fa-gavel"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="pager">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
+        </div>
+    </div>
+</div>
+<!-- 模态框 -->
+<div id="detailWindow" hidden="hidden"></div>
+<div class="modal" id="powerWindow" tabindex="100"
+     role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="padding: 0px;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="margin-right: 10px;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+                </button>
+                <h3 class="modal-title">权限列表</h3>
+            </div>
+            <form id="powerform">
+                <div class="modal-body form-horizontal"
+                     style="padding: 0px; background-color: #fff; min-height: 350px;">
+                    <ul id="user_tree" class="ztree" style="border: 1px solid #617775; overflow-y: scroll; height: 500px;"></ul>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">
+                        <i class="fa fa-close"></i>关闭
+                    </button>
+                    <button type="button" onclick="savePowerDataInfo();" class="btn btn-primary">
+                        <i class="fa fa-save"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框end -->
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Assets/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="@(ViewBag.RootNote)/Assets/js/zTree/jquery.ztree.core.js"></script>
+    <script src="@(ViewBag.RootNote)/Assets/js/zTree/jquery.ztree.excheck.js"></script>
+    <script src="@(ViewBag.RootNote)/Content/Scripts/SysSet/menuusers.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/SysSet/menuset.js"></script>
+}

@@ -1,0 +1,46 @@
+﻿@using System.Linq
+@using WeChatModel
+@{
+    var currentModel = ViewBag.CurrentModel as LoginInfoModel;
+}
+<ul class="nav sidebar-menu">
+    @if (currentModel != null && currentModel.MenuList != null && currentModel.MenuList.Any())
+    {
+        foreach (var item in currentModel.MenuList)
+        {
+            if (string.IsNullOrEmpty(item.Icon))
+            {
+                item.Icon = "fa-desktop";
+            }
+            var hasSub = item.SubMenuModel != null && item.SubMenuModel.Any();
+
+            <li class="@(item.MenuType == ViewBag.ManagerId.ToString()?"active open":"")">
+                <a href="@(hasSub?"#":item.Url)" class="@(hasSub? "menu-dropdown":string.Empty)">
+                    <i class="menu-icon fa @item.Icon"></i>
+                    <span class="menu-text">@item.Title</span>
+                    @if (hasSub)
+                    {
+                        <i class="menu-expand"></i>
+                    }
+                </a>
+                @if (hasSub)
+                {
+                    <ul class="submenu">
+                        @foreach (var menu in item.SubMenuModel)
+                        {
+                            if (string.IsNullOrEmpty(menu.Url))
+                            {
+                                menu.Url = ViewBag.RootNode + "/Home/Home/Index";
+                            }
+                            <li class="@(menu.MenuType == ViewBag.MenuId.ToString()?"active":"")">
+                                <a href="@menu.Url" title="@menu.Title">
+                                    <span class="menu-text">@menu.Title</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </li>
+        }
+    }
+</ul>

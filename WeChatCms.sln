@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatCms", "WeChatCms\WeChatCms.csproj", "{AB1FF58C-F5C3-467C-882E-812A060F2EF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatCmsCommon", "WeChatCmsCommon\WeChatCmsCommon.csproj", "{98BB60A2-9559-44CF-AFA3-A21A5569DC97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatModel", "WeChatModel\WeChatModel.csproj", "{635A8B82-F71A-44FF-8BB6-99D7EDE401DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatService", "WeChatService\WeChatService.csproj", "{D5B14B16-E2CA-4970-BB6E-2413F88AA34A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatDataAccess", "WeChatDataAccess\WeChatDataAccess.csproj", "{A828147C-4533-4454-9733-EE198BEA42BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB1FF58C-F5C3-467C-882E-812A060F2EF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB1FF58C-F5C3-467C-882E-812A060F2EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB1FF58C-F5C3-467C-882E-812A060F2EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB1FF58C-F5C3-467C-882E-812A060F2EF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98BB60A2-9559-44CF-AFA3-A21A5569DC97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98BB60A2-9559-44CF-AFA3-A21A5569DC97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98BB60A2-9559-44CF-AFA3-A21A5569DC97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98BB60A2-9559-44CF-AFA3-A21A5569DC97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{635A8B82-F71A-44FF-8BB6-99D7EDE401DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{635A8B82-F71A-44FF-8BB6-99D7EDE401DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{635A8B82-F71A-44FF-8BB6-99D7EDE401DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{635A8B82-F71A-44FF-8BB6-99D7EDE401DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5B14B16-E2CA-4970-BB6E-2413F88AA34A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5B14B16-E2CA-4970-BB6E-2413F88AA34A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5B14B16-E2CA-4970-BB6E-2413F88AA34A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5B14B16-E2CA-4970-BB6E-2413F88AA34A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A828147C-4533-4454-9733-EE198BEA42BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A828147C-4533-4454-9733-EE198BEA42BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A828147C-4533-4454-9733-EE198BEA42BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A828147C-4533-4454-9733-EE198BEA42BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E177F17B-1059-4C9A-90C0-735D8AA65473}
+	EndGlobalSection
+EndGlobal

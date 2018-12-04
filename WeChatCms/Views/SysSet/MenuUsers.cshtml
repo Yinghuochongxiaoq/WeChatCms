@@ -1,0 +1,165 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "管理员列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+}
+<div class="page-body">
+    <div class="widget widget-body">
+        <div class="panel panel-default">
+            <form class="panel-body" action="" id="form1">
+                <div class="form-inline">
+                    <button type="button" onclick="newCostContent();" class="btn btn-success" title="新增" value="新增">新增<i class="fa fa-plus"></i></button>
+                </div>
+            </form>
+        </div>
+        <div id="resultTable">
+            <table class="table table-bordered  table-hover ">
+                <thead class="flip-content bordered-palegreen">
+                    <tr class="control-center">
+                        <th>用户名</th>
+                        <th>用户类型</th>
+                        <th>性别</th>
+                        <th>生日</th>
+                        <th>电话</th>
+                        <th>真实姓名</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="control-center" v-for="item of dataList">
+                        <td>{{item.UserName}}</td>
+                        <td>{{userTypeEnum[item.UserType]}}</td>
+                        <td>{{sexEnum[item.Sex]}}</td>
+                        <td>{{item.Birthday}}</td>
+                        <td>{{item.TelPhone}}</td>
+                        <td>{{item.TrueName}}</td>
+                        <td>
+                            <button type="button" v-on:click="vueEditContent(item.Id)"
+                                    class="btn btn-success" title="编辑" value="编辑">
+                                编辑<i class="fa fa-edit"></i>
+                            </button>
+                            <button type="button" v-on:click="vueDelCostContent(item.Id)"
+                                    class="btn btn-danger" title="删除" value="删除">
+                                删除<i class="fa fa-trash-o"></i>
+                            </button>
+                            <button type="button" v-on:click="vueResetContent(item.Id)"
+                                    class="btn btn-danger" title="重置密码" value="重置密码">
+                                重置密码<i class="fa fa-eraser"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="pager">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
+        </div>
+    </div>
+</div>
+<!-- 模态框 -->
+<div class="modal" id="detailWindow" tabindex="100"
+     role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="padding: 0px;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="margin-right: 10px;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+                </button>
+                <h3 class="modal-title">新增用户</h3>
+            </div>
+            <form id="acForm">
+                <div class="modal-body form-horizontal"
+                     style="padding: 0px; background-color: #fff; min-height: 350px;">
+                    <div class="col-md-12" style="margin-top: 25px;">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">登录名：</label>
+                            <div class="col-sm-8">
+                                <input autocomplete="off" type="text" v-model="detail_model.UserName" name="UserName" class="form-control input-sm" placeholder="登录名" v-bind:disabled="detail_model.CouldChangeName" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">性别：</label>
+                            <div class="col-sm-8">
+
+                                <select class="form-control input-sm" name="ParentId" v-model="detail_model.Sex">
+                                    <option v-for="item in all_list" v-bind:value="item.Id">
+                                        {{item.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">生日：</label>
+                            <div class="col-sm-8">
+                                <input type="text" v-model="detail_model.Birthday" onfocus="WdatePicker({dateFmt: 'yyyy/MM/dd HH:mm:ss' ,onpicking:function(dp){detailVm.$data.detail_model.Birthday=dp.cal.getNewDateStr(); }})" name="Birthday" class="form-control Wdate input">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">用户类型：</label>
+                            <div class="col-sm-8">
+
+                                <select class="form-control input-sm" name="UserType" v-model="detail_model.UserType">
+                                    <option v-for="item in all_user_type" v-bind:value="item.Id">
+                                        {{item.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">联系电话：</label>
+                            <div class="col-sm-8">
+                                <input type="text" v-model="detail_model.TelPhone" name="TelPhone"
+                                       placeholder="联系电话"
+                                       class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">真实姓名：</label>
+                            <div class="col-sm-8">
+                                <input name="TrueName" class="form-control input-sm"
+                                       type="text" v-model="detail_model.TrueName" placeholder="真实姓名">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">
+                        <i class="fa fa-close"></i>关闭
+                    </button>
+                    <button type="button" onclick="saveDataInfo();" class="btn btn-primary">
+                        <i class="fa fa-save"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框end -->
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Assets/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/SysSet/menuusers.js"></script>
+}
