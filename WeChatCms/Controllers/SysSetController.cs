@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using FreshCommonUtility.Security;
 using Newtonsoft.Json;
+using WeChatCmsCommon.CustomerAttribute;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -419,6 +420,57 @@ namespace WeChatCms.Controllers
             catch (Exception e)
             {
                 Trace.WriteLine(e);
+            }
+            return Json(resultMode, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="firstpwd"></param>
+        /// <returns></returns>
+        [AuthorizeIgnore]
+        public ActionResult ChangePassword(string firstpwd)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            if (string.IsNullOrEmpty(firstpwd))
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "新密码为空";
+            }
+            else
+            {
+                var newPassword = AesHelper.AesEncrypt(firstpwd);
+                var server = new AccountService();
+                try
+                {
+                    var currentModel = server.GetSysUser(CurrentModel.Id);
+                    if (currentModel == null)
+                    {
+                        resultMode.Message = "登录超时，请退出重新登录";
+                        resultMode.ResultCode = ResponceCodeEnum.Fail;
+                        return Json(resultMode, JsonRequestBehavior.AllowGet);
+                    }
+                    var resetUser = server.GetSysUser(CurrentModel.Id);
+                    if (resetUser == null)
+                    {
+                        resultMode.Message = "用户无效";
+                        resultMode.ResultCode = ResponceCodeEnum.Fail;
+                        return Json(resultMode, JsonRequestBehavior.AllowGet);
+                    }
+
+                    resetUser.Password = newPassword;
+                    server.SaveUserModel(resetUser);
+                    return Json(resultMode, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e);
+                }
             }
             return Json(resultMode, JsonRequestBehavior.AllowGet);
         }

@@ -1,9 +1,13 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Diagnostics;
+using System.Web.Mvc;
 using FreshCommonUtility.Cookie;
 using FreshCommonUtility.Security;
 using Newtonsoft.Json;
 using WeChatCmsCommon.CustomerAttribute;
+using WeChatCmsCommon.EnumBusiness;
 using WeChatCmsCommon.Unit;
+using WeChatModel;
 using WeChatService;
 
 namespace WeChatCms.Controllers
@@ -38,6 +42,10 @@ namespace WeChatCms.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 退出登录
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Logout()
         {
             CookieHelper.SetCookie(StaticFileHelper.UserCookieStr, string.Empty);

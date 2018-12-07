@@ -89,7 +89,10 @@
                                 </li>
                                 <!--/Theme Selector Area-->
                                 <li class="dropdown-footer">
-                                    <a href="@Url.Action("Logout", "Auth", new {Area = "Account"})">
+                                    <a href="javascript:showChangePassword();">
+                                        修改密码
+                                    </a>
+                                    <a href="@Url.Action("Logout", "Auth")">
                                         退出登录
                                     </a>
                                 </li>
@@ -130,3 +133,81 @@
     </div>
 </div>
 <!-- /Navbar -->
+
+<script>
+    function showChangePassword() {
+        layer.open({
+            id: 1,
+            type: 1,
+            title: '修改密码',
+            skin: 'layui-layer-rim',
+            area: ['450px', 'auto'],
+
+            content: ' <div class="row" style="width: 420px;  margin-left:7px; margin-top:10px;">'
+            + '<div class="col-sm-12">'
+            + '<div class="input-group">'
+            + '<span class="input-group-addon"> 新 密 码   :</span>'
+            + '<input id="firstpwd" type="password" class="form-control" placeholder="请输入密码">'
+            + '</div>'
+            + '</div>'
+            + '<div class="col-sm-12" style="margin-top: 10px">'
+            + '<div class="input-group">'
+            + '<span class="input-group-addon">确认密码:</span>'
+            + '<input id="secondpwd" type="password" class="form-control" placeholder="请再输入一次密码">'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            ,
+            btn: ['保存', '取消'],
+            yes: function (index, layero) {
+                var firstpwd = $('#firstpwd').val();
+                var secondpwd = $('#secondpwd').val();
+                if (firstpwd == '') {
+                    layer.tips('新密码不能为空', '#firstpwd');
+                    return false;
+                }
+                if (secondpwd == '') {
+                    layer.tips('确认密码不能为空', '#secondpwd');
+                    return false;
+                }
+                if (firstpwd != secondpwd) {
+                    layer.tips('两次密码不一致', '#secondpwd');
+                    return false;
+                }
+                if (firstpwd.length < 6) {
+                    layer.tips('密码不能长度不能小于6位', '#firstpwd');
+                    return false;
+                }
+                if (secondpwd.length < 6) {
+                    layer.tips('密码不能长度不能小于6位', '#secondpwd');
+                    return false;
+                }
+                var ajaxIndex = layer.load();
+                var data = {};
+                data.firstpwd = firstpwd;
+                $.ajax("/SysSet/ChangePassword", {
+                    type: "POST",
+                    data: data,
+                    success: function (result) {
+                        if (result && result.ResultCode == 0) {
+                            parent.layer.msg(result.Message);
+                        } else {
+                             parent.layer.msg("系统异常，接口请求失败");
+                        }
+                        layer.close(ajaxIndex);
+                        layer.close(index);
+                    },
+                    error: function () {
+                        parent.layer.msg("编辑错误");
+                        layer.close(ajaxIndex);
+                    }
+                });
+            },
+            btn2: function (index, layero) {
+                layer.close(index);
+            }
+
+        });
+        return false;
+    }
+</script>
