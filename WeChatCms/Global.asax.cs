@@ -1,8 +1,6 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
-using FreshCommonUtility.Configure;
 using FreshCommonUtility.Dapper;
-using FreshCommonUtility.SqlHelper;
 using WeChatService;
 
 namespace WeChatCms
