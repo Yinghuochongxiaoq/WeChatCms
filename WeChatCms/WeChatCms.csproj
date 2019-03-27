@@ -154,10 +154,12 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AdminControllerBase.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\ControllerBase.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PermissionAttribute.cs" />
     <Compile Include="Controllers\SysSetController.cs" />
+    <Compile Include="Controllers\VMEJsonResult.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -350,9 +352,12 @@
     <Content Include="Assets\js\supersized.3.2.7.min.js" />
     <Content Include="Assets\js\jquery.validate.min.js" />
     <Content Include="Assets\js\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Content\Scripts\Content\contentedit.js" />
+    <Content Include="Content\Scripts\Content\contentlist.js" />
     <Content Include="Content\Scripts\SysSet\menuadmin.js" />
     <Content Include="Content\Scripts\SysSet\menuset.js" />
     <Content Include="Content\Scripts\SysSet\menuusers.js" />
+    <Content Include="Content\Scripts\SysSet\sysdic.js" />
     <Content Include="Content\Styles\Home\admin.main.css" />
     <Content Include="Content\Styles\Home\supersized.css" />
     <Content Include="favicon.ico" />
@@ -672,6 +677,8 @@
     <Content Include="UEditor\third-party\video-js\font\vjs.woff" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Content\Scripts\Home\" />
+    <Folder Include="Scripts\" />
     <Folder Include="UEditor\net\Bin\" />
     <Folder Include="UEditor\net\upload\image\20160329\" />
   </ItemGroup>
@@ -688,6 +695,9 @@
     <Content Include="Views\SysSet\MenuSet.cshtml" />
     <Content Include="Views\SysSet\MenuAdmin.cshtml" />
     <Content Include="Views\SysSet\MenuUsers.cshtml" />
+    <Content Include="Views\Content\ContentEdit.cshtml" />
+    <Content Include="Views\Content\ContentList.cshtml" />
+    <Content Include="Views\SysSet\SysDicManage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

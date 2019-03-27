@@ -6,10 +6,10 @@
   |===============OR Email:qinbocai@sina.cn================|
   |========================================================|
 **/
+
 using System;
 using FreshCommonUtility.Dapper;
 using WeChatCmsCommon.EnumBusiness;
-using Newtonsoft.Json;
 
 namespace WeChatModel.DatabaseModel
 {
@@ -22,7 +22,7 @@ namespace WeChatModel.DatabaseModel
         /// Id 主键，用户id
         /// </summary>
         [Key]
-        public Int32 Id { get; set; }
+        public long Id { get; set; }
         /// <summary>
         /// UserName 用户名
         /// </summary>
@@ -58,11 +58,11 @@ namespace WeChatModel.DatabaseModel
         /// <summary>
         /// CreateAuth 创建人id
         /// </summary>
-        public Int32 CreateAuth { get; set; }
+        public Int64 CreateAuth { get; set; }
         /// <summary>
         /// UpdateAuth 更新人id
         /// </summary>
-        public Int32 UpdateAuth { get; set; }
+        public Int64 UpdateAuth { get; set; }
         /// <summary>
         /// UserType 用户类型0：普通用户；1：超级管理员；2：普通管理员
         /// </summary>

@@ -15,7 +15,7 @@ namespace WeChatCmsCommon.Unit
         /// 如果是https网站，跨域调用静态资源需要欺骗浏览器如：http://content..../.png 改成 //content..../.png
         /// </summary>
         /// <returns></returns>
-        private static string _staticServiceUri = null;
+        private static string _staticServiceUri;
         public static string GetStaticServiceUri()
         {
             //var uri = ServiceHelper.GetStaticServiceUri();

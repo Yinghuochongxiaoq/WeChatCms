@@ -13,26 +13,42 @@ using System.ComponentModel.DataAnnotations;
 namespace WeChatModel.DatabaseModel
 {
     /// <summary>
-    /// Sysusermenu
+    /// syscontent table in MySQL5
     /// </summary>
-    public class Sysusermenu
+    public class Syscontent
     {
         /// <summary>
-        /// Id 主键
+        /// Id 
         /// </summary>
         [Key]
-        public Int32 Id { get; set; }
+        public Int64 Id { get; set; }
         /// <summary>
-        /// UserId 用户id
+        /// CreateTime 创建时间
         /// </summary>
-        public Int32 UserId { get; set; }
+        public DateTime CreateTime { get; set; }
         /// <summary>
-        /// MenuId 菜单id
+        /// CreateUserId 创建者id（sysuser表id）
         /// </summary>
-        public Int32 MenuId { get; set; }
+        public Int64 CreateUserId { get; set; }
+        /// <summary>
+        /// Title 标题
+        /// </summary>
+        public String Title { get; set; }
+        /// <summary>
+        /// Content 文章内容
+        /// </summary>
+        public String Content { get; set; }
         /// <summary>
         /// IsDel 是否已经删除0：未删除，1：已经删除
         /// </summary>
         public Int32 IsDel { get; set; }
+        /// <summary>
+        /// ContentSource 文章来源
+        /// </summary>
+        public String ContentSource { get; set; }
+        /// <summary>
+        /// ContentType 内容类型，关联文章类型
+        /// </summary>
+        public string ContentType { get; set; }
     }
 }

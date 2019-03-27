@@ -15,7 +15,7 @@
     <title>用户登录</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="" name="description" />
-    <meta content="" name="author" />
+    <meta content="qinbocai@sina.cn" name="author" />
     <link href="@Url.StaticFile("/assets/css/bootstrap.min.css")" rel="stylesheet" />
     <link href="@Url.StaticFile("/assets/css/font-awesome.min.css")" rel="stylesheet" />
     <link href="@Url.StaticFile("/assets/css/style.css")" rel="stylesheet" />
@@ -23,6 +23,24 @@
     <link href="@Url.StaticFile("/assets/css/typicons.min.css")" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="@Url.StaticFile("/content/styles/Home/admin.main.css")" />
     <link href="@Url.StaticFile("/Content/Styles/Home/supersized.css")" rel="stylesheet" />
+    <style>
+        .form-control-no-width {
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+        }
+    </style>
 </head>
 <!-- END HEAD -->
 <!-- BEGIN BODY -->
@@ -63,19 +81,26 @@
                     <span class="help-block">@Html.ValidationMessage("password")</span>
                 </div>
             </div>
+
+
+            <div class="control-group">
+                <label class="control-label visible-ie8 visible-ie9">CheckCode</label>
+                <div class="controls">
+                    <div class="input-icon left input-group-xs">
+                        <i class="fa fa-check"></i>
+                        @Html.TextBox("checkcode", string.Empty, new { @class = "form-control-no-width", placeholder = "验证码", data_val_required = "验证码不能为空", data_val = "true", style = "width:120px;vertical-align:middle" } )
+                        <img id="valiCode" style="cursor: pointer; vertical-align: middle; height: 33px; width: 107px;" src="@Url.Action("CheckCode","Auth")" alt="验证码" />
+                    </div>
+                    <span class="help-block">@Html.ValidationMessage("checkcode")</span>
+                </div>
+            </div>
+
             <div class="form-actions-submit">
                 <button type="submit" id="submitButton" class="btn pull-right btnsubmitlogin">
                     登 录 <i class="m-icon-swapright m-icon-white"></i>
                 </button>
                 <span>@Html.ValidationMessage("error") </span>
             </div>
-            @*<div class="forget-password">
-                    <h4>忘记密码 ?</h4>
-                    <p>
-                        请发送邮件 <a href="javascript:;" class="" id="forget-password">guozili@163.com</a>
-                        提出申请重设密码.
-                    </p>
-                </div>*@
             <div class="create-account dn">
                 <p>
                     Don't have an account yet ?&nbsp;
@@ -84,87 +109,6 @@
             </div>
         }
         <!-- END LOGIN FORM -->
-        <!-- BEGIN FORGOT PASSWORD FORM -->
-        <form class="form-vertical forget-form" action="index.html">
-            <h3 class="">Forget Password ?</h3>
-            <p>Enter your e-mail address below to reset your password.</p>
-            <div class="control-group">
-                <div class="controls">
-                    <div class="input-icon left">
-                        <i class="icon-envelope"></i>
-                        <input class="m-wrap placeholder-no-fix" type="text" placeholder="Email" name="email" />
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" id="back-btn" class="btn">
-                    <i class="m-icon-swapleft"></i> Back
-                </button>
-                <button type="submit" class="btn green pull-right">
-                    Submit <i class="m-icon-swapright m-icon-white"></i>
-                </button>
-            </div>
-        </form>
-        <!-- END FORGOT PASSWORD FORM -->
-        <!-- BEGIN REGISTRATION FORM -->
-        <form class="form-vertical register-form" action="index.html">
-            <h3 class="">Sign Up</h3>
-            <p>Enter your account details below:</p>
-            <div class="control-group">
-                <label class="control-label visible-ie8 visible-ie9">Username</label>
-                <div class="controls">
-                    <div class="input-icon left">
-                        <i class="icon-user"></i>
-                        <input class="m-wrap placeholder-no-fix" type="text" placeholder="Username" name="username" />
-                    </div>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label visible-ie8 visible-ie9">Password</label>
-                <div class="controls">
-                    <div class="input-icon left">
-                        <i class="icon-lock"></i>
-                        <input class="m-wrap placeholder-no-fix" type="password" id="register_password" placeholder="Password" name="password" />
-                    </div>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label visible-ie8 visible-ie9">Re-type Your Password</label>
-                <div class="controls">
-                    <div class="input-icon left">
-                        <i class="icon-ok"></i>
-                        <input class="m-wrap placeholder-no-fix" type="password" placeholder="Re-type Your Password" name="rpassword" />
-                    </div>
-                </div>
-            </div>
-            <div class="control-group">
-                <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
-                <label class="control-label visible-ie8 visible-ie9">Email</label>
-                <div class="controls">
-                    <div class="input-icon left">
-                        <i class="icon-envelope"></i>
-                        <input class="m-wrap placeholder-no-fix" type="text" placeholder="Email" name="email" />
-                    </div>
-                </div>
-            </div>
-            <div class="control-group">
-                <div class="controls">
-                    <label class="checkbox">
-                        <input type="checkbox" name="tnc" /> I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                    </label>
-                    <div id="register_tnc_error"></div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button id="register-back-btn" type="button" class="btn">
-                    <i class="m-icon-swapleft"></i>  Back
-                </button>
-                <button type="submit" id="register-submit-btn" class="btn green pull-right">
-                    Sign Up <i class="m-icon-swapright m-icon-white"></i>
-                </button>
-            </div>
-        </form>
-        <!-- END REGISTRATION FORM -->
     </div>
     <!-- END LOGIN -->
     <!-- BEGIN COPYRIGHT -->
@@ -181,39 +125,48 @@
     <script type="text/javascript" src="@Url.StaticFile("/assets/js/jquery.validate.unobtrusive.min.js")"></script>
     <script src="@Url.StaticFile("/assets/js/supersized.3.2.7.min.js")"></script>
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             App.initLogin();
             $.supersized({
 
                 // Functionality
-                slide_interval: 4000,    // Length between transitions
-                transition: 1,    // 0-None, 1-Fade, 2-Slide Top, 3-Slide Right, 4-Slide Bottom, 5-Slide Left, 6-Carousel Right, 7-Carousel Left
-                transition_speed: 1000,    // Speed of transition
-                performance: 1,    // 0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed // (Only works for Firefox/IE, not Webkit)
+                slide_interval: 4000, // Length between transitions
+                transition:
+                    1, // 0-None, 1-Fade, 2-Slide Top, 3-Slide Right, 4-Slide Bottom, 5-Slide Left, 6-Carousel Right, 7-Carousel Left
+                transition_speed: 1000, // Speed of transition
+                performance:
+                    1, // 0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed // (Only works for Firefox/IE, not Webkit)
 
                 // Size & Position
-                min_width: 0,    // Min width allowed (in pixels)
-                min_height: 0,    // Min height allowed (in pixels)
-                vertical_center: 1,    // Vertically center background
-                horizontal_center: 1,    // Horizontally center background
-                fit_always: 0,    // Image will never exceed browser width or height (Ignores min. dimensions)
-                fit_portrait: 1,    // Portrait images will not exceed browser height
-                fit_landscape: 0,    // Landscape images will not exceed browser width
+                min_width: 0, // Min width allowed (in pixels)
+                min_height: 0, // Min height allowed (in pixels)
+                vertical_center: 1, // Vertically center background
+                horizontal_center: 1, // Horizontally center background
+                fit_always: 0, // Image will never exceed browser width or height (Ignores min. dimensions)
+                fit_portrait: 1, // Portrait images will not exceed browser height
+                fit_landscape: 0, // Landscape images will not exceed browser width
 
                 // Components
-                slide_links: 'blank',    // Individual links for each slide (Options: false, 'num', 'name', 'blank')
-                slides: [    // Slideshow Images
-                                         { image: '@Url.StaticFile("/Content/Images/1.jpg")' },
-                                         { image: '@Url.StaticFile("/Content/Images/2.jpg")' },
-                                         { image: '@Url.StaticFile("/Content/Images/3.jpg")' }
+                slide_links: 'blank', // Individual links for each slide (Options: false, 'num', 'name', 'blank')
+                slides: [// Slideshow Images
+                    { image: '@Url.StaticFile("/Content/Images/1.jpg")' },
+                    { image: '@Url.StaticFile("/Content/Images/2.jpg")' },
+                    { image: '@Url.StaticFile("/Content/Images/3.jpg")' }
                 ]
 
             });
         });
-        function keyLogin() {
-            if (event.keyCode == 13)  //回车键的键值为13
-                document.getElementById("submitButton").click(); //调用登录按钮的登录事件
-        }
+    function keyLogin() {
+        if (event.keyCode == 13)  //回车键的键值为13
+            document.getElementById("submitButton").click(); //调用登录按钮的登录事件
+    }
+
+        $(function() {
+            $("#valiCode").bind("click",
+                function() {
+                    this.src = "@Url.Action("CheckCode", "Auth")" +"?time=" + (new Date()).getTime();
+                });
+        });
     </script>
     <!-- END JAVASCRIPTS -->
 </body>

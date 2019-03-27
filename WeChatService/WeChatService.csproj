@@ -44,11 +44,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountService.cs" />
+    <Compile Include="ContentService.cs" />
     <Compile Include="DbLinkTestService.cs" />
     <Compile Include="MenuService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SysDicService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">
+      <Project>{98BB60A2-9559-44CF-AFA3-A21A5569DC97}</Project>
+      <Name>WeChatCmsCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WeChatDataAccess\WeChatDataAccess.csproj">
       <Project>{A828147C-4533-4454-9733-EE198BEA42BA}</Project>
       <Name>WeChatDataAccess</Name>

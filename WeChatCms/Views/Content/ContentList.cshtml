@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "内容列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+}
+<div class="page-body">
+    <div class="widget widget-body">
+        <div class="panel panel-default">
+            <form class="panel-body" action="" id="form1">
+                <div class="form-inline control-left">
+                    <label>
+                        标题：
+                        <input type="text" v-model="model.title" name="title"
+                               id="title" placeholder="标题"
+                               class="form-control input-sm" style="min-width: 150px; width: 155px;">
+                    </label>
+
+                    <label>
+                        来源：
+                        <input type="text" name="contentSource" v-model="model.contentSource"
+                               id="contentSource" placeholder="来源"
+                               class="form-control input-sm" style="min-width: 150px; width: 165px;">
+                    </label>
+                    <label>
+                        类型：
+                        <select class="form-control input-sm" style="min-width: 150px"
+                                name="contentType" v-model="model.contentType">
+                            <option v-for="item in contentTypeNum" v-bind:value="item.Id">
+                                {{item.Lable}}
+                            </option>
+                        </select>
+                    </label>
+                    <label>
+                        日期范围：
+                        <input type="text"
+                               onfocus="WdatePicker({ maxDate: '#F{$dp.$D(\'logmax\')||\'%y-%M-%d\'}', dateFmt: 'yyyy-MM-dd HH:mm:ss', onpicking: function(dp) { searchVm.$data.model.starttime = dp.cal.getNewDateStr(); } })"
+                               id="logmin" class="form-control Wdate input-sm" style="width: 165px;"
+                               name="starttime" v-model="model.starttime">
+                        至
+                        <input type="text"
+                               onfocus="WdatePicker({ minDate: '#F{$dp.$D(\'logmin\')}', maxDate: '%y-%M-%d', dateFmt: 'yyyy-MM-dd HH:mm:ss', onpicking: function(dp) { searchVm.$data.model.endtime = dp.cal.getNewDateStr(); } })"
+                               id="logmax" class="form-control Wdate input-sm" style="width: 165px;"
+                               name="endtime" v-model="model.endtime">
+                    </label>
+                    <button type="button" onclick="LoadingActivityResultDetailDate();"
+                           class="btn btn-success" title="查询" value="查询">查询<i class="fa fa-search"></i></button>
+
+                    <button type="button" onclick="editContent(0);" class="btn btn-success" title="新增" value="新增">新增<i class="fa fa-plus"></i></button>
+                </div>
+            </form>
+        </div>
+        <div id="resultTable">
+            <table class="table table-bordered  table-hover ">
+                <thead class="flip-content bordered-palegreen">
+                    <tr class="control-center">
+                        <th>标题</th>
+                        <th>类别</th>
+                        <th>来源</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="control-center" v-for="item of dataList">
+                        <td>{{item.Title}}</td>
+                        <td>{{vueTypeContent(item.ContentType)}}</td>
+                        <td>{{item.ContentSource}}</td>
+                        <td>{{item.CreateTime}}</td>
+                        <td>
+                            <button type="button" v-on:click="vueEditContent(item.Id)"
+                                    class="btn btn-success" title="编辑" value="编辑">
+                                编辑<i class="fa fa-edit"></i>
+                            </button>
+                            <button type="button" v-on:click="vueDelContent(item.Id)"
+                                    class="btn btn-danger" title="删除" value="删除">
+                                删除<i class="fa fa-trash-o"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="pager">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
+        </div>
+    </div>
+</div>
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Assets/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/Content/contentlist.js"></script>
+}

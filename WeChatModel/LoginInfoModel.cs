@@ -10,9 +10,9 @@ namespace WeChatModel
     /// </summary>
     public class LoginInfoModel
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         public string LoginName { get; set; }
 
@@ -49,5 +49,9 @@ namespace WeChatModel
         /// 员工编号
         /// </summary>
         public string JobNumber { get; set; }
+        /// <summary>
+        /// HeadUrl 头像地址
+        /// </summary>
+        public string HeadUrl { get; set; }
     }
 }

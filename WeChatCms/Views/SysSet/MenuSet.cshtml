@@ -20,52 +20,52 @@
         }
     </style>
 }
-<div class="page-body">
-    <div class="widget widget-body">
-        <div id="resultTable">
-            <table class="table table-bordered  table-hover ">
-                <thead class="flip-content bordered-palegreen">
-                    <tr class="control-center">
-                        <th>用户名</th>
-                        <th>用户类型</th>
-                        <th>性别</th>
-                        <th>生日</th>
-                        <th>电话</th>
-                        <th>真实姓名</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="control-center" v-for="item of dataList">
-                        <td>{{item.UserName}}</td>
-                        <td>{{userTypeEnum[item.UserType]}}</td>
-                        <td>{{sexEnum[item.Sex]}}</td>
-                        <td>{{item.Birthday}}</td>
-                        <td>{{item.TelPhone}}</td>
-                        <td>{{item.TrueName}}</td>
-                        <td>
-                            <button type="button" v-on:click="vuePowerContent(item.Id,'user_tree')" class="btn btn-success" title="权限" value="权限">
-                                权限<i class="fa fa-gavel"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table width="100%">
-                <tbody>
-                    <tr>
-                        <td>
-                            <div id="pager">
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <!--当前页码-->
-            <input type="hidden" id="currentPageIndex" value="1">
-        </div>
+
+<div class="widget widget-body">
+    <div id="resultTable">
+        <table class="table table-bordered  table-hover ">
+            <thead class="flip-content bordered-palegreen">
+                <tr class="control-center">
+                    <th>用户名</th>
+                    <th>用户类型</th>
+                    <th>性别</th>
+                    <th>生日</th>
+                    <th>电话</th>
+                    <th>真实姓名</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="control-center" v-for="item of dataList">
+                    <td>{{item.UserName}}</td>
+                    <td>{{userTypeEnum[item.UserType]}}</td>
+                    <td>{{sexEnum[item.Sex]}}</td>
+                    <td>{{item.Birthday}}</td>
+                    <td>{{item.TelPhone}}</td>
+                    <td>{{item.TrueName}}</td>
+                    <td>
+                        <button type="button" v-on:click="vuePowerContent(item.Id,'user_tree')" class="btn btn-success" title="权限" value="权限">
+                            权限<i class="fa fa-gavel"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td>
+                        <div id="pager">
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!--当前页码-->
+        <input type="hidden" id="currentPageIndex" value="1">
     </div>
 </div>
+
 <!-- 模态框 -->
 <div id="detailWindow" hidden="hidden"></div>
 <div class="modal" id="powerWindow" tabindex="100"

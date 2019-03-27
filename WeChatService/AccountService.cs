@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using WeChatDataAccess;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -66,7 +65,7 @@ namespace WeChatService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public SysUser GetSysUser(int id)
+        public SysUser GetSysUser(long id)
         {
             return _accountData.GetSysUser(id);
         }

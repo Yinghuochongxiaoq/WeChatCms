@@ -37,7 +37,7 @@ namespace WeChatCms.Controllers
             return this.Content(script);
         }
 
-        public new ContentResult RefreshParentTab(string alert = null)
+        public ContentResult RefreshParentTab(string alert = null)
         {
             var script = string.Format("<script>{0}; if (window.opener != null) {{ window.opener.location.reload(); window.opener = null;window.open('', '_self', '');  window.close()}} else {{parent.location.reload(1)}}</script>", string.IsNullOrEmpty(alert) ? string.Empty : "alert('" + alert + "')");
             return this.Content(script);

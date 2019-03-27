@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Dapper;
 using FreshCommonUtility.Dapper;
 using FreshCommonUtility.SqlHelper;
-using Newtonsoft.Json;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel.DatabaseModel;
 
@@ -110,7 +106,7 @@ namespace WeChatDataAccess
                 using (var conn = SqlConnectionHelper.GetOpenConnection())
                 {
                     conn.Update(model);
-                    conn.Execute("update sysusermenu set IsDel=@Del where MenuId=@MenuId and IsDel=@NotDel",
+                    conn.Execute("update sysusermenu set IsDel=@Del where ParentId=@MenuId and IsDel=@NotDel",
                         new
                         {
                             Del = FlagEnum.HadOne.GetHashCode(),

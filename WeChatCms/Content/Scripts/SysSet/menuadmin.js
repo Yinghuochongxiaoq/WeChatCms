@@ -163,7 +163,8 @@ function editContent(id) {
  * 保存
  */
 function saveMenuInfo() {
-    var index = layer.load();
+    //加载
+    $(".loading-container").removeClass("loading-inactive");
     $.ajax("/SysSet/SaveMenuInfo", {
         type: "POST",
         data: detailVm.$data.menu_model,
@@ -174,12 +175,15 @@ function saveMenuInfo() {
                 Search(1);
             } else
                 parent.layer.msg(result.Message);
+            //取消加载
+            $(".loading-container").addClass("loading-inactive");
         },
         error: function () {
             parent.layer.msg("系统异常");
+            //取消加载
+            $(".loading-container").addClass("loading-inactive");
         }
     });
-    layer.close(index);
 }
 
 /*

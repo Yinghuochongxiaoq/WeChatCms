@@ -4,7 +4,7 @@
         <div class="navbar-container">
             <!-- Navbar Barnd -->
             <div class="navbar-header pull-left">
-                <a href="#" class="navbar-brand">
+                <a href="@Url.Action("WelCome","Home")" class="navbar-brand">
                     <small style="text-align: -webkit-center">
                         @*<img src="@(ViewBag.RootNode)/assets/img/logo.png" alt="" />*@
                         @*<img src="@(ViewBag.RootNode)/content/images/logo-big.png" />*@
@@ -50,10 +50,10 @@
                             </ul>
                             <!--/Tasks Dropdown-->
                         </li>
-                        <li>
+                        <li id="headImage">
                             <a class="login-area dropdown-toggle" data-toggle="dropdown">
                                 <div class="avatar" title="View your public profile">
-                                    <img src="@(ViewBag.RootNode)/content/images/myself.png">
+                                    <img :src="headUrl">
                                 </div>
                                 <section>
                                     <h2><span class="profile"><span>@(ViewBag.CurrentModel != null ? ViewBag.CurrentModel.DepartName : string.Empty)  @(ViewBag.CurrentModel != null ? ViewBag.CurrentModel.LoginName : string.Empty)</span></span></h2>
@@ -66,8 +66,9 @@
                                 <!--Avatar Area-->
                                 <li>
                                     <div class="avatar-area">
-                                        <img src="@(ViewBag.RootNode)/content/images/myself.png" class="avatar">
-                                        <span class="caption">修改头像</span>
+                                        <img :src="headUrl" class="avatar">
+                                        <span v-on:click="fileClick" class="caption">修改头像</span>
+                                        <input v-on:change="fileChange($event)" accept=".png,.jpg,.gif,.jpeg" type="file" id="upload_file" style="display: none">
                                     </div>
                                 </li>
                                 <!--Theme Selector Area-->
@@ -144,19 +145,19 @@
             area: ['450px', 'auto'],
 
             content: ' <div class="row" style="width: 420px;  margin-left:7px; margin-top:10px;">'
-            + '<div class="col-sm-12">'
-            + '<div class="input-group">'
-            + '<span class="input-group-addon"> 新 密 码   :</span>'
-            + '<input id="firstpwd" type="password" class="form-control" placeholder="请输入密码">'
-            + '</div>'
-            + '</div>'
-            + '<div class="col-sm-12" style="margin-top: 10px">'
-            + '<div class="input-group">'
-            + '<span class="input-group-addon">确认密码:</span>'
-            + '<input id="secondpwd" type="password" class="form-control" placeholder="请再输入一次密码">'
-            + '</div>'
-            + '</div>'
-            + '</div>'
+                + '<div class="col-sm-12">'
+                + '<div class="input-group">'
+                + '<span class="input-group-addon"> 新 密 码   :</span>'
+                + '<input id="firstpwd" type="password" class="form-control" placeholder="请输入密码">'
+                + '</div>'
+                + '</div>'
+                + '<div class="col-sm-12" style="margin-top: 10px">'
+                + '<div class="input-group">'
+                + '<span class="input-group-addon">确认密码:</span>'
+                + '<input id="secondpwd" type="password" class="form-control" placeholder="请再输入一次密码">'
+                + '</div>'
+                + '</div>'
+                + '</div>'
             ,
             btn: ['保存', '取消'],
             yes: function (index, layero) {
@@ -192,7 +193,7 @@
                         if (result && result.ResultCode == 0) {
                             parent.layer.msg(result.Message);
                         } else {
-                             parent.layer.msg("系统异常，接口请求失败");
+                            parent.layer.msg("系统异常，接口请求失败");
                         }
                         layer.close(ajaxIndex);
                         layer.close(index);
@@ -210,4 +211,63 @@
         });
         return false;
     }
+
+    //处理头像
+    var app = new Vue({
+        el: '#headImage',
+        data() {
+            return {
+                imgList: [],
+                size: 0,
+                headUrl:'@(ViewBag.CurrentModel!=null && !string.IsNullOrEmpty(ViewBag.CurrentModel.HeadUrl)?ViewBag.CurrentModel.HeadUrl: ViewBag.RootNode+"/content/images/myself.png")'
+            }
+        },
+        methods: {
+            fileClick() {
+                document.getElementById('upload_file').click();
+            },
+            fileChange(el) {
+                if (!el.target.files[0].size) return;
+                this.fileList(el.target.files);
+                el.target.value = '';
+            },
+            fileList(files) {
+                for (let i = 0; i < files.length; i++) {
+                    this.fileAdd(files[i]);
+                }
+            },
+            fileAdd(file) {
+                debugger
+                this.size = this.size + file.size; //总大小
+                var reader = new FileReader();
+                reader.vue = this;
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    file.src = this.result;
+                    this.headUrl = this.result;
+                    this.vue.imgList.push({
+                        file
+                    });
+                }
+                //上传到服务器
+                var formData = new FormData();
+                formData.append("file",file);
+                $.ajax({
+                    url: '@(ViewBag.RootNode)/SysSet/ChangeHeadImage',
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if (data && data.ResultCode == 0) {
+                            app.$data.headUrl = data.Message;
+                            layer.msg('处理成功', { icon: 1 });
+                        } else {
+                            layer.msg(data.Message, { icon: 5 });
+                        }
+                    }
+                });
+            }
+        }
+    });
 </script>

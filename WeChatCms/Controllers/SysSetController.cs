@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using FreshCommonUtility.Configure;
 using FreshCommonUtility.Security;
 using Newtonsoft.Json;
 using WeChatCmsCommon.CustomerAttribute;
@@ -472,6 +473,276 @@ namespace WeChatCms.Controllers
                     Trace.WriteLine(e);
                 }
             }
+            return Json(resultMode, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 修改头像
+        /// </summary>
+        /// <returns></returns>
+        [AuthorizeIgnore]
+        public ActionResult ChangeHeadImage()
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            if (Request.Files.Count < 1)
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件不能为空";
+                return Json(resultMode);
+            }
+            var file = Request.Files[0];
+            var uploadFileName = file?.FileName;
+            if (string.IsNullOrEmpty(uploadFileName))
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件不能为空";
+                return Json(resultMode);
+            }
+            var fileExtension = Path.GetExtension(uploadFileName).ToLower();
+            var headImageType = AppConfigurationHelper.GetString("headImageType", null) ?? ".png,.jpg,.gif,.jpeg";
+            if (!headImageType.Split(',').Select(x => x.ToLower()).Contains(fileExtension))
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件类型只能为.png,.jpg,.gif,.jpeg";
+                return Json(resultMode);
+            }
+            //默认2M
+            var imageMaxSize = AppConfigurationHelper.GetInt32("imageMaxSize", 0) <= 0 ? 2048000 : AppConfigurationHelper.GetInt32("imageMaxSize", 0);
+            if (imageMaxSize < file.ContentLength)
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件大小不能超过2M";
+                return Json(resultMode);
+            }
+            var uploadFileBytes = new byte[file.ContentLength];
+            try
+            {
+                file.InputStream.Read(uploadFileBytes, 0, file.ContentLength);
+            }
+            catch (Exception)
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件读取失败";
+                return Json(resultMode);
+            }
+            //文件保存路径
+            //"imagePathFormat": "/Uploadfile/ShareDetailImage/{yyyy}{mm}{dd}/{time}{rand:6}"
+            var imagePathFormat = AppConfigurationHelper.GetString("imagePathFormat", null);
+            imagePathFormat = string.IsNullOrEmpty(imagePathFormat)
+                ? "/Uploadfile/ShareDetailImage/{yyyy}{mm}{dd}/{time}{rand:6}"
+                : imagePathFormat;
+            var savePath = PathFormatter.Format(uploadFileName, imagePathFormat);
+            var localPath = Server.MapPath(savePath);
+            if (string.IsNullOrEmpty(localPath))
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件保存路径创建失败";
+                return Json(resultMode);
+            }
+            try
+            {
+                if (!Directory.Exists(Path.GetDirectoryName(localPath)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                }
+                System.IO.File.WriteAllBytes(localPath, uploadFileBytes);
+                resultMode.Message = savePath;
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+                //保存到数据库
+                var server = new AccountService();
+                var resetUser = server.GetSysUser(CurrentModel.Id);
+                if (resetUser == null)
+                {
+                    resultMode.Message = "用户无效";
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    return Json(resultMode, JsonRequestBehavior.AllowGet);
+                }
+                resetUser.HeadUrl = savePath;
+                server.SaveUserModel(resetUser);
+            }
+            catch (Exception)
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "文件读取失败";
+            }
+            return Json(resultMode);
+        }
+        #endregion
+
+        #region [4、字典处理]
+
+        /// <summary>
+        /// 字典管理页面
+        /// </summary>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.SysDicManage)]
+        public ActionResult SysDicManage()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 获取字典信息
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="label"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.SysDicManage)]
+        public ActionResult GetDicList(int pageIndex, int pageSize = 0, string label = null, string type = null)
+        {
+            if (pageIndex < 1)
+            {
+                pageIndex = 1;
+            }
+            pageSize = pageSize < 1 ? PageSize : pageSize;
+            var dataList = new SysDicService().GetList(label, type, pageIndex, pageSize, out var count);
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功",
+                Data = new { count, dataList }
+            };
+            return Json(resultMode, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 获取所有的分类信息
+        /// </summary>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.SysDicManage)]
+        public ActionResult GetAllDicType()
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            var server = new SysDicService();
+            var data = server.GetAllDict();
+            resultMode.Data = new
+            {
+                typeList = data?.Select(f => new
+                {
+                    f.Type
+                }).Distinct().ToList(),
+                parentList = data?.Select(r => new
+                {
+                    r.Id,
+                    r.Lable
+                }).Distinct().ToList()
+            };
+            return Json(resultMode, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 删除字典
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.SysDicManage)]
+        public ActionResult DelDicModel(string id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            var server = new SysDicService();
+            try
+            {
+                server.DelModel(id);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e);
+            }
+            return Json(resultMode, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 保存字典信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.SysDicManage)]
+        public ActionResult SaveDicInfo(SysdictModel model)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            var server = new SysDicService();
+            var saveModel = new SysdictModel();
+            if (model == null)
+            {
+                Debug.WriteLine("请求参数为空");
+                resultMode.Message = "保存失败";
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                return Json(resultMode, JsonRequestBehavior.AllowGet);
+            }
+            if (!string.IsNullOrEmpty(model.Id))
+            {
+                saveModel = server.Get(model.Id);
+                if (saveModel == null)
+                {
+                    resultMode.Message = "该记录已经被删除";
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    return Json(resultMode, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                saveModel.CreateBy = CurrentModel.Id.ToString();
+                saveModel.CreateTime = DateTime.Now;
+            }
+
+            saveModel.Id = model.Id;
+            saveModel.IsDel = FlagEnum.HadZore.GetHashCode();
+            saveModel.Lable = model.Lable;
+            saveModel.Type = model.Type;
+            saveModel.Description = model.Description;
+            saveModel.ParentId = model.ParentId;
+            saveModel.Remarks = model.Remarks;
+            saveModel.Value = model.Value;
+            saveModel.Sort = model.Sort;
+            try
+            {
+                server.SaveModel(saveModel);
+                return Json(resultMode, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                resultMode.Message = "保存失败";
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Data = e.Message;
+                return Json(resultMode, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>
+        /// 获取字典信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.SysDicManage)]
+        public ActionResult GetDicModel(string id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            var server = new SysDicService();
+            var data = server.Get(id);
+            resultMode.Data = data;
             return Json(resultMode, JsonRequestBehavior.AllowGet);
         }
         #endregion

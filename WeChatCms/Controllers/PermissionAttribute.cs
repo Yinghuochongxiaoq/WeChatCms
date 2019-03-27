@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using WeChatCmsCommon.EnumBusiness;
 
-namespace WeChatCms
+namespace WeChatCms.Controllers
 {
     /// <summary>
     /// 用于权限点认证，标记在Action上面
