@@ -123,6 +123,7 @@
     <Compile Include="CustomerAttribute\AuthorizeIgnoreAttribute.cs" />
     <Compile Include="EnumBusiness\EnumBusinessPermission.cs" />
     <Compile Include="EnumBusiness\FlagEnum.cs" />
+    <Compile Include="EnumBusiness\ResourceTypeEnum.cs" />
     <Compile Include="EnumBusiness\ResponceCodeEnum.cs" />
     <Compile Include="EnumBusiness\SexEnum.cs" />
     <Compile Include="EnumBusiness\UserTypeEnum.cs" />

@@ -57,5 +57,21 @@ namespace WeChatCmsCommon.EnumBusiness
         [Description("内容列表")]
         ContentEditList=2003,
         #endregion
+
+        #region [3、资源管理]
+
+        /// <summary>
+        /// 资源管理
+        /// </summary>
+        [Description("资源管理")]
+        ResourceManage=3001,
+
+        /// <summary>
+        /// 资源列表
+        /// </summary>
+        [Description("资源列表")]
+        ResourceList=3002,
+
+        #endregion
     }
 }

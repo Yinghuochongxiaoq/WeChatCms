@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="DatabaseModel\Syscontent.cs" />
     <Compile Include="DatabaseModel\SysdictModel.cs" />
+    <Compile Include="DatabaseModel\SysresourceModel.cs" />
     <Compile Include="DatabaseModel\SysUser.cs" />
     <Compile Include="DatabaseModel\Sysusermenu.cs" />
     <Compile Include="LoginInfoModel.cs" />

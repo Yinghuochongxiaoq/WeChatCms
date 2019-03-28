@@ -1,0 +1,148 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "资源列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section css
+{
+
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+    @*<link href="~/Content/Styles/Resource/layui.css" rel="stylesheet" />*@
+    @*<link href="~/Content/Styles/Resource/public.css" rel="stylesheet" />*@
+    <link href="/Content/Styles/Resource/resoucelist.css" rel="stylesheet" />
+}
+
+<div class="widget widget-body">
+    <div class="panel panel-default">
+        <form class="panel-body" action="" id="form1">
+            <div class="form-inline control-left">
+                <label>
+                    类型：
+                    <select class="form-control input-sm" style="min-width: 130px"
+                            name="type" v-model="resourceType">
+                        <option v-for="item in all_resource_type" v-bind:value="item.Id">
+                            {{item.name}}
+                        </option>
+                    </select>
+                </label>
+                <button type="button" onclick="LoadingActivityResultDetailDate();"
+                        class="btn btn-success" title="查询" value="查询">
+                    查询<i class="fa fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div id="resultTable">
+        <div class="form-inline control-left">
+            <div class="checkbox">
+                <label>
+                    <input class="colored-danger" name="form-field-checkbox" type="checkbox" :checked="dataIds.length === dataList.length && dataList.length!=0" v-on:click='checkedAll()'>
+                    <span class="text">全选</span>
+                </label>
+            </div>
+            <button type="button" v-on:click="vueDelAll()" :disabled="!dataIds.length>0" class="btn btn-danger" title="批量删除" value="批量删除">
+                批量删除<i class="fa fa-trash-o"></i>
+            </button>
+            <button type="button" onclick="newResource();" class="btn btn-success" title="上传新图片" value="上传新图片">上传新图片<i class="fa fa-plus"></i></button>
+        </div>
+        <ul id="Images">
+            <li v-for="item of dataList">
+                <img :src="item.ResourceUrl" style="height: 176px;" :alt="item.ResourceRemark">
+                <div class="operate">
+                    <div class="check">
+                        <div class="checkbox">
+                            <label>
+                                <input class="colored-danger" :checked="dataIds.indexOf(item.Id)>=0" name="form-field-checkbox" type="checkbox" v-on:click="checkedOne(item.Id)">
+                                <span class="text">{{item.ResourceRemark}}</span>
+                            </label>
+                        </div>
+                    </div><i class="fa fa-trash-o img_del" v-on:click="vueDelCostContent(item.Id)"></i>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <table width="100%">
+        <tbody>
+            <tr>
+                <td>
+                    <div id="pager">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!--当前页码-->
+    <input type="hidden" id="currentPageIndex" value="1">
+</div>
+
+<!-- 模态框 -->
+<div class="modal" id="detailWindow" tabindex="100"
+     role="dialog" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="padding: 0px;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="margin-right: 10px;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+                </button>
+                <h3 class="modal-title">新增</h3>
+            </div>
+            <form id="acForm">
+                <div class="modal-body form-horizontal"
+                     style="padding: 0px; background-color: #fff; min-height: 350px;">
+                    <div class="col-md-12" style="margin-top: 25px;">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">资源类型：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control input-sm" name="ResourceType" v-model="detail_model.ResourceType">
+                                    <option v-for="item in all_resource_type" v-bind:value="item.Id">
+                                        {{item.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">图片：</label>
+                            <div class="col-sm-8">
+                                <img v-on:click="fileClick" :src="detail_model.ResourceUrl" width="100px" height="100px" />
+                                <input v-on:change="fileChange($event)" accept=".png,.jpg,.gif,.jpeg" type="file" id="resource_upload_file" style="display: none">
+                                <input name="ResourceUrl" class="form-control input-sm" type="hidden" v-model="detail_model.ResourceUrl">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">资源备注：</label>
+                            <div class="col-sm-8">
+                                <input autocomplete="off" type="text" v-model="detail_model.ResourceRemark" name="ResourceRemark" class="form-control input-sm" placeholder="资源备注" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">排序值：</label>
+                            <div class="col-sm-8">
+                                <input name="Sort" class="form-control input-sm"
+                                       type="number" v-model="detail_model.Sort" placeholder="排序值">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">
+                        <i class="fa fa-close"></i>关闭
+                    </button>
+                    <button type="button" onclick="saveDataInfo();" class="btn btn-primary">
+                        <i class="fa fa-save"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框end -->
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/SysResource/sysresource.js"></script>
+}

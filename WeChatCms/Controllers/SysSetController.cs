@@ -483,6 +483,41 @@ namespace WeChatCms.Controllers
         [AuthorizeIgnore]
         public ActionResult ChangeHeadImage()
         {
+            var resultMode = PutFile();
+            if (resultMode.ResultCode == ResponceCodeEnum.Success)
+            {
+                //保存到数据库
+                var server = new AccountService();
+                var resetUser = server.GetSysUser(CurrentModel.Id);
+                if (resetUser == null)
+                {
+                    resultMode.Message = "用户无效";
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    return Json(resultMode, JsonRequestBehavior.AllowGet);
+                }
+                resetUser.HeadUrl = resultMode.Message;
+                server.SaveUserModel(resetUser);
+            }
+            return Json(resultMode);
+        }
+
+        /// <summary>
+        /// 保存数据到数据库中
+        /// </summary>
+        /// <returns></returns>
+        [AuthorizeIgnore]
+        public ActionResult PutImageToSys()
+        {
+            var resultMode = PutFile();
+            return Json(resultMode);
+        }
+
+        /// <summary>
+        /// 保存文件
+        /// </summary>
+        /// <returns></returns>
+        private ResponseBaseModel<dynamic> PutFile()
+        {
             var resultMode = new ResponseBaseModel<dynamic>
             {
                 ResultCode = ResponceCodeEnum.Success,
@@ -492,7 +527,7 @@ namespace WeChatCms.Controllers
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件不能为空";
-                return Json(resultMode);
+                return resultMode;
             }
             var file = Request.Files[0];
             var uploadFileName = file?.FileName;
@@ -500,7 +535,7 @@ namespace WeChatCms.Controllers
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件不能为空";
-                return Json(resultMode);
+                return resultMode;
             }
             var fileExtension = Path.GetExtension(uploadFileName).ToLower();
             var headImageType = AppConfigurationHelper.GetString("headImageType", null) ?? ".png,.jpg,.gif,.jpeg";
@@ -508,7 +543,7 @@ namespace WeChatCms.Controllers
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件类型只能为.png,.jpg,.gif,.jpeg";
-                return Json(resultMode);
+                return resultMode;
             }
             //默认2M
             var imageMaxSize = AppConfigurationHelper.GetInt32("imageMaxSize", 0) <= 0 ? 2048000 : AppConfigurationHelper.GetInt32("imageMaxSize", 0);
@@ -516,7 +551,7 @@ namespace WeChatCms.Controllers
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件大小不能超过2M";
-                return Json(resultMode);
+                return resultMode;
             }
             var uploadFileBytes = new byte[file.ContentLength];
             try
@@ -527,7 +562,7 @@ namespace WeChatCms.Controllers
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件读取失败";
-                return Json(resultMode);
+                return resultMode;
             }
             //文件保存路径
             //"imagePathFormat": "/Uploadfile/ShareDetailImage/{yyyy}{mm}{dd}/{time}{rand:6}"
@@ -541,7 +576,7 @@ namespace WeChatCms.Controllers
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件保存路径创建失败";
-                return Json(resultMode);
+                return resultMode;
             }
             try
             {
@@ -552,24 +587,14 @@ namespace WeChatCms.Controllers
                 System.IO.File.WriteAllBytes(localPath, uploadFileBytes);
                 resultMode.Message = savePath;
                 resultMode.ResultCode = ResponceCodeEnum.Success;
-                //保存到数据库
-                var server = new AccountService();
-                var resetUser = server.GetSysUser(CurrentModel.Id);
-                if (resetUser == null)
-                {
-                    resultMode.Message = "用户无效";
-                    resultMode.ResultCode = ResponceCodeEnum.Fail;
-                    return Json(resultMode, JsonRequestBehavior.AllowGet);
-                }
-                resetUser.HeadUrl = savePath;
-                server.SaveUserModel(resetUser);
             }
             catch (Exception)
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
                 resultMode.Message = "文件读取失败";
             }
-            return Json(resultMode);
+
+            return resultMode;
         }
         #endregion
 

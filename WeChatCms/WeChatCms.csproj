@@ -158,6 +158,7 @@
     <Compile Include="Controllers\ControllerBase.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PermissionAttribute.cs" />
+    <Compile Include="Controllers\SysResourceController.cs" />
     <Compile Include="Controllers\SysSetController.cs" />
     <Compile Include="Controllers\VMEJsonResult.cs" />
     <Compile Include="Global.asax.cs">
@@ -293,6 +294,15 @@
     <Content Include="Assets\js\jquery-ui-1.10.4.custom.js" />
     <Content Include="Assets\js\jquery.blockui.js" />
     <Content Include="Assets\js\knob\jquery.knob.js" />
+    <Content Include="Assets\js\layer\layer.js" />
+    <Content Include="Assets\js\layer\mobile\layer.js" />
+    <Content Include="Assets\js\layer\mobile\need\layer.css" />
+    <Content Include="Assets\js\layer\theme\default\icon-ext.png" />
+    <Content Include="Assets\js\layer\theme\default\icon.png" />
+    <Content Include="Assets\js\layer\theme\default\layer.css" />
+    <Content Include="Assets\js\layer\theme\default\loading-0.gif" />
+    <Content Include="Assets\js\layer\theme\default\loading-1.gif" />
+    <Content Include="Assets\js\layer\theme\default\loading-2.gif" />
     <Content Include="Assets\js\My97DatePicker\calendar.js" />
     <Content Include="Assets\js\My97DatePicker\lang\en.js" />
     <Content Include="Assets\js\My97DatePicker\lang\zh-cn.js" />
@@ -348,29 +358,23 @@
     <Content Include="Content\Images\repeat.png" />
     <Content Include="Content\Images\rewind.png" />
     <Content Include="Content\Images\shuffle.png" />
+    <Content Include="Content\Images\upload.png" />
     <Content Include="Content\Images\volume.png" />
     <Content Include="Assets\js\supersized.3.2.7.min.js" />
     <Content Include="Assets\js\jquery.validate.min.js" />
     <Content Include="Assets\js\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\Scripts\Content\contentedit.js" />
     <Content Include="Content\Scripts\Content\contentlist.js" />
+    <Content Include="Content\Scripts\SysResource\sysresource.js" />
     <Content Include="Content\Scripts\SysSet\menuadmin.js" />
     <Content Include="Content\Scripts\SysSet\menuset.js" />
     <Content Include="Content\Scripts\SysSet\menuusers.js" />
     <Content Include="Content\Scripts\SysSet\sysdic.js" />
     <Content Include="Content\Styles\Home\admin.main.css" />
     <Content Include="Content\Styles\Home\supersized.css" />
+    <Content Include="Content\Styles\Resource\resoucelist.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Assets\js\layer\extend\layer.ext.js" />
-    <Content Include="Assets\js\layer\layer.js" />
-    <Content Include="Assets\js\layer\skin\default\icon-ext.png" />
-    <Content Include="Assets\js\layer\skin\default\icon.png" />
-    <Content Include="Assets\js\layer\skin\default\loading-0.gif" />
-    <Content Include="Assets\js\layer\skin\default\loading-1.gif" />
-    <Content Include="Assets\js\layer\skin\default\loading-2.gif" />
-    <Content Include="Assets\js\layer\skin\layer.css" />
-    <Content Include="Assets\js\layer\skin\layer.ext.css" />
     <Content Include="App_Data\Config\AppSettings.config" />
     <Content Include="Assets\fonts\fontawesome-webfont.eot" />
     <Content Include="Assets\fonts\fontawesome-webfont.ttf" />
@@ -698,6 +702,7 @@
     <Content Include="Views\Content\ContentEdit.cshtml" />
     <Content Include="Views\Content\ContentList.cshtml" />
     <Content Include="Views\SysSet\SysDicManage.cshtml" />
+    <Content Include="Views\SysResource\ResourceList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

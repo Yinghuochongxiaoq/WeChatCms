@@ -1,0 +1,59 @@
+﻿/*图片管理*/
+#Images {
+    padding: 0;
+}
+
+    #Images li {
+        width: 19%;
+        margin: 0.5% 0.5%;
+        float: left;
+        overflow: hidden;
+        border: 1px solid #ece3e3;
+    }
+
+        #Images li img {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        #Images li .operate {
+            display: block;
+            height: 40px;
+            width: 100%;
+            background: #f4f5f9;
+        }
+
+            #Images li .operate .check {
+                float: left;
+                width: 74%;
+                position: relative;
+            }
+
+            #Images li .operate .img_del {
+                float: right;
+                margin: 9px 11px 0 0;
+                font-size: 22px !important;
+                cursor: pointer;
+            }
+
+                #Images li .operate .img_del:hover {
+                    color: #f00;
+                }
+
+@media screen and (max-width:1050px) {
+    #Images li {
+        width: 24%;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    #Images li {
+        width: 49%;
+    }
+}
+
+@media screen and (max-width:432px) {
+    #Images li {
+        width: 99%;
+    }
+}
