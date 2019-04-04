@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "留言信息";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+}
+<div class="page-body">
+    <div class="widget widget-body">
+        <div class="panel panel-default">
+            <form class="panel-body" action="" id="form1">
+                <div class="form-inline control-left">
+                    <label>
+                        处理状态：
+                        <select class="form-control input-sm" style="min-width: 130px"
+                                name="type" v-model="model.hasDeal">
+                            <option v-for="item in contentTypeNum" v-bind:value="item.id">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </label>
+                    <label>
+                        日期范围：
+                        <input type="text"
+                               onfocus="WdatePicker({ maxDate: '#F{$dp.$D(\'logmax\')||\'%y-%M-%d\'}', dateFmt: 'yyyy-MM-dd HH:mm:ss', onpicking: function(dp) { searchVm.$data.model.starttime = dp.cal.getNewDateStr(); } })"
+                               id="logmin" class="form-control Wdate input-sm" style="width: 165px;"
+                               name="starttime" v-model="model.starttime">
+                        至
+                        <input type="text"
+                               onfocus="WdatePicker({ minDate: '#F{$dp.$D(\'logmin\')}', maxDate: '%y-%M-%d', dateFmt: 'yyyy-MM-dd HH:mm:ss', onpicking: function(dp) { searchVm.$data.model.endtime = dp.cal.getNewDateStr(); } })"
+                               id="logmax" class="form-control Wdate input-sm" style="width: 165px;"
+                               name="endtime" v-model="model.endtime">
+                    </label>
+                    <button type="button" onclick="LoadingActivityResultDetailDate();"
+                            class="btn btn-success" title="查询" value="查询">
+                        查询<i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div id="resultTable">
+            <table class="table table-bordered  table-hover ">
+                <thead class="flip-content bordered-palegreen">
+                    <tr class="control-center">
+                        <th>姓名</th>
+                        <th>电话</th>
+                        <th>邮箱</th>
+                        <th>留言</th>
+                        <th>处理状态</th>
+                        <th>处理结果</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="control-center" v-for="item of dataList">
+                        <td>{{item.CustomerName}}</td>
+                        <td>{{item.CustomerPhone}}</td>
+                        <td>{{item.CustomerEmail}}</td>
+                        <td>{{item.Content}}</td>
+                        <td>{{vueTypeContent(item.HasDeal)}}</td>
+                        <td>{{item.DealResult}}</td>
+                        <td>{{item.CreateTime}}</td>
+                        <td>
+                            <button type="button" v-on:click="dealCommont(item.Id)"
+                                    class="btn btn-success" title="处理" value="处理">
+                                处理<i class="fa fa-edit"></i>
+                            </button>
+                            <button type="button" v-on:click="vueDelContent(item.Id)"
+                                    class="btn btn-danger" title="删除" value="删除">
+                                删除<i class="fa fa-trash-o"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="pager">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
+        </div>
+    </div>
+</div>
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Assets/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/CustomerComment/customercomment.js"></script>
+}
+

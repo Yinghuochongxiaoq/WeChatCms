@@ -73,5 +73,35 @@ namespace WeChatCmsCommon.EnumBusiness
         ResourceList=3002,
 
         #endregion
+
+        #region [4、广告配置]
+
+        /// <summary>
+        /// 广告配置
+        /// </summary>
+        [Description("广告配置")]
+        AdvertiseManage = 4001,
+
+        /// <summary>
+        /// 广告列表
+        /// </summary>
+        [Description("广告列表")]
+        AdvertiseList = 4002,
+        #endregion
+
+        #region [5、留言管理]
+
+        /// <summary>
+        /// 留言管理
+        /// </summary>
+        [Description("留言管理")]
+        CustomerCommentManage = 5001,
+
+        /// <summary>
+        /// 留言列表
+        /// </summary>
+        [Description("留言列表")]
+        CustomerCommentList = 5002,
+        #endregion
     }
 }

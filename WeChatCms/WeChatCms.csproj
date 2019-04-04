@@ -156,8 +156,10 @@
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\ControllerBase.cs" />
+    <Compile Include="Controllers\CustomerCommentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PermissionAttribute.cs" />
+    <Compile Include="Controllers\SysAdvertiseController.cs" />
     <Compile Include="Controllers\SysResourceController.cs" />
     <Compile Include="Controllers\SysSetController.cs" />
     <Compile Include="Controllers\VMEJsonResult.cs" />
@@ -175,6 +177,7 @@
     <Compile Include="UEditor\net\App_Code\UploadHandler.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\sensitive.txt" />
     <Content Include="Assets\css\4095-rtl.min.css" />
     <Content Include="Assets\css\animate.min.css" />
     <Content Include="Assets\css\beyond-rtl.min.css" />
@@ -365,6 +368,8 @@
     <Content Include="Assets\js\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\Scripts\Content\contentedit.js" />
     <Content Include="Content\Scripts\Content\contentlist.js" />
+    <Content Include="Content\Scripts\CustomerComment\customercomment.js" />
+    <Content Include="Content\Scripts\SysAdvertise\sysadvertise.js" />
     <Content Include="Content\Scripts\SysResource\sysresource.js" />
     <Content Include="Content\Scripts\SysSet\menuadmin.js" />
     <Content Include="Content\Scripts\SysSet\menuset.js" />
@@ -703,6 +708,8 @@
     <Content Include="Views\Content\ContentList.cshtml" />
     <Content Include="Views\SysSet\SysDicManage.cshtml" />
     <Content Include="Views\SysResource\ResourceList.cshtml" />
+    <Content Include="Views\CustomerComment\CustomerCommentList.cshtml" />
+    <Content Include="Views\SysAdvertise\SysAdvertiseList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

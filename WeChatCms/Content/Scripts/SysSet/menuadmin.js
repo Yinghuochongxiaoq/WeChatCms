@@ -27,7 +27,8 @@ pager.render();
 var searchVm = new Vue({
     el: '#form1',
     data: {
-        pageIndex: 1
+        pageIndex: pager.index,
+        pageSize: pager.size
     }
 });
 
