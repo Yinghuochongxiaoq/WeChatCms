@@ -52,7 +52,7 @@ namespace WeChatService
         /// <param name="pageSize"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public List<Syscontent> GetList(string title, string starttime , string endtime , int contentType, string contentSource ,int indexPage, int pageSize, out int count)
+        public List<Syscontent> GetList(string title, string starttime , string endtime , string contentType, string contentSource ,int indexPage, int pageSize, out int count)
         {
             count = _dataAccess.GetCount(title,starttime,endtime,contentType,contentSource);
             return _dataAccess.GetModels(title, starttime, endtime, contentType, contentSource,indexPage, pageSize);

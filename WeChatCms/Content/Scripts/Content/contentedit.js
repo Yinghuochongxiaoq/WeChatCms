@@ -19,7 +19,9 @@ var detailVm = new Vue({
             Title: "",
             ContentType: "",
             Content: "",
-            ContentSource: ""
+            ContentSource: "",
+            ContentFlag: "",
+            Introduction:""
         },
         all_type_list: []
     }

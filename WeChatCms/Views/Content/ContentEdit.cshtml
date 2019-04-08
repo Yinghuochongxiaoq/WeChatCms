@@ -14,6 +14,14 @@
             <input id="shareTheme" autocomplete="off" type="text" v-model="content_model.Title" name="contentTitle" placeholder="输入内容标题" style="min-width: 150px; width: 80%;" class="form-control input-sm" />
         </p>
         <p class="form-inline margin-10">
+            内容简介：
+            <input id="Introduction" autocomplete="off" type="text" v-model="content_model.Introduction" name="Introduction" placeholder="输入内容简介" style="min-width: 150px; width: 80%;" class="form-control input-sm" />
+        </p>
+        <p class="form-inline margin-10">
+            内容标签：
+            <input id="ContentFlag" autocomplete="off" type="text" v-model="content_model.ContentFlag" name="ContentFlag" placeholder="输入内容标签" style="min-width: 150px; width: 80%;" class="form-control input-sm" />
+        </p>
+        <p class="form-inline margin-10">
             内容类型：
             <select class="form-control input-sm" style="min-width: 150px; width: 80%;"
                     name="ContentType" v-model="content_model.ContentType">

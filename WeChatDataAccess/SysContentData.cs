@@ -56,7 +56,7 @@ namespace WeChatDataAccess
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public List<Syscontent> GetModels(string title, string starttime, string endtime, int contentType, string contentSource, int pageIndex, int pageSize)
+        public List<Syscontent> GetModels(string title, string starttime, string endtime, string contentType, string contentSource, int pageIndex, int pageSize)
         {
             var where = new StringBuilder(" where IsDel=@IsDel ");
             if (!string.IsNullOrEmpty(title))
@@ -74,7 +74,7 @@ namespace WeChatDataAccess
                 where.Append(" and CreateTime< @EndTime ");
             }
 
-            if (contentType > 0)
+            if (!string.IsNullOrEmpty(contentType))
             {
                 where.Append(" and ContentType=@ContentType ");
             }
@@ -102,7 +102,7 @@ namespace WeChatDataAccess
         /// 获取总记录数
         /// </summary>
         /// <returns></returns>
-        public int GetCount(string title, string starttime, string endtime, int contentType, string contentSource)
+        public int GetCount(string title, string starttime, string endtime, string contentType, string contentSource)
         {
             var where = new StringBuilder(" where IsDel=@IsDel ");
             if (!string.IsNullOrEmpty(title))
@@ -120,7 +120,7 @@ namespace WeChatDataAccess
                 where.Append(" and CreateTime< @EndTime ");
             }
 
-            if (contentType > 0)
+            if (!string.IsNullOrEmpty(contentType))
             {
                 where.Append(" and ContentType=@ContentType ");
             }

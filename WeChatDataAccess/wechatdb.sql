@@ -11,7 +11,7 @@
  Target Server Version : 50724
  File Encoding         : 65001
 
- Date: 04/04/2019 18:21:20
+ Date: 08/04/2019 17:03:59
 */
 
 SET NAMES utf8mb4;
@@ -66,14 +66,16 @@ CREATE TABLE `syscontent`  (
   `IsDel` int(255) NULL DEFAULT 0 COMMENT '是否已经删除0：未删除，1：已经删除',
   `ContentSource` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文章来源',
   `ContentType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '内容类型，关联文章类型',
+  `Introduction` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '简介',
+  `ContentFlag` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '标签',
   PRIMARY KEY (`Id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of syscontent
 -- ----------------------------
-INSERT INTO `syscontent` VALUES (1, '2019-03-22 14:03:04', 1, '五一放假调整通知', '<p>&nbsp; &nbsp; &nbsp; &nbsp;五一放假调整通知专题为您提供最新最全的五一放假调整通知相关法律知识，以及提供全国各地的五一放假调整通知最快捷律师在线为您提供相关的法律咨询.<br/></p>', 0, '华律网', '75b25bc195304ac381d95ebb00836be4');
-INSERT INTO `syscontent` VALUES (2, '2019-03-23 15:58:42', 1, '根据数组对象的某个属性值找到指定的元素', '<p><span style=\"color: rgb(47, 47, 47); font-family: -apple-system, &quot;SF UI Text&quot;, Arial, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;, &quot;Microsoft YaHei&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-weight: 700; background-color: rgb(255, 255, 255);\">filter() 方法将匹配元素集合缩减为匹配指定选择器的元素.该方法不改变原数组,返回的是筛选后满足条件的数组.</span></p><p><br/></p><pre class=\"brush:js;toolbar:false\">var&nbsp;datas&nbsp;=&nbsp;[\n&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;name&quot;:&nbsp;&quot;商品房&quot;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;bianma&quot;:&nbsp;&quot;11&quot;\n&nbsp;&nbsp;&nbsp;&nbsp;},\n&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;name&quot;:&nbsp;&quot;商铺&quot;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;bianma&quot;:&nbsp;&quot;12&quot;\n&nbsp;&nbsp;&nbsp;&nbsp;}\n&nbsp;]\n&nbsp;var&nbsp;data=&nbsp;datas.filter(function(item){&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;item.bianma&nbsp;==&nbsp;&quot;12&quot;;&nbsp;\n})console.log(data);&nbsp;//&nbsp;[{name:&nbsp;&quot;商铺&quot;,&nbsp;bianma:&nbsp;&quot;12&quot;}]</pre><p><br/></p>', 0, '断线の风筝', '75b25bc195304ac381d95ebb00836be4');
+INSERT INTO `syscontent` VALUES (1, '2019-03-22 14:03:04', 1, '五一放假调整通知', '<p>&nbsp; &nbsp; &nbsp; &nbsp;五一放假调整通知专题为您提供最新最全的五一放假调整通知相关法律知识，以及提供全国各地的五一放假调整通知最快捷律师在线为您提供相关的法律咨询.<br/></p>', 0, '华律网', '75b25bc195304ac381d95ebb00836be4', NULL, NULL);
+INSERT INTO `syscontent` VALUES (2, '2019-03-23 15:58:42', 1, '根据数组对象的某个属性值找到指定的元素', '<p><span style=\"color: rgb(47, 47, 47); font-family: -apple-system, &quot;SF UI Text&quot;, Arial, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;, &quot;Microsoft YaHei&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-weight: 700; background-color: rgb(255, 255, 255);\">filter() 方法将匹配元素集合缩减为匹配指定选择器的元素.该方法不改变原数组,返回的是筛选后满足条件的数组.</span></p><p><br/></p><pre class=\"brush:js;toolbar:false\">var&nbsp;datas&nbsp;=&nbsp;[\n&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;name&quot;:&nbsp;&quot;商品房&quot;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;bianma&quot;:&nbsp;&quot;11&quot;\n&nbsp;&nbsp;&nbsp;&nbsp;},\n&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;name&quot;:&nbsp;&quot;商铺&quot;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;bianma&quot;:&nbsp;&quot;12&quot;\n&nbsp;&nbsp;&nbsp;&nbsp;}\n&nbsp;]\n&nbsp;var&nbsp;data=&nbsp;datas.filter(function(item){&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;item.bianma&nbsp;==&nbsp;&quot;12&quot;;&nbsp;\n})console.log(data);&nbsp;//&nbsp;[{name:&nbsp;&quot;商铺&quot;,&nbsp;bianma:&nbsp;&quot;12&quot;}]</pre><p><br/></p>', 0, '断线の风筝', '75b25bc195304ac381d95ebb00836be4', 'filter() 方法将匹配元素集合缩减为匹配指定选择器的元素.该方法不改变原数组,返回的是筛选后满足条件的数组.', 'filter');
 
 -- ----------------------------
 -- Table structure for sysdict

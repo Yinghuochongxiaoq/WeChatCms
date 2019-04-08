@@ -50,5 +50,13 @@ namespace WeChatModel.DatabaseModel
         /// ContentType 内容类型，关联文章类型
         /// </summary>
         public string ContentType { get; set; }
+        /// <summary>
+        /// 简介
+        /// </summary>
+        public string Introduction { get; set; }
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public string ContentFlag { get; set; }
     }
 }

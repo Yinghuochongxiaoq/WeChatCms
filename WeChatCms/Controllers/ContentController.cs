@@ -85,6 +85,8 @@ namespace WeChatCms.Controllers
                 oldModel.Content = model.Content;
                 oldModel.ContentSource = model.ContentSource;
                 oldModel.ContentType = model.ContentType;
+                oldModel.ContentFlag = model.ContentFlag;
+                oldModel.Introduction = model.Introduction;
                 oldModel.Title = model.Title;
                 id = server.AddAndUpdateContentInfo(oldModel);
             }
@@ -151,7 +153,7 @@ namespace WeChatCms.Controllers
         /// <param name="contentSource"></param>
         /// <returns></returns>
         [Permission(EnumBusinessPermission.ContentEditList)]
-        public ActionResult GetList(int pageIndex, int pageSize = 0, string title = null, string starttime = null, string endtime = null, int contentType = 0, string contentSource = null)
+        public ActionResult GetList(int pageIndex, int pageSize = 0, string title = null, string starttime = null, string endtime = null, string contentType = null, string contentSource = null)
         {
             if (pageIndex < 1)
             {
