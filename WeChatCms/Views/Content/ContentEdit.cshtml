@@ -31,6 +31,20 @@
             </select>
         </p>
         <p class="form-inline margin-10">
+            封面图片：
+            <img v-on:click="fileClick(0)" :src="initImageUrl(content_model.ContentDisImage,0)" width="64px" height="64px" />
+            <input v-on:change="fileChange($event,0)" accept=".png,.jpg,.gif,.jpeg" type="file" id="resource_upload_file" style="display: none">
+            <input name="ContentDisImage" class="form-control input-sm" type="hidden" v-model="content_model.ContentDisImage">
+        </p>
+        <p class="form-inline margin-10">
+            内容附件：
+            <img v-on:click="fileClick(1)" :src="initImageUrl(content_model.AttachmentFile,1)" width="64px" height="64px" />
+            <input v-on:change="fileChange($event,1)" accept=".rar,.zip,.txt,.tar,.gz" type="file" id="attache_button" style="display: none">
+            <input name="AttachmentFile" class="form-control input-sm" type="hidden" v-model="content_model.AttachmentFile">
+            <span>文件名称：{{content_model.AttachmentFileName}}</span>
+            <span>文件大小：{{content_model.AttachmentFileSize}}KB</span>
+        </p>
+        <p class="form-inline margin-10">
             <script id="shareContent" name="shareContent" type="text/plain" style="width: 100%; height: 300px;">
             </script>
         </p>

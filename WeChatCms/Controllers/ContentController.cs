@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Web.Mvc;
+using FreshCommonUtility.DataConvert;
+using FreshCommonUtility.Web;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -71,6 +73,11 @@ namespace WeChatCms.Controllers
                 return Json(resultMode, JsonRequestBehavior.AllowGet);
             }
 
+            if (string.IsNullOrEmpty(model.Introduction))
+            {
+                var introduction = FilterHtmlHelper.NoHtml(model.Content);
+                model.Introduction = introduction.Substring(0, 200);
+            }
             var server = new ContentService();
             long id;
             if (model.Id > 0)
@@ -88,6 +95,10 @@ namespace WeChatCms.Controllers
                 oldModel.ContentFlag = model.ContentFlag;
                 oldModel.Introduction = model.Introduction;
                 oldModel.Title = model.Title;
+                oldModel.ContentDisImage = model.ContentDisImage;
+                oldModel.AttachmentFile = model.AttachmentFile;
+                oldModel.AttachmentFileName = model.AttachmentFileName;
+                oldModel.AttachmentFileSize = model.AttachmentFileSize;
                 id = server.AddAndUpdateContentInfo(oldModel);
             }
             else

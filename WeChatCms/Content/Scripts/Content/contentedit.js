@@ -21,9 +21,101 @@ var detailVm = new Vue({
             Content: "",
             ContentSource: "",
             ContentFlag: "",
-            Introduction:""
+            Introduction: "",
+            ContentDisImage: "",
+            AttachmentFile: "",
+            AttachmentFileSize: "",
+            AttachmentFileName: ""
         },
         all_type_list: []
+    },
+    methods: {
+        initImageUrl(url, type) {
+            if (type == 1) {
+                return '/Content/Images/attach_64.png';
+            } else if (type == 0) {
+                if (url) return url;
+                return '/Content/Images/upload.png';
+            }
+        },
+        fileClick(type) {
+            if (type == 0) {
+                document.getElementById('resource_upload_file').click();
+            } else if (type == 1) {
+                document.getElementById('attache_button').click();
+            }
+        },
+        fileChange(el, type) {
+            if (!el.target.files[0].size) return;
+            this.fileList(el.target.files, type);
+            el.target.value = '';
+        },
+        fileList(files, type) {
+            for (let i = 0; i < files.length; i++) {
+                if (type == 0) {
+                    this.fileAdd(files[i]);
+                }
+                else if (type == 1) {
+                    this.attacheFileAdd(files[i]);
+                }
+
+            }
+        },
+        fileAdd(file) {
+            var reader = new FileReader();
+            reader.vue = this;
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                file.src = this.result;
+            }
+            //上传到服务器
+            var formData = new FormData();
+            formData.append("file", file);
+            $.ajax({
+                url: '/SysSet/PutImageToSys',
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data && data.ResultCode == 0) {
+                        detailVm.$data.content_model.ContentDisImage = data.Message;
+                        layer.msg('上传成功', { icon: 1 });
+                    } else {
+                        layer.msg(data.Message, { icon: 5 });
+                    }
+                }
+            });
+        },
+        attacheFileAdd(file) {
+            var reader = new FileReader();
+            reader.vue = this;
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                file.src = this.result;
+            }
+            //上传到服务器
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("type", "1");
+            $.ajax({
+                url: '/SysSet/PutImageToSys',
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data && data.ResultCode == 0) {
+                        detailVm.$data.content_model.AttachmentFile = data.Message;
+                        detailVm.$data.content_model.AttachmentFileName = data.Data.oldName;
+                        detailVm.$data.content_model.AttachmentFileSize = data.Data.fileSize;
+                        layer.msg('上传成功', { icon: 1 });
+                    } else {
+                        layer.msg(data.Message, { icon: 5 });
+                    }
+                }
+            });
+        }
     }
 });
 

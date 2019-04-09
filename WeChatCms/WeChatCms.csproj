@@ -341,6 +341,7 @@
     <Content Include="Content\Images\2.jpg" />
     <Content Include="Content\Images\3.jpg" />
     <Content Include="Content\Images\404.jpg" />
+    <Content Include="Content\Images\attach_64.png" />
     <Content Include="Content\Images\avatar.gif" />
     <Content Include="Content\Images\error.gif" />
     <Content Include="Content\Images\error.png" />
@@ -348,8 +349,6 @@
     <Content Include="Content\Images\honehone_clock_tr.swf" />
     <Content Include="Content\Images\loading.gif" />
     <Content Include="Content\Images\loadingAnimation.gif" />
-    <Content Include="Content\Images\logo-big.png" />
-    <Content Include="Content\Images\logo-big2.png" />
     <Content Include="Content\Images\logo.ico" />
     <Content Include="Content\Images\logo.png" />
     <Content Include="Content\Images\mute.png" />

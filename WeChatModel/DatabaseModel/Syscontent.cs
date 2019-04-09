@@ -58,5 +58,21 @@ namespace WeChatModel.DatabaseModel
         /// 标签
         /// </summary>
         public string ContentFlag { get; set; }
+        /// <summary>
+        /// 文章配图
+        /// </summary>
+        public string ContentDisImage { get; set; }
+        /// <summary>
+        /// 附件文件地址
+        /// </summary>
+        public string AttachmentFile { get; set; }
+        /// <summary>
+        /// 附件大小
+        /// </summary>
+        public string AttachmentFileSize { get; set; }
+        /// <summary>
+        /// 附件名称
+        /// </summary>
+        public string AttachmentFileName { get; set; }
     }
 }

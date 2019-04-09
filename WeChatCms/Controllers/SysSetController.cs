@@ -506,9 +506,9 @@ namespace WeChatCms.Controllers
         /// </summary>
         /// <returns></returns>
         [AuthorizeIgnore]
-        public ActionResult PutImageToSys()
+        public ActionResult PutImageToSys(string type = null)
         {
-            var resultMode = PutFile();
+            var resultMode = PutFile(type);
             return Json(resultMode);
         }
 
@@ -516,7 +516,7 @@ namespace WeChatCms.Controllers
         /// 保存文件
         /// </summary>
         /// <returns></returns>
-        private ResponseBaseModel<dynamic> PutFile()
+        private ResponseBaseModel<dynamic> PutFile(string type = null)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -538,19 +538,46 @@ namespace WeChatCms.Controllers
                 return resultMode;
             }
             var fileExtension = Path.GetExtension(uploadFileName).ToLower();
-            var headImageType = AppConfigurationHelper.GetString("headImageType", null) ?? ".png,.jpg,.gif,.jpeg";
-            if (!headImageType.Split(',').Select(x => x.ToLower()).Contains(fileExtension))
+            if (string.IsNullOrEmpty(type) || type == "0")
             {
-                resultMode.ResultCode = ResponceCodeEnum.Fail;
-                resultMode.Message = "文件类型只能为.png,.jpg,.gif,.jpeg";
-                return resultMode;
+                var headImageType = AppConfigurationHelper.GetString("headImageType", null) ?? ".png,.jpg,.gif,.jpeg";
+                if (!headImageType.Split(',').Select(x => x.ToLower()).Contains(fileExtension))
+                {
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    resultMode.Message = "文件类型只能为.png,.jpg,.gif,.jpeg";
+                    return resultMode;
+                }
+                //默认2M
+                var imageMaxSize = AppConfigurationHelper.GetInt32("imageMaxSize", 0) <= 0 ? 2048000 : AppConfigurationHelper.GetInt32("imageMaxSize", 0);
+                if (imageMaxSize < file.ContentLength)
+                {
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    resultMode.Message = "文件大小不能超过2M";
+                    return resultMode;
+                }
             }
-            //默认2M
-            var imageMaxSize = AppConfigurationHelper.GetInt32("imageMaxSize", 0) <= 0 ? 2048000 : AppConfigurationHelper.GetInt32("imageMaxSize", 0);
-            if (imageMaxSize < file.ContentLength)
+            else if (type == "1")
+            {
+                var headOtherType = AppConfigurationHelper.GetString("headOtherType", null) ?? ".rar,.zip,.txt,.tar,.gz";
+                if (!headOtherType.Split(',').Select(x => x.ToLower()).Contains(fileExtension))
+                {
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    resultMode.Message = "文件类型只能为.rar,.zip,.txt,.tar";
+                    return resultMode;
+                }
+                //默认20M
+                var otherMaxSize = AppConfigurationHelper.GetInt32("otherMaxSize", 0) <= 0 ? 20480000 : AppConfigurationHelper.GetInt32("otherMaxSize", 0);
+                if (otherMaxSize < file.ContentLength)
+                {
+                    resultMode.ResultCode = ResponceCodeEnum.Fail;
+                    resultMode.Message = "文件大小不能超过20M";
+                    return resultMode;
+                }
+            }
+            else
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
-                resultMode.Message = "文件大小不能超过2M";
+                resultMode.Message = "文件类型错误";
                 return resultMode;
             }
             var uploadFileBytes = new byte[file.ContentLength];
@@ -585,7 +612,9 @@ namespace WeChatCms.Controllers
                     Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                 }
                 System.IO.File.WriteAllBytes(localPath, uploadFileBytes);
-                resultMode.Message = savePath;
+                resultMode.Message = AppConfigurationHelper.GetString("accessPre", null) + savePath;
+                resultMode.Data = new
+                { oldName = file.FileName, newName = uploadFileName, fileSize = file.ContentLength / 1024 };
                 resultMode.ResultCode = ResponceCodeEnum.Success;
             }
             catch (Exception)
