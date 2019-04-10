@@ -660,6 +660,7 @@
     <Content Include="UEditor\ueditor.config.js" />
     <Content Include="UEditor\ueditor.parse.js" />
     <Content Include="UEditor\ueditor.parse.min.js" />
+    <Content Include="Uploadfile\ShareDetailImage\20190326\6368921088309469071603066.jpg" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -686,7 +687,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Scripts\Home\" />
-    <Folder Include="Scripts\" />
     <Folder Include="UEditor\net\Bin\" />
     <Folder Include="UEditor\net\upload\image\20160329\" />
   </ItemGroup>
