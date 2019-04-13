@@ -43,7 +43,8 @@ var searchVm = new Vue({
             endtime: '',
             contentType: '',
             contentSource: '',
-            pageIndex: 1
+            pageIndex: pager.index,
+            pageSize:pager.size
         },
         contentTypeNum: []
     }
