@@ -76,7 +76,7 @@ namespace WeChatCms.Controllers
             if (string.IsNullOrEmpty(model.Introduction))
             {
                 var introduction = FilterHtmlHelper.NoHtml(model.Content);
-                model.Introduction = introduction.Substring(0, 200);
+                model.Introduction = introduction != null && introduction.Length > 200 ? introduction.Substring(0, 200) : introduction;
             }
             var server = new ContentService();
             long id;
