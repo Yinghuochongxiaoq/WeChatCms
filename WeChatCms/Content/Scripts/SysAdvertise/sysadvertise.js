@@ -83,7 +83,7 @@ function LoadingActivityResultDetailDate() {
  */
 function GetAllType() {
     $.ajax({
-        url: +hidRootUrl + "/SysAdvertise/GetContentType",
+        url: hidRootUrl + "/SysAdvertise/GetContentType",
         type: "POST",
         success: function (data) {
             if (data && data.ResultCode == 0) {
