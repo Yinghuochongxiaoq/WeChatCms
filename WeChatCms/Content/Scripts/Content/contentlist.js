@@ -1,4 +1,6 @@
-﻿var resultVm = new Vue({
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+var resultVm = new Vue({
     el: '#resultTable',
     data: {
         dataList: [],
@@ -44,7 +46,7 @@ var searchVm = new Vue({
             contentType: '',
             contentSource: '',
             pageIndex: pager.index,
-            pageSize:pager.size
+            pageSize: pager.size
         },
         contentTypeNum: []
     }
@@ -58,7 +60,7 @@ function LoadingActivityResultDetailDate() {
     $(".loading-container").removeClass("loading-inactive");
     searchVm.$data.model.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/Content/GetList",
+        url: hidRootUrl + "/Content/GetList",
         type: "POST",
         data: searchVm.$data.model,
         success: function (data) {
@@ -101,7 +103,7 @@ function delContent(id) {
         , yes: function (indexOne) {
             layer.close(indexOne);
             var index = layer.load();
-            $.ajax("/Content/DeleteId?id=" + id, {
+            $.ajax(hidRootUrl + "/Content/DeleteId?id=" + id, {
                 type: "POST",
                 success: function (result) {
                     if (result && result.ResultCode == 0) {
@@ -126,7 +128,7 @@ function delContent(id) {
  * @param {any} id
  */
 function editContent(id) {
-    window.location.href = "/Content/ContentEdit?id=" + id;
+    window.location.href = hidRootUrl + "/Content/ContentEdit?id=" + id;
 }
 
 /**
@@ -134,7 +136,7 @@ function editContent(id) {
  */
 function getTypeList() {
     $.ajax({
-        url: "/Content/GetContentType",
+        url: hidRootUrl + "/Content/GetContentType",
         type: "POST",
         success: function (data) {
             if (data && data.ResultCode == 0) {

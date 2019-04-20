@@ -106,7 +106,7 @@ namespace WeChatDataAccess
                 using (var conn = SqlConnectionHelper.GetOpenConnection())
                 {
                     conn.Update(model);
-                    conn.Execute("update sysusermenu set IsDel=@Del where ParentId=@MenuId and IsDel=@NotDel",
+                    conn.Execute("update sysusermenu set IsDel=@Del where MenuId=@MenuId and IsDel=@NotDel",
                         new
                         {
                             Del = FlagEnum.HadOne.GetHashCode(),

@@ -186,7 +186,7 @@
                 var ajaxIndex = layer.load();
                 var data = {};
                 data.firstpwd = firstpwd;
-                $.ajax("/SysSet/ChangePassword", {
+                $.ajax("@(ViewBag.RootNode)/SysSet/ChangePassword", {
                     type: "POST",
                     data: data,
                     success: function (result) {

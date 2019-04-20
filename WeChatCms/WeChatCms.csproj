@@ -686,7 +686,6 @@
     <Content Include="UEditor\third-party\video-js\font\vjs.woff" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\Scripts\Home\" />
     <Folder Include="UEditor\net\Bin\" />
     <Folder Include="UEditor\net\upload\image\20160329\" />
   </ItemGroup>

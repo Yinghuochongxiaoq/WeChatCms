@@ -1,4 +1,6 @@
-﻿var tree_id = "user_tree";
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+var tree_id = "user_tree";
 var user_id = 0;
 
 /**
@@ -9,7 +11,7 @@ function delPowerContent(id, userTree) {
     user_id = id;
     var index = layer.load();
     $.ajax({
-        url: "/SysSet/GetUserPowerList?id=" + id,
+        url: hidRootUrl + "/SysSet/GetUserPowerList?id=" + id,
         type: "POST",
         success: function (dataStr) {
             var data = JSON.parse(dataStr);
@@ -116,7 +118,7 @@ function savePowerDataInfo() {
     postData.id = user_id;
     postData.listIds = v;
     var index = layer.load();
-    $.ajax("/SysSet/SaveUserPower", {
+    $.ajax(hidRootUrl + "/SysSet/SaveUserPower", {
         type: "POST",
         data: postData,
         success: function (result) {

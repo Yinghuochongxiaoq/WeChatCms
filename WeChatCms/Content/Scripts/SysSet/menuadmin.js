@@ -1,4 +1,6 @@
-﻿var resultVm = new Vue({
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+var resultVm = new Vue({
     el: '#resultTable',
     data: {
         menuList: []
@@ -39,7 +41,7 @@ function LoadingActivityResultDetailDate() {
     var index = layer.load();
     searchVm.$data.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/SysSet/GetMenuList",
+        url: hidRootUrl + "/SysSet/GetMenuList",
         type: "POST",
         data: searchVm.$data,
         success: function (data) {
@@ -112,7 +114,7 @@ function newCostContent() {
  */
 function getAllMenuList() {
     $.ajax({
-        url: "/SysSet/GetAllMenuList",
+        url: hidRootUrl + "/SysSet/GetAllMenuList",
         type: "POST",
         success: function (data) {
             if (data && data.ResultCode == 0) {
@@ -135,7 +137,7 @@ function editContent(id) {
     }
     initViewModel();
     var index = layer.load();
-    $.ajax("/SysSet/GetMenuModel?id=" + id, {
+    $.ajax(hidRootUrl + "/SysSet/GetMenuModel?id=" + id, {
         type: "POST",
         success: function (result) {
             if (result && result.ResultCode == 0 && result.Data) {
@@ -166,7 +168,7 @@ function editContent(id) {
 function saveMenuInfo() {
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysSet/SaveMenuInfo", {
+    $.ajax(hidRootUrl + "/SysSet/SaveMenuInfo", {
         type: "POST",
         data: detailVm.$data.menu_model,
         success: function (result) {
@@ -203,7 +205,7 @@ function delContent(id) {
         , yes: function (indexOne) {
             layer.close(indexOne);
             var index = layer.load();
-            $.ajax("/SysSet/DelMenuModel?id=" + id, {
+            $.ajax(hidRootUrl + "/SysSet/DelMenuModel?id=" + id, {
                 type: "POST",
                 success: function (result) {
                     if (result && result.ResultCode == 0) {

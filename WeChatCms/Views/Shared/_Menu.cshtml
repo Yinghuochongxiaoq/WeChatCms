@@ -15,7 +15,7 @@
             var hasSub = item.SubMenuModel != null && item.SubMenuModel.Any();
 
             <li class="@(item.MenuType == ViewBag.ManagerId.ToString()?"active open":"")">
-                <a href="@(hasSub?"#":item.Url)" class="@(hasSub? "menu-dropdown":string.Empty)">
+                <a href="@(hasSub?"#":ViewBag.RootNode+item.Url)" class="@(hasSub? "menu-dropdown":string.Empty)">
                     <i class="menu-icon fa @item.Icon"></i>
                     <span class="menu-text">@item.Title</span>
                     @if (hasSub)
@@ -33,7 +33,7 @@
                                 menu.Url = ViewBag.RootNode + "/Home/Home/Index";
                             }
                             <li class="@(menu.MenuType == ViewBag.MenuId.ToString()?"active":"")">
-                                <a href="@menu.Url" title="@menu.Title">
+                                <a href="@(ViewBag.RootNode+menu.Url)" title="@menu.Title">
                                     <span class="menu-text">@menu.Title</span>
                                 </a>
                             </li>

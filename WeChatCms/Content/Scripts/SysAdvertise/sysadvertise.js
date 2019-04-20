@@ -1,4 +1,6 @@
-﻿/**
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+/**
  * 查询结果
  */
 var resultVm = new Vue({
@@ -57,7 +59,7 @@ function LoadingActivityResultDetailDate() {
     $(".loading-container").removeClass("loading-inactive");
     searchVm.$data.model.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/SysAdvertise/ResourceListPage",
+        url: hidRootUrl + "/SysAdvertise/ResourceListPage",
         type: "POST",
         data: searchVm.$data.model,
         success: function (data) {
@@ -81,7 +83,7 @@ function LoadingActivityResultDetailDate() {
  */
 function GetAllType() {
     $.ajax({
-        url: "/SysAdvertise/GetContentType",
+        url: +hidRootUrl + "/SysAdvertise/GetContentType",
         type: "POST",
         success: function (data) {
             if (data && data.ResultCode == 0) {
@@ -117,7 +119,7 @@ function delContent(id) {
         , yes: function (indexOne) {
             layer.close(indexOne);
             var index = layer.load();
-            $.ajax("/SysAdvertise/DelResourceModels", {
+            $.ajax(hidRootUrl + "/SysAdvertise/DelResourceModels", {
                 type: "POST",
                 data: { ids: [id] },
                 success: function (result) {
@@ -150,7 +152,7 @@ function editContent(id) {
     initViewModel();
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysAdvertise/GetModel?id=" + id, {
+    $.ajax(hidRootUrl + "/SysAdvertise/GetModel?id=" + id, {
         type: "POST",
         success: function (result) {
             if (result && result.ResultCode == 0 && result.Data) {
@@ -191,7 +193,7 @@ var detailVm = new Vue({
     methods: {
         initImageUrl(url) {
             if (url) return url;
-            return '/Content/Images/upload.png';
+            return hidRootUrl + '/Content/Images/upload.png';
         },
         fileClick() {
             document.getElementById('resource_upload_file').click();
@@ -217,7 +219,7 @@ var detailVm = new Vue({
             var formData = new FormData();
             formData.append("file", file);
             $.ajax({
-                url: '/SysSet/PutImageToSys',
+                url: hidRootUrl + '/SysSet/PutImageToSys',
                 type: "POST",
                 data: formData,
                 contentType: false,
@@ -266,7 +268,7 @@ function newContent() {
 function saveDataInfo() {
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysAdvertise/SaveResourceInfo", {
+    $.ajax(hidRootUrl + "/SysAdvertise/SaveResourceInfo", {
         type: "POST",
         data: detailVm.$data.model,
         success: function (result) {

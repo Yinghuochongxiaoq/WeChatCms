@@ -1,4 +1,6 @@
-﻿var all_resource_type = [{ Id: 1, name: '图片' }];
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+var all_resource_type = [{ Id: 1, name: '图片' }];
 var resultVm = new Vue({
     el: '#resultTable',
     data: {
@@ -76,7 +78,7 @@ function LoadingActivityResultDetailDate() {
     $(".loading-container").removeClass("loading-inactive");
     searchVm.$data.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/SysResource/ResourceListPage",
+        url: hidRootUrl + "/SysResource/ResourceListPage",
         type: "POST",
         data: searchVm.$data,
         success: function (data) {
@@ -149,7 +151,7 @@ var detailVm = new Vue({
             var formData = new FormData();
             formData.append("file", file);
             $.ajax({
-                url: '/SysSet/PutImageToSys',
+                url: hidRootUrl + '/SysSet/PutImageToSys',
                 type: "POST",
                 data: formData,
                 contentType: false,
@@ -173,7 +175,7 @@ var detailVm = new Vue({
 function initViewModel() {
     detailVm.$data.detail_model = {
         Id: 0,
-        ResourceUrl: "/Content/Images/upload.png",
+        ResourceUrl: hidRootUrl + "/Content/Images/upload.png",
         ResourceType: 1,
         ResourceRemark: "",
         Sort: 0
@@ -194,7 +196,7 @@ function newResource() {
 function saveDataInfo() {
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysResource/SaveResourceInfo", {
+    $.ajax(hidRootUrl + "/SysResource/SaveResourceInfo", {
         type: "POST",
         data: detailVm.$data.detail_model,
         success: function (result) {
@@ -270,7 +272,7 @@ function delAll() {
 function do_del(ids) {
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysResource/DelResourceModels", {
+    $.ajax(hidRootUrl + "/SysResource/DelResourceModels", {
         type: "POST",
         data: { ids: ids },
         success: function (result) {

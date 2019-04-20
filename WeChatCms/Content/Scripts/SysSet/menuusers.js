@@ -1,4 +1,6 @@
-﻿var sexEnum = ['保密', '男', '女'];
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+var sexEnum = ['保密', '男', '女'];
 var userTypeEnum = ['普通用户', '超级管理员', '普通管理员'];
 var resultVm = new Vue({
     el: '#resultTable',
@@ -47,7 +49,7 @@ function LoadingActivityResultDetailDate() {
     var index = layer.load();
     searchVm.$data.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/SysSet/GetUserList",
+        url: hidRootUrl + "/SysSet/GetUserList",
         type: "POST",
         data: searchVm.$data,
         success: function (data) {
@@ -126,7 +128,7 @@ function editContent(id) {
     }
     initViewModel();
     var index = layer.load();
-    $.ajax("/SysSet/GetUserModel?id=" + id, {
+    $.ajax(hidRootUrl + "/SysSet/GetUserModel?id=" + id, {
         type: "POST",
         success: function (result) {
             if (result && result.ResultCode == 0 && result.Data) {
@@ -156,7 +158,7 @@ function editContent(id) {
  */
 function saveDataInfo() {
     var index = layer.load();
-    $.ajax("/SysSet/SaveDataInfo", {
+    $.ajax(hidRootUrl + "/SysSet/SaveDataInfo", {
         type: "POST",
         data: detailVm.$data.detail_model,
         success: function (result) {
@@ -196,7 +198,7 @@ function delContent(id) {
         return;
     }
     var index = layer.load();
-    $.ajax("/SysSet/DelModel?id=" + id, {
+    $.ajax(hidRootUrl + "/SysSet/DelModel?id=" + id, {
         type: "POST",
         success: function (result) {
             if (result && result.ResultCode == 0) {
@@ -218,7 +220,7 @@ function delContent(id) {
  */
 function resetPassword(id) {
     var index = layer.load();
-    $.ajax("/SysSet/ResetPassword?id=" + id, {
+    $.ajax(hidRootUrl + "/SysSet/ResetPassword?id=" + id, {
         type: "POST",
         success: function (result) {
             if (result && result.ResultCode == 0) {

@@ -1,4 +1,6 @@
-﻿/**
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+/**
  * 查询结果
  */
 var resultVm = new Vue({
@@ -33,8 +35,8 @@ var searchVm = new Vue({
         model: {
             label: "",
             type: "",
-            pageIndex: 1,
-            pageSize: 10
+            pageIndex: pager.index,
+            pageSize: pager.size
         },
         contentTypeNum: []
     }
@@ -48,7 +50,7 @@ function LoadingActivityResultDetailDate() {
     $(".loading-container").removeClass("loading-inactive");
     searchVm.$data.model.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/SysSet/GetDicList",
+        url: hidRootUrl + "/SysSet/GetDicList",
         type: "POST",
         data: searchVm.$data.model,
         success: function (data) {
@@ -72,7 +74,7 @@ function LoadingActivityResultDetailDate() {
  */
 function GetAllType() {
     $.ajax({
-        url: "/SysSet/GetAllDicType",
+        url: hidRootUrl + "/SysSet/GetAllDicType",
         type: "POST",
         success: function (data) {
             if (data && data.ResultCode == 0) {
@@ -107,7 +109,7 @@ function delContent(id) {
         , yes: function (indexOne) {
             layer.close(indexOne);
             var index = layer.load();
-            $.ajax("/SysSet/DelDicModel?id=" + id, {
+            $.ajax(hidRootUrl + "/SysSet/DelDicModel?id=" + id, {
                 type: "POST",
                 success: function (result) {
                     if (result && result.ResultCode == 0) {
@@ -139,7 +141,7 @@ function editContent(id) {
     initViewModel();
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysSet/GetDicModel?id=" + id, {
+    $.ajax(hidRootUrl + "/SysSet/GetDicModel?id=" + id, {
         type: "POST",
         success: function (result) {
             if (result && result.ResultCode == 0 && result.Data) {
@@ -216,7 +218,7 @@ function newContent() {
 function saveDataInfo() {
     //加载
     $(".loading-container").removeClass("loading-inactive");
-    $.ajax("/SysSet/SaveDicInfo", {
+    $.ajax(hidRootUrl + "/SysSet/SaveDicInfo", {
         type: "POST",
         data: detailVm.$data.model,
         success: function (result) {

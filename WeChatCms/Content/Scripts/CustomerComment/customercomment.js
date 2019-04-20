@@ -1,4 +1,6 @@
-﻿var dealType = [{ id: 1, name: "已处理" }, { id: 0, name: "未处理" }];
+﻿//根目录
+var hidRootUrl = $("#hidRootNode").val();
+var dealType = [{ id: 1, name: "已处理" }, { id: 0, name: "未处理" }];
 /**
  * 查询结果
  */
@@ -62,7 +64,7 @@ function LoadingActivityResultDetailDate() {
     $(".loading-container").removeClass("loading-inactive");
     searchVm.$data.model.pageIndex = $("#currentPageIndex").val();
     $.ajax({
-        url: "/CustomerComment/CustomerCommentListPage",
+        url: hidRootUrl + "/CustomerComment/CustomerCommentListPage",
         type: "POST",
         data: searchVm.$data.model,
         success: function (data) {
@@ -105,7 +107,7 @@ function delContent(id) {
         , yes: function (indexOne) {
             layer.close(indexOne);
             var index = layer.load();
-            $.ajax("/CustomerComment/DelResourceModels", {
+            $.ajax(hidRootUrl + "/CustomerComment/DelResourceModels", {
                 type: "POST",
                 data: { ids: [id] },
                 success: function (result) {
@@ -137,7 +139,7 @@ function dealComment(id, dealResult, handler) {
         parent.layer.msg("参数错误", { icon: 5 });
         return;
     }
-    $.ajax("/CustomerComment/DealResultModels", {
+    $.ajax(hidRootUrl + "/CustomerComment/DealResultModels", {
         type: "POST",
         data: { id: id, dealResult: dealResult },
         success: function (result) {
