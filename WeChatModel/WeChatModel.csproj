@@ -95,6 +95,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseModel\CostChannelModel.cs" />
+    <Compile Include="DatabaseModel\CostContentModel.cs" />
+    <Compile Include="DatabaseModel\CostTypeModel.cs" />
     <Compile Include="DatabaseModel\CustomercommentModel.cs" />
     <Compile Include="DatabaseModel\SysadvertisementModel.cs" />
     <Compile Include="DatabaseModel\Syscontent.cs" />

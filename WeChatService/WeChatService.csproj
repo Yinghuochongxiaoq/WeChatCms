@@ -45,6 +45,9 @@
   <ItemGroup>
     <Compile Include="AccountService.cs" />
     <Compile Include="ContentService.cs" />
+    <Compile Include="CostChannelService.cs" />
+    <Compile Include="CostContentService.cs" />
+    <Compile Include="CostTypeService.cs" />
     <Compile Include="CustomerCommentService.cs" />
     <Compile Include="DbLinkTestService.cs" />
     <Compile Include="MenuService.cs" />

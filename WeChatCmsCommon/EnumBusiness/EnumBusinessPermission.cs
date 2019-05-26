@@ -103,5 +103,38 @@ namespace WeChatCmsCommon.EnumBusiness
         [Description("留言列表")]
         CustomerCommentList = 5002,
         #endregion
+
+        #region [6、消费记录]
+
+        /// <summary>
+        /// 消费记录
+        /// </summary>
+        [Description("消费记录")]
+        CostNoteManager = 6001,
+
+        /// <summary>
+        /// 消费记录列表
+        /// </summary>
+        [Description("消费记录列表")]
+        CostNoteList=6002,
+
+        /// <summary>
+        /// 消费记录统计
+        /// </summary>
+        [Description("消费记录统计")]
+        CostStatistical = 6003,
+
+        /// <summary>
+        /// 支付类型设置
+        /// </summary>
+        [Description("支付类型设置")]
+        CostTypePage=6004,
+
+        /// <summary>
+        /// 账户设置
+        /// </summary>
+        [Description("账户设置")]
+        CostChannel=6005,
+        #endregion
     }
 }

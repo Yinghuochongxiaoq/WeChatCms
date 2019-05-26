@@ -17,6 +17,88 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+
+-- ----------------------------
+-- Table structure for costchannel
+-- ----------------------------
+DROP TABLE IF EXISTS `costchannel`;
+CREATE TABLE `costchannel` (
+  `Id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `CostChannelName` varchar(255) DEFAULT NULL COMMENT '渠道名称',
+  `CostChannelNo` varchar(255) DEFAULT NULL COMMENT '渠道账号',
+  `IsDel` int(255) DEFAULT NULL COMMENT '1:启用；0：删除',
+  `IsValid` int(255) DEFAULT '1' COMMENT '1:启用；0：停用',
+  `UserId` bigint(11) DEFAULT NULL COMMENT '用户id',
+  `CreateTime` datetime DEFAULT NULL COMMENT '创建时间',
+  `UpdateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `CreateUserId` bigint(11) DEFAULT NULL,
+  `UpdateUserId` bigint(11) DEFAULT NULL,
+  `Sort` int(255) DEFAULT '0' COMMENT '排序值',
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of costchannel
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for costcontent
+-- ----------------------------
+DROP TABLE IF EXISTS `costcontent`;
+CREATE TABLE `costcontent` (
+  `Id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `Cost` decimal(10,2) DEFAULT NULL,
+  `UserId` bigint(11) DEFAULT NULL,
+  `CostAddress` varchar(255) DEFAULT NULL,
+  `CostTime` datetime DEFAULT NULL,
+  `CostThing` varchar(255) DEFAULT NULL,
+  `CostTypeName` varchar(255) DEFAULT NULL COMMENT '消费类型快照',
+  `CostType` int(11) DEFAULT NULL,
+  `CostYear` int(255) DEFAULT NULL,
+  `CostMonth` int(255) DEFAULT NULL,
+  `SpendType` int(255) NOT NULL DEFAULT '-1' COMMENT '2：转移；1:收入；0：支出',
+  `CostChannel` bigint(255) DEFAULT NULL COMMENT '渠道id',
+  `CreateTime` datetime DEFAULT NULL COMMENT '创建时间',
+  `UpdateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `CreateUserId` bigint(11) DEFAULT NULL,
+  `UpdateUserId` bigint(11) DEFAULT NULL,
+  `CostChannelName` varchar(255) DEFAULT NULL COMMENT '渠道名称',
+  `CostChannelNo` varchar(255) DEFAULT NULL COMMENT '渠道账号',
+  `CostInOrOut` bit(1) DEFAULT NULL COMMENT '1:入账；0：出账',
+  `LinkCostId` bigint(11) DEFAULT NULL COMMENT '关联记录id',
+  `LinkCostChannelName` varchar(255) DEFAULT NULL COMMENT '关联渠道名称',
+  `LinkCostChannelNo` varchar(255) DEFAULT NULL COMMENT '关联渠道账号',
+  `LinkCostChannel` bigint(255) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of costcontent
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for costtype
+-- ----------------------------
+DROP TABLE IF EXISTS `costtype`;
+CREATE TABLE `costtype` (
+  `Id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键，类型id',
+  `Name` varchar(255) DEFAULT NULL COMMENT '类型名称',
+  `IsValid` int(11) DEFAULT '1' COMMENT '是否有效',
+  `IsDel` int(255) DEFAULT '0' COMMENT '是否删除',
+  `Sort` int(255) DEFAULT '0' COMMENT '排序值',
+  `SpendType` int(255) NOT NULL COMMENT '1:收入；0：支出',
+  `UserId` bigint(11) DEFAULT NULL COMMENT '用户id',
+  `CreateTime` datetime DEFAULT NULL COMMENT '创建时间',
+  `UpdateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `CreateUserId` bigint(11) DEFAULT NULL,
+  `UpdateUserId` bigint(11) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of costtype
+-- ----------------------------
+ 
 -- ----------------------------
 -- Table structure for customercomment
 -- ----------------------------

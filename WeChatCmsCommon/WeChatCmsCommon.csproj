@@ -123,6 +123,7 @@
     <Compile Include="CheckCodeHelper\FilterWord.cs" />
     <Compile Include="CheckCodeHelper\YZMHelper.cs" />
     <Compile Include="CustomerAttribute\AuthorizeIgnoreAttribute.cs" />
+    <Compile Include="EnumBusiness\CostInOrOutEnum.cs" />
     <Compile Include="EnumBusiness\EnumBusinessPermission.cs" />
     <Compile Include="EnumBusiness\FlagEnum.cs" />
     <Compile Include="EnumBusiness\ResourceTypeEnum.cs" />

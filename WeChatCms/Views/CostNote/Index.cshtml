@@ -1,0 +1,235 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "消费记录";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+}
+<div class="widget widget-body">
+    <div class="panel panel-default">
+        <form class="panel-body" action="" id="form1">
+            <div class="form-inline control-left">
+                <label>
+                    收入or支出
+                    <select class="form-control input-sm" style="width: 75px"
+                            name="spendtype" v-model="costcontentmodel.spendtype" v-on:change="changeSpendType(costcontentmodel.spendtype)">
+                        <option v-for="item in inorout" v-bind:value="item.id">
+                            {{item.name}}
+                        </option>
+                    </select>
+                </label>
+                <label>
+                    地址：
+                    <input type="text" v-model="costcontentmodel.costaddress" name="costaddress"
+                           id="costaddress" placeholder="地址"
+                           class="form-control input-sm" style="min-width: 150px; width: 155px;">
+                </label>
+
+                <label>
+                    事件：
+                    <input type="text" name="shareTheme" v-model="costcontentmodel.costthing"
+                           id="costthing" placeholder="事件"
+                           class="form-control input-sm" style="min-width: 150px; width: 165px;">
+                </label>
+                <label>
+                    类型：
+                    <select class="form-control input-sm" style="width: 75px"
+                            name="costtype" v-model="costcontentmodel.costtype">
+                        <option v-for="item in staticcosttypenum" v-bind:value="item.Id">
+                            {{item.Name}}
+                        </option>
+                    </select>
+                </label>
+                <label>
+
+                    日期范围：
+                    <input type="text"
+                           onfocus="WdatePicker({ maxDate: '#F{$dp.$D(\'logmax\')||\'%y-%M-%d\'}', dateFmt: 'yyyy-MM-dd HH:mm:ss' ,onpicking:function(dp){searchVm.$data.costcontentmodel.starttime=dp.cal.getNewDateStr(); }})"
+                           id="logmin" class="form-control Wdate input-sm" style="width: 165px;"
+                           name="starttime" v-model="costcontentmodel.starttime">
+                    至
+                    <input type="text"
+                           onfocus="WdatePicker({ minDate: '#F{$dp.$D(\'logmin\')}', maxDate: '%y-%M-%d', dateFmt: 'yyyy-MM-dd HH:mm:ss',onpicking:function(dp){searchVm.$data.costcontentmodel.endtime=dp.cal.getNewDateStr(); } })"
+                           id="logmax" class="form-control Wdate input-sm" style="width: 165px;"
+                           name="endtime" v-model="costcontentmodel.endtime">
+                </label>
+                <input type="button" onclick="LoadingActivityResultDetailDate();"
+                       class="btn btn-success" title="查询" value="查询">
+
+                <input type="button" onclick="newCostContent();"
+                       class="btn btn-success" title="新增" value="新增">
+
+            </div>
+        </form>
+    </div>
+    <div id="resultTable">
+        <table class="table table-bordered  table-hover ">
+            <thead class="flip-content bordered-palegreen">
+                <tr class="control-center">
+                    <th>时间</th>
+                    <th>金额（单位元）</th>
+                    <th>账户</th>
+                    <th>收/支</th>
+                    <th>事件</th>
+                    <th>类型</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="control-center" v-for="item of costcontentlist">
+                    <td>{{item.CostTime}}</td>
+                    <td>{{item.Cost}}元</td>
+                    <td>{{item.CostChannelName}}</td>
+                    <td>{{vueInOrOut(item.SpendType)+(item.SpendType==2?(item.CostInOrOut==1?"(收)":"(支)"):"")}}</td>
+                    <td>{{item.CostThing}}</td>
+                    <td>{{vueTypeContent(item.CostType)}}</td>
+                    <td>
+                        <input type="button" v-on:click="vueEditCostContent(item.Id)"
+                               class="btn btn-success" title="编辑" value="编辑">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td>
+                        <div id="pager">
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!--当前页码-->
+        <input type="hidden" id="currentPageIndex" value="1">
+    </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal inmodal" id="detailWindow" tabindex="-1"
+     role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="padding: 0px;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="margin-right: 10px;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+                </button>
+                <h3 class="modal-title">编辑收支记录</h3>
+            </div>
+            <form id="acForm">
+                <div class="modal-body form-horizontal"
+                     style="padding: 0px; background-color: #fff; min-height: 350px;">
+                    <div class="col-md-12" style="margin-top: 25px;">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==0">支出时间：</label>
+                            <label class="col-sm-3 control-label" v-else-if="costcontentmodel.SpendType==1">收入时间：</label>
+                            <label class="col-sm-3 control-label" v-else-if="costcontentmodel.SpendType==2">转移时间：</label>
+                            <div class="col-sm-8">
+                                <input autocomplete="off" type="text"
+                                       onfocus="WdatePicker({dateFmt: 'yyyy-MM-dd HH:mm:ss',onpicking:function(dp){detailVm.$data.costcontentmodel.CostTime=dp.cal.getNewDateStr(); } })"
+                                       class="form-control Wdate input-sm" name="costtime"
+                                       v-model="costcontentmodel.CostTime">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">支出or收入：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control input-sm"
+                                        name="costtype" v-model="costcontentmodel.SpendType" v-on:change="changeSpendType(costcontentmodel.SpendType)">
+                                    <option v-for="item in inorout" v-bind:value="item.id">
+                                        {{item.name}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group" v-if="costcontentmodel.SpendType==0 || costcontentmodel.SpendType==1">
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==0">支出类型：</label>
+                            <label class="col-sm-3 control-label" v-else-if="costcontentmodel.SpendType==1">收入类型：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control input-sm"
+                                        name="costtype" v-model="costcontentmodel.CostType">
+                                    <option v-for="item in costTypeCmputed" v-bind:value="item.Id">
+                                        {{item.Name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==0">支出金额：</label>
+                            <label class="col-sm-3 control-label" v-else-if="costcontentmodel.SpendType==1">收入金额：</label>
+                            <label class="col-sm-3 control-label" v-else-if="costcontentmodel.SpendType==2">转移金额：</label>
+                            <div class="col-sm-8">
+                                <input name="cost" id="cost" class="form-control input-sm"
+                                       type="text" v-model="costcontentmodel.Cost">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==0 || costcontentmodel.SpendType==2">支出账户：</label>
+                            <label class="col-sm-3 control-label" v-else-if="costcontentmodel.SpendType==1">收款账户：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control input-sm"
+                                        name="CostChannel" v-model="costcontentmodel.CostChannel">
+                                    <option v-for="item in costchannellist" v-bind:value="item.Id">
+                                        {{item.CostChannelName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" v-if="costcontentmodel.SpendType==2">
+                            <label class="col-sm-3 control-label">收款账户：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control input-sm"
+                                        name="LinkCostChannel" v-model="costcontentmodel.LinkCostChannel">
+                                    <option v-for="item in costchannellist" v-bind:value="item.Id">
+                                        {{item.CostChannelName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==0">支出位置：</label>
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==1">收款位置：</label>
+                            <label class="col-sm-3 control-label" v-if="costcontentmodel.SpendType==2">转移位置：</label>
+                            <div class="col-sm-8">
+                                <input type="text" v-model="costcontentmodel.CostAddress" name="costaddress"
+                                       placeholder="地址/位置"
+                                       class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">处理事件：</label>
+                            <div class="col-sm-8">
+                                <input name="costthing" class="form-control input-sm"
+                                       type="text" v-model="costcontentmodel.CostThing" placeholder="处理事件">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">
+                        <i class="fa fa-close"></i>关闭
+                    </button>
+                    <button type="button" onclick="saveCostContentInfo();" class="btn btn-primary">
+                        <i class="fa fa-save"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框end -->
+
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Assets/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/CostNote/costnote.js"></script>
+}
