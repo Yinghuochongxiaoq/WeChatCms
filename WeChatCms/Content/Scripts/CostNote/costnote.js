@@ -17,17 +17,18 @@ var searchVm = new Vue({
     el: '#form1',
     data: {
         costcontentmodel: {
-            costaddress: '',
             starttime: '',
             endtime: '',
             costtype: -1,
             spendtype: -1,
             costthing: '',
+            costchannel: -1,
             pageindex: pager.index,
             pagesize: pager.size
         },
         staticcosttypenum: [],
-        inorout: inOrOutArr
+        inorout: inOrOutArr,
+        costchannellist: []
     }, methods: {
         changeSpendType(params) {
             getCostType(params);
@@ -40,7 +41,12 @@ var vm = new Vue({
     data: {
         costcontentlist: [],
         costtypeenum: [],
-        inorout: inOrOutArr
+        inorout: inOrOutArr,
+        statisticsModel: {
+            allCouldCost: 0,
+            allOutCost: 0,
+            allInCost: 0
+        }
     },
     computed: {},
     methods: {
@@ -72,7 +78,7 @@ var detailVm = new Vue({
     el: '#detailWindow',
     data: {
         costcontentmodel: {
-            Cost: 0,
+            Cost: '',
             CostAddress: "",
             CostChannel: 0,
             CostThing: "",
@@ -121,6 +127,7 @@ function LoadingActivityResultDetailDate() {
         success: function (data) {
             if (data && data.ResultCode == 0 && data.Data) {
                 vm.$data.costcontentlist = data.Data.dataList;
+                vm.$data.statisticsModel = data.Data.statisticsModel;
                 pager.itemCount = data.Data.count;
                 pager.index = $("#currentPageIndex").val();
                 pager.render();
@@ -271,6 +278,7 @@ function getAllCostChannelList() {
         success: function (result) {
             if (result.ResultCode == 0 && result.Data) {
                 detailVm.$data.costchannellist = result.Data;
+                searchVm.$data.costchannellist = result.Data;
             } else {
                 parent.layer.msg(result.message);
             }

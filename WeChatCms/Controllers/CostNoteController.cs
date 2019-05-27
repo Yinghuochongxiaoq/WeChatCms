@@ -51,6 +51,7 @@ namespace WeChatCms.Controllers
             int costtype = System.Web.HttpContext.Current.GetIntFromParameters("costtype");
             int spendtype = System.Web.HttpContext.Current.GetIntFromParameters("spendtype");
             string costthing = System.Web.HttpContext.Current.GetStringFromParameters("costthing");
+            long costchannel = System.Web.HttpContext.Current.GetIntFromParameters("costchannel");
             var userId = CurrentModel.UserId;
             if (userId < 1)
             {
@@ -59,10 +60,23 @@ namespace WeChatCms.Controllers
             else
             {
                 var server = new CostContentService();
-                var count = 0;
-                var dataList = server.GetList(userId, spendtype, costaddress, costthing, costtype, starttime, endtime,
-                    pageIndex, pageSize, out count);
-                resultMode.Data = new { count, dataList };
+                var dataList = server.GetList(userId, spendtype, costaddress, costthing, costtype, costchannel, starttime, endtime,
+                    pageIndex, pageSize, out var count);
+                var dic = server.GetStatisticsCost(userId, spendtype, costaddress, costthing, costtype, costchannel,
+                    starttime, endtime);
+                var allOutCost = dic.ContainsKey(CostInOrOutEnum.Out.GetHashCode())
+                    ? dic[CostInOrOutEnum.Out.GetHashCode()]
+                    : 0;
+                var allInCost = dic.ContainsKey(CostInOrOutEnum.In.GetHashCode())
+                    ? dic[CostInOrOutEnum.In.GetHashCode()]
+                    : 0;
+                var statisticsModel = new
+                {
+                    allCouldCost = $"{allInCost - allOutCost:N2}",
+                    allOutCost = $"{allOutCost:N2}",
+                    allInCost = $"{allInCost:N2}"
+                };
+                resultMode.Data = new { count, dataList, statisticsModel };
                 resultMode.ResultCode = ResponceCodeEnum.Success;
             }
 
@@ -732,6 +746,12 @@ namespace WeChatCms.Controllers
             resultMode.Message = "初始化成功";
             return Json(resultMode, JsonRequestBehavior.AllowGet);
         }
+        #endregion
+
+        #region [4、统计消费情况]
+
+
+
         #endregion
     }
 }

@@ -4,8 +4,12 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Dapper;
 using FreshCommonUtility.Dapper;
+using FreshCommonUtility.DataConvert;
+using FreshCommonUtility.Enum;
 using FreshCommonUtility.SqlHelper;
+using WeChatCmsCommon.EnumBusiness;
 using WeChatModel.DatabaseModel;
 
 namespace WeChatDataAccess
@@ -20,12 +24,13 @@ namespace WeChatDataAccess
         /// <param name="address"></param>
         /// <param name="costThing"></param>
         /// <param name="costType"></param>
+        /// <param name="costchannel"></param>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public List<CostContentModel> GetModels(long userId, int spendType, string address, string costThing, int costType, DateTime startTime, DateTime endTime, int pageIndex, int pageSize)
+        public List<CostContentModel> GetModels(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int pageIndex, int pageSize)
         {
             var where = new StringBuilder(" where UserId=@UserId ");
 
@@ -36,6 +41,11 @@ namespace WeChatDataAccess
             if (costType != -1)
             {
                 where.Append(" AND CostType = @CostType ");
+            }
+
+            if (costchannel != -1)
+            {
+                where.Append(" and CostChannel=@CostChannel ");
             }
 
             if (startTime > new DateTime(1900, 1, 1))
@@ -61,6 +71,7 @@ namespace WeChatDataAccess
                 UserId = userId,
                 SpendType = spendType,
                 CostType = costType,
+                CostChannel = costchannel,
                 StartTime = startTime,
                 EndTime = endTime,
                 CostAddress = "%" + address + "%",
@@ -76,7 +87,7 @@ namespace WeChatDataAccess
         /// 获取总记录数
         /// </summary>
         /// <returns></returns>
-        public int GetCount(long userId, int spendType, string address, string costThing, int costType, DateTime startTime, DateTime endTime)
+        public int GetCount(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
             var where = new StringBuilder(" where UserId=@UserId ");
 
@@ -87,6 +98,11 @@ namespace WeChatDataAccess
             if (costType != -1)
             {
                 where.Append(" AND CostType = @CostType ");
+            }
+
+            if (costchannel != -1)
+            {
+                where.Append(" and CostChannel=@CostChannel ");
             }
 
             if (startTime > new DateTime(1900, 1, 1))
@@ -112,6 +128,7 @@ namespace WeChatDataAccess
                 UserId = userId,
                 SpendType = spendType,
                 CostType = costType,
+                CostChannel = costchannel,
                 StartTime = startTime,
                 EndTime = endTime,
                 CostAddress = "%" + address + "%",
@@ -121,6 +138,84 @@ namespace WeChatDataAccess
             {
                 return conn.RecordCount<CostContentModel>(where.ToString(), param);
             }
+        }
+
+        /// <summary>
+        /// 获取统计数据
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="spendType"></param>
+        /// <param name="address"></param>
+        /// <param name="costThing"></param>
+        /// <param name="costType"></param>
+        /// <param name="costchannel"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public Dictionary<int, decimal> GetStatisticsCost(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
+        {
+            var select = "select CostInOrOut,sum(cost) Sum from costcontent ";
+            var where = new StringBuilder(" where UserId=@UserId ");
+
+            if (spendType != -1)
+            {
+                where.Append(" AND SpendType = @SpendType ");
+            }
+            if (costType != -1)
+            {
+                where.Append(" AND CostType = @CostType ");
+            }
+
+            if (costchannel != -1)
+            {
+                where.Append(" and CostChannel=@CostChannel ");
+            }
+
+            if (startTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" AND CostTime >= @StartTime ");
+            }
+
+            if (endTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" AND CostTime <= @EndTime ");
+            }
+            if (!string.IsNullOrEmpty(address))
+            {
+                where.Append(" AND CostAddress LIKE @CostAddress ");
+            }
+
+            if (!string.IsNullOrEmpty(costThing))
+            {
+                where.Append(" AND CostThing LIKE @CostThing ");
+            }
+
+            var groupby = " GROUP BY CostInOrOut ";
+            var param = new
+            {
+                UserId = userId,
+                SpendType = spendType,
+                CostType = costType,
+                CostChannel = costchannel,
+                StartTime = startTime,
+                EndTime = endTime,
+                CostAddress = "%" + address + "%",
+                CostThing = "%" + costThing + "%"
+            };
+            var result = new Dictionary<int, decimal>();
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                IEnumerable<dynamic> query = conn.Query(select + where + groupby, param);
+                foreach (var rows in query)
+                {
+                    if (!(rows is IDictionary<string, object> fields)) continue;
+                    var sum = fields["Sum"];
+                    var inOrOut = fields["CostInOrOut"];
+                    result.Add(DataTypeConvertHelper.ToInt(inOrOut), DataTypeConvertHelper.ToDecimal(sum));
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

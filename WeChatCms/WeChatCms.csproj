@@ -372,6 +372,9 @@
     <Content Include="Content\Scripts\CostNote\costchannel.js" />
     <Content Include="Content\Scripts\CostNote\costtypeset.js" />
     <Content Include="Content\Scripts\CustomerComment\customercomment.js" />
+    <Content Include="Content\Scripts\HighCharts\exporting.js" />
+    <Content Include="Content\Scripts\HighCharts\highcharts.js" />
+    <Content Include="Content\Scripts\HighCharts\sand-signika.js" />
     <Content Include="Content\Scripts\SysAdvertise\sysadvertise.js" />
     <Content Include="Content\Scripts\SysResource\sysresource.js" />
     <Content Include="Content\Scripts\SysSet\menuadmin.js" />

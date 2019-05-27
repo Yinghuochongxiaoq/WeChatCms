@@ -92,6 +92,7 @@ namespace WeChatService
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="costType"></param>
+        /// <param name="costchannel"></param>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
         /// <param name="indexPage"></param>
@@ -101,11 +102,30 @@ namespace WeChatService
         /// <param name="address"></param>
         /// <param name="costThing"></param>
         /// <returns></returns>
-        public List<CostContentModel> GetList(long userId, int spendType, string address, string costThing, int costType, DateTime startTime, DateTime endTime, int indexPage, int pageSize, out int count)
+        public List<CostContentModel> GetList(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int indexPage, int pageSize, out int count)
         {
-            count = _dataAccess.GetCount(userId, spendType, address, costThing, costType, startTime, endTime);
-            var list = _dataAccess.GetModels(userId, spendType, address, costThing, costType, startTime, endTime, indexPage, pageSize);
+            count = _dataAccess.GetCount(userId, spendType, address, costThing, costType, costchannel, startTime, endTime);
+            var list = _dataAccess.GetModels(userId, spendType, address, costThing, costType, costchannel, startTime, endTime, indexPage, pageSize);
             return list;
+        }
+
+        /// <summary>
+        /// 获取统计信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="spendType"></param>
+        /// <param name="address"></param>
+        /// <param name="costThing"></param>
+        /// <param name="costType"></param>
+        /// <param name="costchannel"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public Dictionary<int, decimal> GetStatisticsCost(long userId, int spendType, string address, string costThing,
+            int costType, long costchannel, DateTime startTime, DateTime endTime)
+        {
+            return _dataAccess.GetStatisticsCost(userId, spendType, address, costThing, costType, costchannel,
+                startTime, endTime);
         }
     }
 }
