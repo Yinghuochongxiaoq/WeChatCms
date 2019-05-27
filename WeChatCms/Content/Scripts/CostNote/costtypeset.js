@@ -230,3 +230,28 @@ function saveDataInfo() {
         }
     });
 }
+
+/*
+ * 初始化
+ */
+function initCostTypeInfo() {
+    //加载
+    $(".loading-container").removeClass("loading-inactive");
+    $.ajax(hidRootUrl + "/CostNote/InitCostTypeModel", {
+        type: "POST",
+        success: function (result) {
+            if (result && result.ResultCode == 0) {
+                parent.layer.msg("操作成功!");
+                Search(1);
+            } else
+                parent.layer.msg(result.Message);
+            //取消加载
+            $(".loading-container").addClass("loading-inactive");
+        },
+        error: function () {
+            parent.layer.msg("系统异常");
+            //取消加载
+            $(".loading-container").addClass("loading-inactive");
+        }
+    });
+}
