@@ -5,4 +5,96 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>消费统计</h2>
+<div class="widget widget-body">
+    <div class="panel panel-default">
+        <form class="panel-body" action="" id="form1">
+            <div class="form-inline control-left">
+                <label>
+                    消费类型：
+                    <select class="form-control input" name="costtype"
+                            v-model="costcontentmodel.costtype">
+                        <option v-for="item in staticcosttypenum" v-bind:value="item.id">
+                            {{item.name}}
+                        </option>
+                    </select>
+                </label>
+                <label>
+                    日期范围：
+                    <input type="text"
+                           onfocus="WdatePicker({ maxDate: '#F{$dp.$D(\'logmax\')||\'%y-%M-%d\'}', dateFmt: 'yyyy-MM-dd HH:mm:ss' ,onpicking:function(dp){searchVm.$data.costcontentmodel.starttime=dp.cal.getNewDateStr(); }})"
+                           id="logmin" class="form-control Wdate input" style="width: 165px;"
+                           name="starttime" v-model="costcontentmodel.starttime">
+                    至
+                    <input type="text"
+                           onfocus="WdatePicker({ minDate: '#F{$dp.$D(\'logmin\')}', maxDate: '%y-%M-%d', dateFmt: 'yyyy-MM-dd HH:mm:ss',onpicking:function(dp){searchVm.$data.costcontentmodel.endtime=dp.cal.getNewDateStr(); } })"
+                           id="logmax" class="form-control Wdate input" style="width: 165px;"
+                           name="endtime" v-model="costcontentmodel.endtime">
+                </label>
+                <input type="button" onclick="search();" class="btn btn-success" title="查询" value="查询">
+
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-sm-12 col-xs-12">
+            <div class="widget">
+                <div class="widget-header bordered-bottom bordered-blue">
+                    <span class="widget-caption">消费情况</span>
+                </div>
+                <div class="widget-body">
+                    <div class="form-group">
+                        <div style="height: 150px;" id="costPay"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="widget">
+                <div class="widget-header bordered-bottom bordered-blue">
+                    <span class="widget-caption">每月消费情况</span>
+                </div>
+                <div class="widget-body">
+                    <div class="form-group">
+                        <div class="dropdown-alerts" style="height: 250px;" id="costMonth"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+                    <div class="widget">
+                        <div class="widget-header bordered-bottom bordered-blue">
+                            <span class="widget-caption">
+                                收入情况：<label class="danger"
+                                            id="amoutcount"></label>
+                            </span>
+                        </div>
+                        <div class="widget-body">
+                            <div class="form-group">
+                                <div class="dropdown-alerts" id="costIncome"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+                    <div class="widget">
+                        <div class="widget-header bordered-bottom bordered-blue">
+                            <span class="widget-caption">消费类型分布</span>
+                        </div>
+                        <div class="widget-body">
+                            <div class="form-group">
+                                <div class="dropdown-alerts" id="container2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/Echarts/echarts.js"></script>
+    @*<script src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>*@
+    <script src="@(ViewBag.RootNode)/Content/Scripts/CostNote/coststatistical.js"></script>
+}
