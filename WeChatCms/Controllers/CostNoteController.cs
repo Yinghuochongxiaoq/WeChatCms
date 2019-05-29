@@ -750,7 +750,15 @@ namespace WeChatCms.Controllers
 
         #region [4、统计消费情况]
 
-
+        /// <summary>
+        /// 统计消费情况
+        /// </summary>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.CostStatistical)]
+        public ActionResult CostStatistical()
+        {
+            return View();
+        }
 
         #endregion
     }
