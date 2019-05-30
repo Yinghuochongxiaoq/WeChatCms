@@ -1,4 +1,5 @@
-﻿using WeChatCmsCommon.EnumBusiness;
+﻿using System;
+using WeChatCmsCommon.EnumBusiness;
 
 namespace WeChatModel.CustomerModel
 {
@@ -25,5 +26,9 @@ namespace WeChatModel.CustomerModel
         /// 消费类型名称
         /// </summary>
         public string CostTypeName { get; set; }
+        /// <summary>
+        /// 统计消费天
+        /// </summary>
+        public DateTime CostDay { get; set; }
     }
 }

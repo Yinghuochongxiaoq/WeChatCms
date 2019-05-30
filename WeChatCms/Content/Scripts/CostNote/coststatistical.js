@@ -57,6 +57,7 @@ function getAllCanPayInfo() {
                 statistical.$data.statisticalModel.CostPayAcount = result.Data.allTypeCost;
                 drawCanPayLine(result.Data.channelAcount);
                 drawCostType(result.Data.costTypeList, result.Data.allTypeCost);
+                dayCost(result.Data.costDayDic, result.Data.costBeginTime, result.Data.costEndTime);
                 parent.layer.msg("操作成功!");
             } else
                 parent.layer.msg(result.Message);
@@ -100,7 +101,7 @@ function drawCanPayLine(data) {
     var option = {
         title: {
             text: '',
-            subtext: '各账户分量'
+            subtext: ''
         },
         tooltip: {
             trigger: 'axis',
@@ -213,36 +214,36 @@ function drawCostType(data, allCost) {
     }
 }
 
-function dayCost() {
+/**
+ * 绘制每一天的数据
+ */
+function dayCost(data, costBeginTime, costEndTime) {
     var dom = document.getElementById("dayCost");
     var myChart = echarts.init(dom);
-    var app = {};
-    option = null;
-    function getVirtulData(year) {
-        year = year || '2017';
-        var date = +echarts.number.parseDate(year + '-01-01');
-        var end = +echarts.number.parseDate((+year + 1) + '-01-01');
-        var dayTime = 3600 * 24 * 1000;
-        var data = [];
-        for (var time = date; time < end; time += dayTime) {
-            data.push([
-                echarts.format.formatTime('yyyy-MM-dd', time),
-                Math.floor(Math.random() * 10000)
-            ]);
-        }
-        return data;
-    }
 
-    option = {
+    var max = 0;
+    var seriesData = [];
+    if (data) {
+        for (var item in data) {
+            if (data.hasOwnProperty(item)) {
+                seriesData.push([item, data[item]]);
+                if (max < data[item]) {
+                    max = data[item];
+                }
+            }
+        }
+    }
+    var range = [costBeginTime, costEndTime];
+    var option = {
         title: {
             top: 30,
             left: 'left',
-            text: '2016年某人每天的步数'
+            text: ''
         },
         tooltip: {},
         visualMap: {
             min: 0,
-            max: 10000,
+            max: max,
             type: 'piecewise',
             orient: 'horizontal',
             left: 'left',
@@ -256,7 +257,7 @@ function dayCost() {
             left: 30,
             right: 30,
             cellSize: ['auto', 13],
-            range: '2016',
+            range: range,
             itemStyle: {
                 normal: { borderWidth: 0.5 }
             },
@@ -265,15 +266,11 @@ function dayCost() {
         series: {
             type: 'heatmap',
             coordinateSystem: 'calendar',
-            data: getVirtulData(2016)
+            data: seriesData
         }
     };
-    ;
-    if (option && typeof option === "object") {
-        myChart.setOption(option, true);
-    }
+    myChart.setOption(option, true);
 }
 
 getAllCostChannelList();
 getAllCanPayInfo();
-dayCost();

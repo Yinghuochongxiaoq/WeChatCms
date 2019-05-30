@@ -368,5 +368,49 @@ FROM
                 return query.ToList();
             }
         }
+
+        /// <summary>
+        /// 获取消费天记录
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="userId"></param>
+        /// <param name="inOrOut"></param>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        public List<CanPayAcountModel> GetStatisticsCostDayPay(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
+        {
+            var select = @"select DATE(CostTime) as CostDay,sum(cost) as CostCount from costcontent ";
+            var groupby = " group by CostDay ORDER BY CostDay";
+            var where = new StringBuilder("WHERE UserId = @UserId  ");
+            where.Append(" AND CostInOrOut = @CostInOrOut  ");
+            if (starTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" and  CostTime>@StartTime  ");
+            }
+
+            if (endTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" and  CostTime<=@EndTime  ");
+            }
+
+            if (channelId > 0)
+            {
+                where.Append(" and  CostChannel=@CostChannel  ");
+            }
+            var param = new
+            {
+                UserId = userId,
+                CostInOrOut = inOrOut.GetHashCode(),
+                StartTime = starTime,
+                EndTime = endTime,
+                CostChannel = channelId
+            };
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                IEnumerable<CanPayAcountModel> query = conn.Query<CanPayAcountModel>(select + where + groupby, param);
+                return query.ToList();
+            }
+        }
     }
 }

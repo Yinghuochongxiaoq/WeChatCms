@@ -164,7 +164,22 @@ namespace WeChatService
 
             var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
             var allTypeCost = costTypeList.Sum(f => f.CostCount);
-            return new { allCanPay, allTypeCost, channelAcount = data, costTypeList };
+
+            var costDayList = _dataAccess.GetStatisticsCostDayPay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            var costDayDic = new Dictionary<string, decimal>();
+            costDayList.ForEach(f =>
+            {
+                costDayDic.Add(f.CostDay.ToString("yyyy-MM-dd"), f.CostCount);
+            });
+            var costBeginTime = "";
+            var costEndTime = "";
+            if (costDayList.Count > 0)
+            {
+                costBeginTime = costDayList[0].CostDay.ToString("yyyy-MM-01");
+                var itemEndTime = costDayList[costDayList.Count - 1].CostDay;
+                costEndTime = new DateTime(itemEndTime.Year, itemEndTime.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
+            }
+            return new { allCanPay, allTypeCost, channelAcount = data, costTypeList, costDayDic, costBeginTime, costEndTime };
         }
     }
 }
