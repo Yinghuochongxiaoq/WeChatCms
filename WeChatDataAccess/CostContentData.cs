@@ -10,6 +10,7 @@ using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Enum;
 using FreshCommonUtility.SqlHelper;
 using WeChatCmsCommon.EnumBusiness;
+using WeChatModel.CustomerModel;
 using WeChatModel.DatabaseModel;
 
 namespace WeChatDataAccess
@@ -297,6 +298,74 @@ namespace WeChatDataAccess
                     return 0;
                 }
 
+            }
+        }
+
+        /// <summary>
+        /// 获取余额统计数据
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<CanPayAcountModel> GetStatisticsCanPay(long userId)
+        {
+            var select = @"	SELECT CostInOrOut, CostChannel, sum( cost ) CostCount,CostChannelName
+	FROM costcontent WHERE userid = @UserId GROUP BY CostInOrOut, CostChannel ,CostChannelName";
+            var param = new
+            {
+                UserId = userId
+            };
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                IEnumerable<CanPayAcountModel> query = conn.Query<CanPayAcountModel>(select, param);
+                return query.ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取消费分类记录
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="userId"></param>
+        /// <param name="inOrOut"></param>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        public List<CanPayAcountModel> GetStatisticsCostTypePay(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
+        {
+            var select = @"SELECT
+	CostTypeName,
+	sum( cost ) CostCount 
+FROM
+	costcontent ";
+            var groupby = " GROUP BY CostTypeName ORDER BY CostCount DESC";
+            var where = new StringBuilder("WHERE UserId = @UserId  ");
+            where.Append(" AND CostInOrOut = @CostInOrOut  ");
+            if (starTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" and  CostTime>@StartTime  ");
+            }
+
+            if (endTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" and  CostTime<=@EndTime  ");
+            }
+
+            if (channelId > 0)
+            {
+                where.Append(" and  CostChannel=@CostChannel  ");
+            }
+            var param = new
+            {
+                UserId = userId,
+                CostInOrOut = inOrOut.GetHashCode(),
+                StartTime = starTime,
+                EndTime = endTime,
+                CostChannel = channelId
+            };
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                IEnumerable<CanPayAcountModel> query = conn.Query<CanPayAcountModel>(select + where + groupby, param);
+                return query.ToList();
             }
         }
     }

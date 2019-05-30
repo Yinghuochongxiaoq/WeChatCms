@@ -284,7 +284,7 @@ function getAllCostChannelList() {
             }
         },
         error: function () {
-            parent.layer.msg("获取类型失败");
+            parent.layer.msg("获取账户列表失败");
         }
     });
 }

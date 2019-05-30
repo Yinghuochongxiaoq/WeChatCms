@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatDataAccess;
+using WeChatModel.CustomerModel;
 using WeChatModel.DatabaseModel;
 
 namespace WeChatService
@@ -126,6 +127,44 @@ namespace WeChatService
         {
             return _dataAccess.GetStatisticsCost(userId, spendType, address, costThing, costType, costchannel,
                 startTime, endTime);
+        }
+
+        /// <summary>
+        /// 获取总的可支配账户信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        public dynamic GetStatisticsCanPay(long userId, DateTime starTime, DateTime endTime, long channelId)
+        {
+            List<CanPayAcountModel> channelCanPayList = _dataAccess.GetStatisticsCanPay(userId);
+            var inCostList = channelCanPayList.Where(f => f.CostInOrOut == CostInOrOutEnum.In);
+            var outCostList = channelCanPayList.Where(e => e.CostInOrOut == CostInOrOutEnum.Out);
+            var allCanPay = inCostList.Sum(r => r.CostCount) - outCostList.Sum(s => s.CostCount);
+            var channelAcount = new Dictionary<string, decimal>();
+            channelCanPayList.ForEach(h =>
+            {
+                if (channelAcount.ContainsKey(h.CostChannelName))
+                {
+                    channelAcount[h.CostChannelName] = channelAcount[h.CostChannelName] +
+                                                       (h.CostInOrOut == CostInOrOutEnum.In
+                                                           ? h.CostCount
+                                                           : h.CostCount * -1);
+                }
+                else
+                {
+                    channelAcount.Add(h.CostChannelName, h.CostInOrOut == CostInOrOutEnum.In
+                        ? h.CostCount
+                        : h.CostCount * -1);
+                }
+            });
+            var data = channelAcount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
+
+            var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            var allTypeCost = costTypeList.Sum(f => f.CostCount);
+            return new { allCanPay, allTypeCost, channelAcount = data, costTypeList };
         }
     }
 }

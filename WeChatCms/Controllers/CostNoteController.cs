@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Web;
 using System.Web.Mvc;
+using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Enum;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
@@ -687,7 +688,7 @@ namespace WeChatCms.Controllers
             }
             List<string> outTypeList = new List<string>
             {
-                "餐饮","乘车","旅游","服饰","奢侈品","送礼","外借","取现","住宿","充话费","水电气费","物管费","发红包"
+                "餐饮","乘车","旅游","服饰","奢侈品","送礼","取现","住宿","充话费","水电气费","物管费","发红包"
             };
             List<string> inTypeList = new List<string>
             {
@@ -760,6 +761,38 @@ namespace WeChatCms.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 获取统计信息
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="costChannel"></param>
+        /// <returns></returns>
+        [Permission(EnumBusinessPermission.CostStatistical)]
+        public ActionResult GetStatisticalData(string startTime = null, string endTime = null, long costChannel = 0)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userId = CurrentModel.UserId;
+            if (userId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+            }
+            else
+            {
+                var beginTime = DataTypeConvertHelper.ToDateTime(startTime);
+                var closeTime = DataTypeConvertHelper.ToDateTime(endTime);
+                var server = new CostContentService();
+                var data = server.GetStatisticsCanPay(userId, beginTime, closeTime, costChannel);
+                resultMode.Data = data;
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+            }
+
+            return Json(resultMode, JsonRequestBehavior.AllowGet);
+        }
         #endregion
     }
 }
