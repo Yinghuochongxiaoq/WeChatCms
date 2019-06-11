@@ -186,7 +186,7 @@ function editCostContent(id) {
 function initViewModel() {
     var d = new Date();
     detailVm.$data.costcontentmodel = {
-        Cost: 0,
+        Cost: '',
         CostAddress: "",
         CostChannel: 0,
         CostThing: "",
