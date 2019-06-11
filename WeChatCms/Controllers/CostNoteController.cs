@@ -171,7 +171,7 @@ namespace WeChatCms.Controllers
             newModel.Cost = Math.Round(Math.Abs(model.Cost), 2);
             newModel.CostAddress = model.CostAddress;
             newModel.CostChannel = model.CostChannel;
-            newModel.CostType = model.CostType;
+            newModel.CostType = model.SpendType == 2 ? -1 : model.CostType;
             newModel.UserId = userId;
             newModel.CostInOrOut = model.CostInOrOut;
             newModel.CostThing = model.CostThing;

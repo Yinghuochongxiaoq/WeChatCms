@@ -79,58 +79,54 @@
             </div>
         </form>
     </div>
-    <div id="resultTable" class="well with-footer">
+    <div id="resultTable" class="well with-header with-footer">
+        <div class="header bordered-yellow">
+            当前条件下可支配余额：<b class="danger">{{statisticsModel.allCouldCost}}</b>
+            支出总额：<b class="warning">{{statisticsModel.allOutCost}}</b>
+            收入总额：<b class="success">{{statisticsModel.allInCost}}</b>
+        </div>
         <div class="table-scrollable">
             <table class="table table-bordered  table-hover ">
                 <thead class="flip-content bordered-palegreen">
-                    <tr class="control-center">
-                        <th>时间</th>
-                        <th>金额（单位元）</th>
-                        <th>账户</th>
-                        <th>收/支</th>
-                        <th>事件</th>
-                        <th>类型</th>
-                        <th>操作</th>
-                    </tr>
+                <tr class="control-center">
+                    <th>时间</th>
+                    <th>金额（单位元）</th>
+                    <th>账户</th>
+                    <th>收/支</th>
+                    <th>事件</th>
+                    <th>类型</th>
+                    <th>操作</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr class="control-center" v-for="item of costcontentlist">
-                        <td>{{item.CostTime}}</td>
-                        <td>{{item.Cost}}元</td>
-                        <td>{{item.CostChannelName}}</td>
-                        <td>{{vueInOrOut(item.SpendType)+(item.SpendType==2?(item.CostInOrOut==1?"(收)":"(支)"):"")}}</td>
-                        <td>{{item.CostThing}}</td>
-                        <td>{{vueTypeContent(item.CostType)}}</td>
-                        <td>
-                            <input type="button" v-on:click="vueEditCostContent(item.Id)"
-                                   class="btn btn-success" title="编辑" value="编辑">
-                        </td>
-                    </tr>
+                <tr class="control-center" v-for="item of costcontentlist">
+                    <td>{{item.CostTime}}</td>
+                    <td>{{item.Cost}}元</td>
+                    <td>{{item.CostChannelName}}</td>
+                    <td>{{vueInOrOut(item.SpendType)+(item.SpendType==2?(item.CostInOrOut==1?"(收)":"(支)"):"")}}</td>
+                    <td>{{item.CostThing}}</td>
+                    <td>{{vueTypeContent(item.CostType)}}</td>
+                    <td>
+                        <input type="button" v-on:click="vueEditCostContent(item.Id)"
+                               class="btn btn-success" title="编辑" value="编辑">
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
         <div class="footer col-md-12" style="padding: 4px;">
-            <div class="form-group">
-                <div class="col-sm-5">
-                    当前条件下可支配余额：<b class="danger">{{statisticsModel.allCouldCost}}</b>
-                    支出总额：<b class="warning">{{statisticsModel.allOutCost}}</b>
-                    收入总额：<b class="success">{{statisticsModel.allInCost}}</b>
-                </div>
-                <div class="col-sm-7">
-                    <table width="100%">
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div id="pager">
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!--当前页码-->
-                    <input type="hidden" id="currentPageIndex" value="1">
-                </div>
-            </div>
+            <table width="100%">
+                <tbody>
+                <tr>
+                    <td>
+                        <div id="pager">
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
         </div>
     </div>
 </div>

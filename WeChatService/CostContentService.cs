@@ -160,7 +160,7 @@ namespace WeChatService
                         : h.CostCount * -1);
                 }
             });
-            var data = channelAcount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
+            var data = channelAcount.Where(r => r.Value != 0).Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
 
             var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
             var allTypeCost = costTypeList.Sum(f => f.CostCount);

@@ -339,6 +339,7 @@ FROM
 	costcontent ";
             var groupby = " GROUP BY CostTypeName ORDER BY CostCount DESC";
             var where = new StringBuilder("WHERE UserId = @UserId  ");
+            where.Append(" AND SpendType!=2 ");
             where.Append(" AND CostInOrOut = @CostInOrOut  ");
             if (starTime > new DateTime(1900, 1, 1))
             {
@@ -383,6 +384,7 @@ FROM
             var select = @"select DATE(CostTime) as CostDay,sum(cost) as CostCount from costcontent ";
             var groupby = " group by CostDay ORDER BY CostDay";
             var where = new StringBuilder("WHERE UserId = @UserId  ");
+            where.Append(" AND SpendType!=2 ");
             where.Append(" AND CostInOrOut = @CostInOrOut  ");
             if (starTime > new DateTime(1900, 1, 1))
             {
