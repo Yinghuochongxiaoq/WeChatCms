@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatService", "WeChatServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatDataAccess", "WeChatDataAccess\WeChatDataAccess.csproj", "{A828147C-4533-4454-9733-EE198BEA42BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatNoteCostApi", "WeChatNoteCostApi\WeChatNoteCostApi.csproj", "{353BA60D-C3E2-4D75-970A-7DE3AD86E9F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A828147C-4533-4454-9733-EE198BEA42BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A828147C-4533-4454-9733-EE198BEA42BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A828147C-4533-4454-9733-EE198BEA42BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{353BA60D-C3E2-4D75-970A-7DE3AD86E9F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{353BA60D-C3E2-4D75-970A-7DE3AD86E9F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{353BA60D-C3E2-4D75-970A-7DE3AD86E9F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{353BA60D-C3E2-4D75-970A-7DE3AD86E9F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

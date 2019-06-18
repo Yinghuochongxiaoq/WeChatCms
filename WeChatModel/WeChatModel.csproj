@@ -111,6 +111,8 @@
     <Compile Include="PowerTreeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseBaseModel.cs" />
+    <Compile Include="WeChatAuthModel\WxResponseUserInfo.cs" />
+    <Compile Include="WeChatAuthModel\WxValidateUserResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">
