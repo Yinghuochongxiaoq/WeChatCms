@@ -9,7 +9,6 @@ using FreshCommonUtility.Cookie;
 using FreshCommonUtility.Enum;
 using FreshCommonUtility.Security;
 using Newtonsoft.Json;
-using WeChatCmsCommon.CustomerAttribute;
 using WeChatModel;
 using WeChatService;
 
@@ -84,7 +83,7 @@ namespace WeChatCms.Controllers
         /// <param name="filterContext"></param>
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var noAuthorizeAttributes = filterContext.ActionDescriptor.GetCustomAttributes(typeof(AuthorizeIgnoreAttribute), false);
+            var noAuthorizeAttributes = filterContext.ActionDescriptor.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
             if (noAuthorizeAttributes.Length > 0)
                 return;
 

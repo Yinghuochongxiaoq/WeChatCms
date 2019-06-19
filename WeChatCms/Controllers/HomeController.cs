@@ -1,11 +1,10 @@
 ﻿using System.Web.Mvc;
-using WeChatCmsCommon.CustomerAttribute;
 
 namespace WeChatCms.Controllers
 {
     public class HomeController : AdminControllerBase
     {
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult Index()
         {
             return RedirectToAction("Login", "Auth");

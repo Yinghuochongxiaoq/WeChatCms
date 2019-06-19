@@ -55,6 +55,7 @@
     <Compile Include="ResourceService.cs" />
     <Compile Include="SysAdvertiseService.cs" />
     <Compile Include="SysDicService.cs" />
+    <Compile Include="WechatAccountService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

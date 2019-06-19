@@ -7,7 +7,6 @@ using System.Web.Mvc;
 using FreshCommonUtility.Configure;
 using FreshCommonUtility.Security;
 using Newtonsoft.Json;
-using WeChatCmsCommon.CustomerAttribute;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -430,7 +429,7 @@ namespace WeChatCms.Controllers
         /// </summary>
         /// <param name="firstpwd"></param>
         /// <returns></returns>
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult ChangePassword(string firstpwd)
         {
             var resultMode = new ResponseBaseModel<dynamic>
@@ -480,7 +479,7 @@ namespace WeChatCms.Controllers
         /// 修改头像
         /// </summary>
         /// <returns></returns>
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult ChangeHeadImage()
         {
             var resultMode = PutFile();
@@ -505,7 +504,7 @@ namespace WeChatCms.Controllers
         /// 保存数据到数据库中
         /// </summary>
         /// <returns></returns>
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult PutImageToSys(string type = null)
         {
             var resultMode = PutFile(type);

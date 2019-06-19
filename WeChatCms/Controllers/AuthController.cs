@@ -6,7 +6,6 @@ using FreshCommonUtility.Cookie;
 using FreshCommonUtility.Security;
 using Newtonsoft.Json;
 using WeChatCmsCommon.CheckCodeHelper;
-using WeChatCmsCommon.CustomerAttribute;
 using WeChatCmsCommon.Unit;
 using WeChatService;
 
@@ -23,7 +22,7 @@ namespace WeChatCms.Controllers
         /// 登录页面
         /// </summary>
         /// <returns></returns>
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult Login()
         {
             return View();
@@ -37,7 +36,7 @@ namespace WeChatCms.Controllers
         /// <param name="checkcode"></param>
         /// <returns></returns>
         [HttpPost]
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult Login(string username, string password,string checkcode)
         {
             var code = Session["ValidateCode"]?.ToString();
@@ -63,7 +62,7 @@ namespace WeChatCms.Controllers
         /// <summary>
         /// 获取验证码
         /// </summary>
-        [AuthorizeIgnore]
+        [AllowAnonymous]
         public ActionResult CheckCode()
         {
             var yzm = new YzmHelper();

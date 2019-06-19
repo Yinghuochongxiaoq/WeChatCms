@@ -106,13 +106,15 @@
     <Compile Include="DatabaseModel\SysresourceModel.cs" />
     <Compile Include="DatabaseModel\SysUser.cs" />
     <Compile Include="DatabaseModel\Sysusermenu.cs" />
+    <Compile Include="DatabaseModel\WechatAccountModel.cs" />
     <Compile Include="LoginInfoModel.cs" />
     <Compile Include="DatabaseModel\SysMenuModel.cs" />
     <Compile Include="PowerTreeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseBaseModel.cs" />
-    <Compile Include="WeChatAuthModel\WxResponseUserInfo.cs" />
-    <Compile Include="WeChatAuthModel\WxValidateUserResponse.cs" />
+    <Compile Include="WeChatAuthModel\WechatLoginInfo.cs" />
+    <Compile Include="WeChatAuthModel\WechatUserInfo.cs" />
+    <Compile Include="WeChatAuthModel\OpenIdAndSessionKey.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

@@ -108,6 +108,7 @@
     <Compile Include="SysAdvertiseData.cs" />
     <Compile Include="SysContentData.cs" />
     <Compile Include="SysDicData.cs" />
+    <Compile Include="WechatAccountData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

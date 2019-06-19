@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WeChatModel.WeChatAuthModel
+﻿namespace WeChatModel.WeChatAuthModel
 {
     /// <summary>
     /// 微信用户信息
     /// </summary>
-    public class WxResponseUserInfo
+    public class WechatUserInfo
     {
         /// <summary>
         /// 单平台用户唯一ID
@@ -43,6 +37,15 @@ namespace WeChatModel.WeChatAuthModel
         /// 头像Url
         /// </summary>
         public string avatarUrl { get; set; }
-        public string sessionKey { get; set; }
+        /// <summary>
+        /// 验证信息
+        /// </summary>
+        public Watermark watermark { get; set; }
+
+        public class Watermark
+        {
+            public string appid { get; set; }
+            public string timestamp { get; set; }
+        }
     }
 }

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WeChatModel.WeChatAuthModel
+﻿namespace WeChatModel.WeChatAuthModel
 {
     /// <summary>
     /// 微信授权用户反馈类
     /// </summary>
-    public class WxValidateUserResponse
+    public class OpenIdAndSessionKey
     {
         /// <summary>
         /// session_key
@@ -19,5 +13,13 @@ namespace WeChatModel.WeChatAuthModel
         /// 单平台用户唯一ID
         /// </summary>
         public string openid { get; set; }
+        /// <summary>
+        /// 错误code
+        /// </summary>
+        public string errcode { get; set; }
+        /// <summary>
+        /// 错误信息
+        /// </summary>
+        public string errmsg { get; set; }
     }
 }

@@ -328,4 +328,17 @@ INSERT INTO `sysusermenu` VALUES (51, 1, 6, 0);
 INSERT INTO `sysusermenu` VALUES (52, 1, 7, 0);
 INSERT INTO `sysusermenu` VALUES (53, 1, 8, 0);
 
+CREATE TABLE `wechatdb`.`WeChatAccount`  (
+  `Id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `OpenId` varchar(255) NULL COMMENT '微信OpenId',
+  `NickName` varchar(255) NULL COMMENT '昵称获取微信授权的昵称或重命名',
+  `AvatarUrl` varchar(255) NULL COMMENT '头像',
+  `Gender` int(255) NULL COMMENT '性别1:女；2:男',
+  `CreateTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `Remarks` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `IsDel` int(255) NULL DEFAULT NULL COMMENT '是否已经删除0：未删除，1：已经删除',
+  `AccountId` bigint(0) NULL DEFAULT NULL COMMENT '关联的用户id',
+  PRIMARY KEY (`Id`)
+);
+
 SET FOREIGN_KEY_CHECKS = 1;

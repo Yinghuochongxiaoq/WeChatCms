@@ -7,7 +7,6 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using WeChatCmsCommon.CustomerAttribute;
 
 namespace WeChatNoteCostApi.Filter
 {
@@ -16,14 +15,16 @@ namespace WeChatNoteCostApi.Filter
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             //如果用户方位的Action带有AllowAnonymousAttribute，则不进行授权验证
+            if (actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<AllowAnonymousAttribute>()
+                .Any())
+            {
+                return;
+            }
             if (actionContext.ActionDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any())
             {
                 return;
             }
-            if (actionContext.ActionDescriptor.GetCustomAttributes<AuthorizeIgnoreAttribute>().Any())
-            {
-                return;
-            }
+            //TODO:验证权限
             var verifyResult = actionContext.Request.Headers.Authorization != null &&  //要求请求中需要带有Authorization头
                                actionContext.Request.Headers.Authorization.Parameter == "123456"; //并且Authorization参数为123456则验证通过
             if (!verifyResult)
