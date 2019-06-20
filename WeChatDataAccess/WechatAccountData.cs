@@ -11,13 +11,13 @@ using WeChatModel.DatabaseModel;
 
 namespace WeChatDataAccess
 {
-    public class WechatAccountData : BaseData<long, WechatAccountModel>
+    public class WeChatAccountData : BaseData<long, WeChatAccountModel>
     {
         /// <summary>
         /// 保存信息
         /// </summary>
         /// <param name="saveModel"></param>
-        public void SaveModel(WechatAccountModel saveModel)
+        public void SaveModel(WeChatAccountModel saveModel)
         {
             if (saveModel == null) return;
             using (var conn = SqlConnectionHelper.GetOpenConnection())
@@ -25,7 +25,7 @@ namespace WeChatDataAccess
                 if (saveModel.Id < 1)
                 {
                     //新增
-                    conn.Insert<long, WechatAccountModel>(saveModel);
+                    conn.Insert<long, WeChatAccountModel>(saveModel);
                 }
                 else
                 {
@@ -40,7 +40,7 @@ namespace WeChatDataAccess
         /// </summary>
         /// <param name="openId"></param>
         /// <returns></returns>
-        public WechatAccountModel GetModelByOpenId(string openId)
+        public WeChatAccountModel GetModelByOpenId(string openId)
         {
             if (string.IsNullOrEmpty(openId))
             {
@@ -48,7 +48,22 @@ namespace WeChatDataAccess
             }
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
-                return conn.GetList<WechatAccountModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), OpenId = openId })?.FirstOrDefault();
+                return conn.GetList<WeChatAccountModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), OpenId = openId })?.FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// 根据accountid获取用户信息
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        public WeChatAccountModel GetByAccountId(long accountId)
+        {
+            if (accountId < 1) return null;
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                return conn.GetList<WeChatAccountModel>(new
+                { IsDel = FlagEnum.HadZore.GetHashCode(), AccountId = accountId })?.FirstOrDefault();
             }
         }
 

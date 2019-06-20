@@ -3,7 +3,7 @@
     /// <summary>
     /// 微信用户信息
     /// </summary>
-    public class WechatUserInfo
+    public class WeChatUserInfo
     {
         /// <summary>
         /// 单平台用户唯一ID

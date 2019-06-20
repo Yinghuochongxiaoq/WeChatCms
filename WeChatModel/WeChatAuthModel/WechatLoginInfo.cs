@@ -3,7 +3,7 @@
     /// <summary>
     /// 微信小程序登录信息结构
     /// </summary>
-    public class WechatLoginInfo
+    public class WeChatLoginInfo
     {
         public string code { get; set; }
         public string encryptedData { get; set; }

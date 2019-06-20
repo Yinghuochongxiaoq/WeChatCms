@@ -14,7 +14,7 @@ namespace WeChatService
         /// <summary>
         /// 数据服务
         /// </summary>
-        private WechatAccountData _dataAccess = new WechatAccountData();
+        private WeChatAccountData _dataAccess = new WeChatAccountData();
 
         /// <summary>
         /// 获取内容
@@ -24,7 +24,7 @@ namespace WeChatService
         /// <param name="pageSize"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public List<WechatAccountModel> GetList(string type, int indexPage, int pageSize, out int count)
+        public List<WeChatAccountModel> GetList(string type, int indexPage, int pageSize, out int count)
         {
             count = _dataAccess.GetCount();
             return _dataAccess.GetModels(indexPage, pageSize);
@@ -48,9 +48,21 @@ namespace WeChatService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public WechatAccountModel Get(long id)
+        public WeChatAccountModel Get(long id)
         {
             var data = _dataAccess.Get(id);
+            if (data == null || data.IsDel == FlagEnum.HadOne.GetHashCode()) return null;
+            return data;
+        }
+
+        /// <summary>
+        /// 通过绑定的id获取用户信息
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        public WeChatAccountModel GetByAccountId(long accountId)
+        {
+            var data = _dataAccess.GetByAccountId(accountId);
             if (data == null || data.IsDel == FlagEnum.HadOne.GetHashCode()) return null;
             return data;
         }
@@ -60,7 +72,7 @@ namespace WeChatService
         /// </summary>
         /// <param name="openId"></param>
         /// <returns></returns>
-        public WechatAccountModel GetByOpenId(string openId)
+        public WeChatAccountModel GetByOpenId(string openId)
         {
             var data = _dataAccess.GetModelByOpenId(openId);
             if (data == null || data.IsDel == FlagEnum.HadOne.GetHashCode()) return null;
@@ -71,7 +83,7 @@ namespace WeChatService
         /// 保存信息
         /// </summary>
         /// <param name="saveModel"></param>
-        public void SaveModel(WechatAccountModel saveModel)
+        public void SaveModel(WeChatAccountModel saveModel)
         {
             _dataAccess.SaveModel(saveModel);
         }

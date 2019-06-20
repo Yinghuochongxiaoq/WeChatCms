@@ -99,5 +99,20 @@ namespace WeChatService
             _accountData.DelUserModel(id);
         }
         #endregion
+
+        #region [3、添加并绑定一个新微信用户]
+
+        /// <summary>
+        /// 绑定新用户
+        /// </summary>
+        /// <param name="sysUser"></param>
+        /// <param name="openId"></param>
+        /// <returns></returns>
+        public long InsertWeChatUserAndBind(SysUser sysUser, string openId)
+        {
+            return _accountData.InsertAndBindWechatUser(sysUser, openId);
+        }
+
+        #endregion
     }
 }

@@ -19,7 +19,7 @@ namespace WeChatModel.DatabaseModel
     /// wechataccount table in MySQL5
     /// </summary>
     [Table("wechataccount")]
-    public class WechatAccountModel
+    public class WeChatAccountModel
     {
         /// <summary>
         /// Id 自增主键

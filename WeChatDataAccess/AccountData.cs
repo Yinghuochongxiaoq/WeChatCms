@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using Dapper;
 using FreshCommonUtility.Cache;
@@ -239,6 +241,46 @@ namespace WeChatDataAccess
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
                 return conn.GetList<SysUser>(new { UserName = userName })?.ToList();
+            }
+        }
+        #endregion
+
+        #region [3、处理微信用户需求]
+
+        /// <summary>
+        /// 添加新的用户并绑定微信账户
+        /// </summary>
+        /// <param name="sysUser"></param>
+        /// <param name="openId"></param>
+        /// <returns></returns>
+        public long InsertAndBindWechatUser(SysUser sysUser, string openId)
+        {
+            if (sysUser == null) return 0;
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                var wechatUser = conn.GetList<WeChatAccountModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), OpenId = openId })?.FirstOrDefault();
+                if (wechatUser == null || wechatUser.AccountId > 0)
+                {
+                    return -1;
+                }
+                IDbTransaction transaction = conn.BeginTransaction();
+                try
+                {
+                    var inId = conn.Insert<long, SysUser>(sysUser, transaction);
+                    wechatUser.AccountId = inId;
+                    conn.Update(wechatUser, transaction);
+                    transaction.Commit();
+                    return inId;
+                }
+                catch (Exception e)
+                {
+                    if (Debugger.IsAttached)
+                    {
+                        Trace.WriteLine("事务处理失败：" + e.Message);
+                    }
+                    transaction.Rollback();
+                    return 0;
+                }
             }
         }
         #endregion

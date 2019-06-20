@@ -46,7 +46,7 @@ namespace WeChatNoteCostApi.WeChatHelper
         /// </summary>
         /// <param name="loginInfo">Json数据包</param>
         /// <returns>包含OpenId和SessionKey的类</returns>
-        public OpenIdAndSessionKey DecodeOpenIdAndSessionKey(WechatLoginInfo loginInfo)
+        public OpenIdAndSessionKey DecodeOpenIdAndSessionKey(WeChatLoginInfo loginInfo)
         {
             OpenIdAndSessionKey oiask = JsonConvert.DeserializeObject<OpenIdAndSessionKey>(GetOpenIdAndSessionKeyString(loginInfo.code));
             if (!string.IsNullOrEmpty(oiask.errcode))
@@ -81,7 +81,7 @@ namespace WeChatNoteCostApi.WeChatHelper
         /// <param name="loginInfo">登陆信息</param>
         /// <param name="sessionKey">从服务端获取的SessionKey</param>
         /// <returns>True：资料有效，False：资料无效</returns>
-        public bool VaildateUserInfo(WechatLoginInfo loginInfo, string sessionKey)
+        public bool VaildateUserInfo(WeChatLoginInfo loginInfo, string sessionKey)
         {
             return VaildateUserInfo(loginInfo.rawData, loginInfo.signature, sessionKey);
         }
@@ -92,7 +92,7 @@ namespace WeChatNoteCostApi.WeChatHelper
         /// <param name="loginInfo">登陆信息</param>
         /// <param name="idAndKey">包含OpenId和SessionKey的类</param>
         /// <returns>True：资料有效，False：资料无效</returns>
-        public bool VaildateUserInfo(WechatLoginInfo loginInfo, OpenIdAndSessionKey idAndKey)
+        public bool VaildateUserInfo(WeChatLoginInfo loginInfo, OpenIdAndSessionKey idAndKey)
         {
             return VaildateUserInfo(loginInfo, idAndKey.session_key);
         }
@@ -104,9 +104,9 @@ namespace WeChatNoteCostApi.WeChatHelper
         /// <param name="iv">初始向量</param>
         /// <param name="sessionKey">从服务端获取的SessionKey</param>
         /// <returns></returns>
-        public WechatUserInfo Decrypt(string encryptedData, string iv, string sessionKey)
+        public WeChatUserInfo Decrypt(string encryptedData, string iv, string sessionKey)
         {
-            WechatUserInfo userInfo;
+            WeChatUserInfo userInfo;
             //创建解密器生成工具实例
             AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
             //设置解密器参数
@@ -130,7 +130,7 @@ namespace WeChatNoteCostApi.WeChatHelper
             string result = Encoding.UTF8.GetString(final);
 
             //反序列化结果，生成用户信息实例
-            userInfo = JsonConvert.DeserializeObject<WechatUserInfo>(result);
+            userInfo = JsonConvert.DeserializeObject<WeChatUserInfo>(result);
 
             return userInfo;
 
@@ -141,7 +141,7 @@ namespace WeChatNoteCostApi.WeChatHelper
         /// </summary>
         /// <param name="loginInfo">登陆信息</param>
         /// <returns>用户信息</returns>
-        public WechatUserInfo Decrypt(WechatLoginInfo loginInfo)
+        public WeChatUserInfo Decrypt(WeChatLoginInfo loginInfo)
         {
             if (loginInfo == null)
                 return null;
@@ -157,7 +157,7 @@ namespace WeChatNoteCostApi.WeChatHelper
             if (!VaildateUserInfo(loginInfo, oiask))
                 return null;
 
-            WechatUserInfo userInfo = Decrypt(loginInfo.encryptedData, loginInfo.iv, oiask.session_key);
+            WeChatUserInfo userInfo = Decrypt(loginInfo.encryptedData, loginInfo.iv, oiask.session_key);
 
             return userInfo;
         }
