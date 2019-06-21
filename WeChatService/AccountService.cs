@@ -110,7 +110,12 @@ namespace WeChatService
         /// <returns></returns>
         public long InsertWeChatUserAndBind(SysUser sysUser, string openId)
         {
-            return _accountData.InsertAndBindWechatUser(sysUser, openId);
+            var newIndex = _accountData.InsertAndBindWechatUser(sysUser, openId);
+            var costTypeServer = new CostTypeService();
+            costTypeServer.InitCostType(newIndex);
+            var costChannelServer = new CostChannelService();
+            costChannelServer.InitCostChannel(newIndex);
+            return newIndex;
         }
 
         #endregion

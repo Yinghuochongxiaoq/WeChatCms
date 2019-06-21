@@ -7,6 +7,13 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using FreshCommonUtility.Cache;
+using FreshCommonUtility.Dynamic;
+using Newtonsoft.Json;
+using WeChatCmsCommon.EnumBusiness;
+using WeChatModel;
+using WeChatModel.DatabaseModel;
+using WeChatNoteCostApi.WeChatInnerModel;
 
 namespace WeChatNoteCostApi.Filter
 {
@@ -25,13 +32,54 @@ namespace WeChatNoteCostApi.Filter
                 return;
             }
             //TODO:验证权限
-            var verifyResult = actionContext.Request.Headers.Authorization != null &&  //要求请求中需要带有Authorization头
-                               actionContext.Request.Headers.Authorization.Parameter == "123456"; //并且Authorization参数为123456则验证通过
-            if (!verifyResult)
+            var method = actionContext.Request.Method;
+            object token = null;
+            var resultMode = new ResponseBaseModel<dynamic>
             {
-                //如果验证不通过，则返回401错误，并且Body中写入错误原因
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Unauthorized, new HttpError("Token 不正确"));
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            if (method == HttpMethod.Post)
+            {
+                var requestContent = actionContext.Request.Content.ReadAsStringAsync();//读取post提交的json数据
+                requestContent.Wait();//等待异步读取结束
+                var inputJson = requestContent.Result;
+                var model = JsonConvert.DeserializeObject<DynamicDataEntity>(inputJson);
+                token = model?["token"];
             }
+            else if (method == HttpMethod.Get)
+            {
+                var queryNameValuePairs = actionContext.Request.GetQueryNameValuePairs();
+                var nameValuePairs = queryNameValuePairs.ToList();
+                if (nameValuePairs.Any(f => f.Key == "token"))
+                {
+                    token = nameValuePairs.FirstOrDefault(r => r.Key == "token").Value;
+                }
+            }
+
+            #region 判断TOKEN信息
+            if (token != null && !string.IsNullOrEmpty(token.ToString()))
+            {
+                try
+                {
+                    var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+                    var tempUserId = userData?.AccountId;
+                    if (tempUserId == null || tempUserId < 1)
+                    {
+                        resultMode.Message = "登录失效，请重新登录";
+                        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, resultMode);
+                    }
+                    return;
+                }
+                catch (Exception e)
+                {
+                    resultMode.Message = "登录失效，请重新登录";
+                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, resultMode);
+                }
+            }
+            resultMode.Message = "token无效";
+            actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, resultMode);
+            #endregion
         }
     }
 }

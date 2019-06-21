@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,6 +73,72 @@ namespace WeChatService
         public void SaveModel(CostTypeModel saveModel)
         {
             _dataAccess.SaveModel(saveModel);
+        }
+
+        /// <summary>
+        /// 初始化类型
+        /// </summary>
+        /// <param name="userId"></param>
+        public void InitCostType(long userId)
+        {
+            if(userId<1) return;
+            List<string> outTypeList = new List<string>
+            {
+                "餐饮","乘车","旅游","服饰","奢侈品","送礼","取现","住宿","充话费","水电气费","物管费","发红包"
+            };
+            List<string> inTypeList = new List<string>
+            {
+                "工资","结存","收红包"
+            };
+            int i = 1;
+            foreach (var s in outTypeList)
+            {
+                var oldModel = new CostTypeModel()
+                {
+                    IsDel = FlagEnum.HadZore,
+                    IsValid = FlagEnum.HadOne,
+                    UpdateUserId = userId,
+                    UpdateTime = DateTime.Now,
+                    CreateTime = DateTime.Now,
+                    CreateUserId = userId,
+                    Sort = i++,
+                    UserId = userId,
+                    Name = s,
+                    SpendType = CostInOrOutEnum.Out.GetHashCode()
+                };
+                try
+                {
+                    SaveModel(oldModel);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e);
+                }
+            }
+            foreach (var s in inTypeList)
+            {
+                var oldModel = new CostTypeModel()
+                {
+                    IsDel = FlagEnum.HadZore,
+                    IsValid = FlagEnum.HadOne,
+                    UpdateUserId = userId,
+                    UpdateTime = DateTime.Now,
+                    CreateTime = DateTime.Now,
+                    CreateUserId = userId,
+                    Sort = i++,
+                    UserId = userId,
+                    Name = s,
+                    SpendType = CostInOrOutEnum.In.GetHashCode()
+                };
+                try
+                {
+                    SaveModel(oldModel);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e);
+                }
+            }
         }
     }
 }

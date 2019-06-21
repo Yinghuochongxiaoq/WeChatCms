@@ -467,35 +467,7 @@ namespace WeChatCms.Controllers
                 resultMode.Message = "已经初始化过";
                 return Json(resultMode, JsonRequestBehavior.AllowGet);
             }
-            List<string> channelList = new List<string>
-            {
-                "现金账户","支付宝账户","微信账户"
-            };
-            int i = 1;
-            foreach (var s in channelList)
-            {
-                var oldModel = new CostChannelModel
-                {
-                    IsDel = FlagEnum.HadZore,
-                    IsValid = FlagEnum.HadOne,
-                    UpdateUserId = userId,
-                    UpdateTime = DateTime.Now,
-                    CostChannelName = s,
-                    CostChannelNo = "",
-                    CreateTime = DateTime.Now,
-                    CreateUserId = userId,
-                    Sort = i++,
-                    UserId = userId
-                };
-                try
-                {
-                    server.SaveModel(oldModel);
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e);
-                }
-            }
+            server.InitCostChannel(userId);
 
             resultMode.ResultCode = ResponceCodeEnum.Success;
             resultMode.Message = "初始化成功";
@@ -686,63 +658,7 @@ namespace WeChatCms.Controllers
                 resultMode.Message = "已经初始化过";
                 return Json(resultMode, JsonRequestBehavior.AllowGet);
             }
-            List<string> outTypeList = new List<string>
-            {
-                "餐饮","乘车","旅游","服饰","奢侈品","送礼","取现","住宿","充话费","水电气费","物管费","发红包"
-            };
-            List<string> inTypeList = new List<string>
-            {
-                "工资","归还","结余","收红包"
-            };
-            int i = 1;
-            foreach (var s in outTypeList)
-            {
-                var oldModel = new CostTypeModel()
-                {
-                    IsDel = FlagEnum.HadZore,
-                    IsValid = FlagEnum.HadOne,
-                    UpdateUserId = userId,
-                    UpdateTime = DateTime.Now,
-                    CreateTime = DateTime.Now,
-                    CreateUserId = userId,
-                    Sort = i++,
-                    UserId = userId,
-                    Name = s,
-                    SpendType = CostInOrOutEnum.Out.GetHashCode()
-                };
-                try
-                {
-                    server.SaveModel(oldModel);
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e);
-                }
-            }
-            foreach (var s in inTypeList)
-            {
-                var oldModel = new CostTypeModel()
-                {
-                    IsDel = FlagEnum.HadZore,
-                    IsValid = FlagEnum.HadOne,
-                    UpdateUserId = userId,
-                    UpdateTime = DateTime.Now,
-                    CreateTime = DateTime.Now,
-                    CreateUserId = userId,
-                    Sort = i++,
-                    UserId = userId,
-                    Name = s,
-                    SpendType = CostInOrOutEnum.In.GetHashCode()
-                };
-                try
-                {
-                    server.SaveModel(oldModel);
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e);
-                }
-            }
+            server.InitCostType(userId);
             resultMode.ResultCode = ResponceCodeEnum.Success;
             resultMode.Message = "初始化成功";
             return Json(resultMode, JsonRequestBehavior.AllowGet);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,6 +76,43 @@ namespace WeChatService
         public void SaveModel(CostChannelModel saveModel)
         {
             _dataAccess.SaveModel(saveModel);
+        }
+
+        /// <summary>
+        /// 初始化账户
+        /// </summary>
+        /// <param name="userId"></param>
+        public void InitCostChannel(long userId)
+        {
+            List<string> channelList = new List<string>
+            {
+                "现金账户","支付宝账户","微信账户"
+            };
+            int i = 1;
+            foreach (var s in channelList)
+            {
+                var oldModel = new CostChannelModel
+                {
+                    IsDel = FlagEnum.HadZore,
+                    IsValid = FlagEnum.HadOne,
+                    UpdateUserId = userId,
+                    UpdateTime = DateTime.Now,
+                    CostChannelName = s,
+                    CostChannelNo = "",
+                    CreateTime = DateTime.Now,
+                    CreateUserId = userId,
+                    Sort = i++,
+                    UserId = userId
+                };
+                try
+                {
+                    SaveModel(oldModel);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e);
+                }
+            }
         }
     }
 }
