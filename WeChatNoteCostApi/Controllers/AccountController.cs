@@ -92,7 +92,6 @@ namespace WeChatNoteCostApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-
         public ResponseBaseModel<dynamic> BindWeChatUser(string name, string password, string checkcode, string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -276,24 +275,40 @@ namespace WeChatNoteCostApi.Controllers
             return resultMode;
         }
 
-        ///// <summary>
-        ///// 获取消费类型
-        ///// </summary>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> GetCostType(int spendType)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //        Message = ""
-        //    };
-        //    var server = new CostTypeService();
-        //    var userId = CurrentModel.UserId;
-        //    var data = server.GetList(spendType, userId, 1, 100000, out _);
-        //    resultMode.Data = data;
-        //    resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+        /// <summary>
+        /// 获取消费类型
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetCostChannelType(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            var _ = 0;
+            var server = new CostTypeService();
+            var userId = userData.AccountId;
+            var costTypeData = server.GetList(-1, userId, 1, 100000, out _);
+            var channelServer = new CostChannelService();
+            var channelData = channelServer.GetList(FlagEnum.HadOne.GetHashCode(), userId, 1, 100000, out _);
+            resultMode.Data = new
+            {
+                costTypeData,
+                channelData
+            };
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
 
         ///// <summary>
         ///// 获取账户信息
