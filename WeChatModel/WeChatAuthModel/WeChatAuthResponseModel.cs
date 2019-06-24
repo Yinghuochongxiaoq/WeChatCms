@@ -27,5 +27,10 @@ namespace WeChatModel.WeChatAuthModel
         /// AccountId 关联的用户id
         /// </summary>
         public long AccountId { get; set; }
+
+        /// <summary>
+        /// 用户昵称
+        /// </summary>
+        public string NickName { get; set; }
     }
 }

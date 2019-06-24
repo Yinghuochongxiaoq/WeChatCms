@@ -18,14 +18,9 @@ namespace WeChatCmsCommon.Unit
         private static string _staticServiceUri;
         public static string GetStaticServiceUri()
         {
-            //var uri = ServiceHelper.GetStaticServiceUri();
-            //if (HttpContext.Current.Request.Url.Scheme == "https")
-            //    uri = uri.Substring(5);
-            //return uri;
-
             //使用本地图片，而不做资源分离，暂时取本地地址：
             if (_staticServiceUri == null)
-                _staticServiceUri = "http://" + HttpContext.Current.Request.Url.Authority;
+                _staticServiceUri = HttpContext.Current.Request.Url.Scheme+"://" + HttpContext.Current.Request.Url.Authority;
 
             return _staticServiceUri;
         }

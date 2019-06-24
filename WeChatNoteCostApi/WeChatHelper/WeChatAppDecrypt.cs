@@ -22,7 +22,6 @@ namespace WeChatNoteCostApi.WeChatHelper
         {
             this.appId = appId;
             this.appSecret = appSecret;
-            return;
         }
 
         /// <summary>
@@ -114,17 +113,17 @@ namespace WeChatNoteCostApi.WeChatHelper
             aes.BlockSize = 128;
             aes.Padding = PaddingMode.PKCS7;
             //格式化待处理字符串
-            byte[] byte_encryptedData = Convert.FromBase64String(encryptedData);
-            byte[] byte_iv = Convert.FromBase64String(iv);
-            byte[] byte_sessionKey = Convert.FromBase64String(sessionKey);
+            byte[] byteEncryptedData = Convert.FromBase64String(encryptedData);
+            byte[] byteIv = Convert.FromBase64String(iv);
+            byte[] byteSessionKey = Convert.FromBase64String(sessionKey);
 
-            aes.IV = byte_iv;
-            aes.Key = byte_sessionKey;
+            aes.IV = byteIv;
+            aes.Key = byteSessionKey;
             //根据设置好的数据生成解密器实例
             ICryptoTransform transform = aes.CreateDecryptor();
 
             //解密
-            byte[] final = transform.TransformFinalBlock(byte_encryptedData, 0, byte_encryptedData.Length);
+            byte[] final = transform.TransformFinalBlock(byteEncryptedData, 0, byteEncryptedData.Length);
 
             //生成结果
             string result = Encoding.UTF8.GetString(final);

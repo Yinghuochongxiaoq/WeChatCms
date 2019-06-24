@@ -181,5 +181,49 @@ namespace WeChatService
             }
             return new { allCanPay, allTypeCost, channelAcount = data, costTypeList, costDayDic, costBeginTime, costEndTime };
         }
+
+        /// <summary>
+        /// 获取用户的所有账户信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public dynamic GetStatisticsAllChannel(long userId)
+        {
+            List<CanPayAcountModel> channelCanPayList = _dataAccess.GetStatisticsCanPay(userId);
+
+            var allOutCost = channelCanPayList.Where(e => e.CostInOrOut == CostInOrOutEnum.Out).Sum(e => e.CostCount);
+            var allInCost = channelCanPayList.Where(f => f.CostInOrOut == CostInOrOutEnum.In).Sum(s => s.CostCount);
+            var allCouldCost = allInCost - allOutCost;
+            var channelAcount = new Dictionary<string, decimal>();
+            var channelServer = new CostChannelService();
+            var channelList = channelServer.GetList(FlagEnum.HadOne.GetHashCode(), userId, 1, 10000, out _);
+            if (channelList != null && channelList.Any())
+            {
+                channelList.ForEach(f => channelAcount.Add(f.CostChannelName, 0));
+            }
+            channelCanPayList.ForEach(h =>
+            {
+                if (channelAcount.ContainsKey(h.CostChannelName))
+                {
+                    channelAcount[h.CostChannelName] = channelAcount[h.CostChannelName] +
+                                                       (h.CostInOrOut == CostInOrOutEnum.In
+                                                           ? h.CostCount
+                                                           : h.CostCount * -1);
+                }
+                else
+                {
+                    channelAcount.Add(h.CostChannelName, h.CostInOrOut == CostInOrOutEnum.In
+                        ? h.CostCount
+                        : h.CostCount * -1);
+                }
+            });
+            var data = channelAcount.Where(r => r.Value != 0).Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
+
+            return new
+            {
+                StatisticsModel = new {allCouldCost, allInCost , allOutCost },
+                channelAcount = data
+            };
+        }
     }
 }
