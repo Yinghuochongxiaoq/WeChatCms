@@ -124,131 +124,138 @@ namespace WeChatNoteCostApi.Controllers
             return resultMode;
         }
 
-        ///// <summary>
-        ///// 添加信息
-        ///// </summary>
-        ///// <param name="model"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> AddCostInfo(CostContentModel model)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //    };
-        //    if (model == null)
-        //    {
-        //        resultMode.Message = "参数错误";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
+        /// <summary>
+        /// 添加信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ResponseBaseModel<dynamic> AddCostInfo([FromBody]CostContentModel model)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            if (model == null)
+            {
+                resultMode.Message = "参数错误";
+                return resultMode;
+            }
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + model.Token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var userId = tempUserId;
+            var server = new CostContentService();
+            CostContentModel newModel = new CostContentModel();
+            if (model.Id > 0)
+            {
+                newModel = server.GetContentModel(model.Id);
+                //验证权限
+                if (newModel == null || newModel.UserId != userId)
+                {
+                    resultMode.Message = "非法访问";
+                    return resultMode;
+                }
 
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostContentService();
-        //    CostContentModel newModel = new CostContentModel();
-        //    if (model.Id > 0)
-        //    {
-        //        newModel = server.GetContentModel(model.Id);
-        //        //验证权限
-        //        if (newModel == null || newModel.UserId != userId)
-        //        {
-        //            resultMode.Message = "非法访问";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
+                if (newModel.SpendType == 2 && (model.SpendType != 2 || model.LinkCostId < 0))
+                {
+                    resultMode.Message = "转移记录类型不能修改或无关联入账信息";
+                    return resultMode;
+                }
 
-        //        if (newModel.SpendType == 2 && (model.SpendType != 2 || model.LinkCostId < 0))
-        //        {
-        //            resultMode.Message = "转移记录类型不能修改或无关联入账信息";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
+                if (newModel.SpendType == 2 && newModel.CostInOrOut == CostInOrOutEnum.In)
+                {
+                    resultMode.Message = "转移记录入账信息不能修改";
+                    return resultMode;
+                }
+            }
+            //验证参数
+            newModel.Cost = Math.Round(Math.Abs(model.Cost), 2);
+            newModel.CostAddress = model.CostAddress;
+            newModel.CostChannel = model.CostChannel;
+            newModel.CostType = model.SpendType == 2 ? -1 : model.CostType;
+            newModel.UserId = userId.Value;
+            newModel.CostInOrOut = model.CostInOrOut;
+            newModel.CostThing = model.CostThing;
+            newModel.CostTime = model.CostTime;
+            newModel.CostMonth = newModel.CostTime.Month;
+            newModel.CostYear = newModel.CostTime.Year;
+            newModel.CreateTime = newModel.Id > 0 ? newModel.CreateTime : DateTime.Now;
+            newModel.CreateUserId = userId.Value;
+            newModel.SpendType = model.SpendType;
+            newModel.UpdateTime = DateTime.Now;
+            newModel.UpdateUserId = userId.Value;
+            newModel.LinkCostChannel = model.LinkCostChannel;
+            if (newModel.Cost < (decimal)0.01)
+            {
+                resultMode.Message = "金额设置错误";
+                return resultMode;
+            }
 
-        //        if (newModel.SpendType == 2 && newModel.CostInOrOut == CostInOrOutEnum.In)
-        //        {
-        //            resultMode.Message = "转移记录入账信息不能修改";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
-        //    }
-        //    //验证参数
-        //    newModel.Cost = Math.Round(Math.Abs(model.Cost), 2);
-        //    newModel.CostAddress = model.CostAddress;
-        //    newModel.CostChannel = model.CostChannel;
-        //    newModel.CostType = model.SpendType == 2 ? -1 : model.CostType;
-        //    newModel.UserId = userId;
-        //    newModel.CostInOrOut = model.CostInOrOut;
-        //    newModel.CostThing = model.CostThing;
-        //    newModel.CostTime = model.CostTime;
-        //    newModel.CostMonth = newModel.CostTime.Month;
-        //    newModel.CostYear = newModel.CostTime.Year;
-        //    newModel.CreateTime = newModel.Id > 0 ? newModel.CreateTime : DateTime.Now;
-        //    newModel.CreateUserId = userId;
-        //    newModel.SpendType = model.SpendType;
-        //    newModel.UpdateTime = DateTime.Now;
-        //    newModel.UpdateUserId = userId;
-        //    newModel.LinkCostChannel = model.LinkCostChannel;
-        //    if (newModel.Cost < (decimal)0.01)
-        //    {
-        //        resultMode.Message = "金额设置错误";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
+            if (model.SpendType != 2)
+            {
+                var costTypeInfo = new CostTypeService().Get(newModel.CostType);
+                if (costTypeInfo == null
+                    || costTypeInfo.UserId != userId
+                    || costTypeInfo.IsDel == FlagEnum.HadOne
+                    || costTypeInfo.IsValid == FlagEnum.HadZore)
+                {
+                    resultMode.Message = "类型选择无效";
+                    return resultMode;
+                }
+                newModel.CostTypeName = costTypeInfo.Name;
+            }
 
-        //    if (model.SpendType != 2)
-        //    {
-        //        var costTypeInfo = new CostTypeService().Get(newModel.CostType);
-        //        if (costTypeInfo == null
-        //            || costTypeInfo.UserId != userId
-        //            || costTypeInfo.IsDel == FlagEnum.HadOne
-        //            || costTypeInfo.IsValid == FlagEnum.HadZore)
-        //        {
-        //            resultMode.Message = "类型选择无效";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
-        //        newModel.CostTypeName = costTypeInfo.Name;
-        //    }
+            var costChannelServer = new CostChannelService();
+            var costChannelInfo = costChannelServer.Get(newModel.CostChannel);
+            if (costChannelInfo == null
+                || costChannelInfo.UserId != userId
+                || costChannelInfo.IsDel == FlagEnum.HadOne
+                || costChannelInfo.IsValid == FlagEnum.HadZore)
+            {
+                resultMode.Message = "账户选择无效";
+                return resultMode;
+            }
+            newModel.CostChannelName = costChannelInfo.CostChannelName;
+            newModel.CostChannelNo = costChannelInfo.CostChannelNo;
+            newModel.CostInOrOut = newModel.SpendType == 1 ? CostInOrOutEnum.In : CostInOrOutEnum.Out;
 
-        //    var costChannelServer = new CostChannelService();
-        //    var costChannelInfo = costChannelServer.Get(newModel.CostChannel);
-        //    if (costChannelInfo == null
-        //        || costChannelInfo.UserId != userId
-        //        || costChannelInfo.IsDel == FlagEnum.HadOne
-        //        || costChannelInfo.IsValid == FlagEnum.HadZore)
-        //    {
-        //        resultMode.Message = "账户选择无效";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    newModel.CostChannelName = costChannelInfo.CostChannelName;
-        //    newModel.CostChannelNo = costChannelInfo.CostChannelNo;
-        //    newModel.CostInOrOut = newModel.SpendType == 1 ? CostInOrOutEnum.In : CostInOrOutEnum.Out;
+            if (newModel.SpendType == 2)
+            {
+                if (newModel.LinkCostChannel < 1)
+                {
+                    resultMode.Message = "转入账户无效";
+                    return resultMode;
+                }
+                var linkChannelInfo = costChannelServer.Get(newModel.LinkCostChannel);
+                if (linkChannelInfo == null
+                    || linkChannelInfo.UserId != userId
+                    || linkChannelInfo.IsDel == FlagEnum.HadOne
+                    || linkChannelInfo.IsValid == FlagEnum.HadZore)
+                {
+                    resultMode.Message = "转入账户无效";
+                    return resultMode;
+                }
 
-        //    if (newModel.SpendType == 2)
-        //    {
-        //        if (newModel.LinkCostChannel < 1)
-        //        {
-        //            resultMode.Message = "转入账户无效";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
-        //        var linkChannelInfo = costChannelServer.Get(newModel.LinkCostChannel);
-        //        if (linkChannelInfo == null
-        //            || linkChannelInfo.UserId != userId
-        //            || linkChannelInfo.IsDel == FlagEnum.HadOne
-        //            || linkChannelInfo.IsValid == FlagEnum.HadZore)
-        //        {
-        //            resultMode.Message = "转入账户无效";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
-
-        //        newModel.LinkCostChannelName = linkChannelInfo.CostChannelName;
-        //        newModel.LinkCostChannelNo = linkChannelInfo.CostChannelNo;
-        //    }
-        //    else
-        //    {
-        //        newModel.LinkCostChannel = 0;
-        //        newModel.LinkCostId = 0;
-        //        newModel.LinkCostChannelNo = "";
-        //        newModel.LinkCostChannelName = "";
-        //    }
-        //    var costContentServer = new CostContentService();
-        //    costContentServer.AddAndUpdateContentInfo(newModel);
-        //    resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+                newModel.LinkCostChannelName = linkChannelInfo.CostChannelName;
+                newModel.LinkCostChannelNo = linkChannelInfo.CostChannelNo;
+            }
+            else
+            {
+                newModel.LinkCostChannel = 0;
+                newModel.LinkCostId = 0;
+                newModel.LinkCostChannelNo = "";
+                newModel.LinkCostChannelName = "";
+            }
+            var costContentServer = new CostContentService();
+            costContentServer.AddAndUpdateContentInfo(newModel);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
 
         ///// <summary>
         ///// 获取记录信息

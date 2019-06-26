@@ -114,5 +114,13 @@ namespace WeChatModel.DatabaseModel
         /// 关联记录渠道账号
         /// </summary>
         public String LinkCostChannelNo { get; set; }
+
+        /// <summary>
+        /// 用户token
+        /// </summary>
+        [IgnoreInsert]
+        [IgnoreUpdate]
+        [IgnoreSelect]
+        public string Token { get; set; }
     }
 }
