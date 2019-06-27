@@ -196,7 +196,7 @@ namespace WeChatService
             var allCouldCost = allInCost - allOutCost;
             var channelAcount = new Dictionary<string, decimal>();
             var channelServer = new CostChannelService();
-            var channelList = channelServer.GetList(FlagEnum.HadOne.GetHashCode(), userId, 1, 10000, out _);
+            var channelList = channelServer.GetList(-1, userId, 1, 10000, out _);
             if (channelList != null && channelList.Any())
             {
                 channelList.ForEach(f => channelAcount.Add(f.CostChannelName, 0));
@@ -217,11 +217,11 @@ namespace WeChatService
                         : h.CostCount * -1);
                 }
             });
-            var data = channelAcount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
+            var data = channelAcount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key, CostChannel = channelList?.FirstOrDefault(r => r.CostChannelName == f.Key)?.Id }).ToList();
 
             return new
             {
-                StatisticsModel = new {allCouldCost, allInCost , allOutCost },
+                StatisticsModel = new { allCouldCost, allInCost, allOutCost },
                 channelAcount = data
             };
         }

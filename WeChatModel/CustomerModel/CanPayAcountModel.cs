@@ -12,7 +12,7 @@ namespace WeChatModel.CustomerModel
         /// <summary>
         /// 消费账户id
         /// </summary>
-        public long CostChannel { get; set; }
+        public long? CostChannel { get; set; }
         /// <summary>
         /// 账户名称
         /// </summary>

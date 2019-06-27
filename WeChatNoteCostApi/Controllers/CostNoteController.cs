@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
+using FreshCommonUtility.Enum;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -258,240 +259,105 @@ namespace WeChatNoteCostApi.Controllers
             return resultMode;
         }
 
-        ///// <summary>
-        ///// 获取记录信息
-        ///// </summary>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> GetCostModel(long id)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //        Message = ""
-        //    };
-        //    var server = new CostContentService();
-        //    var userId = CurrentModel.UserId;
-        //    var data = server.GetContentModel(id);
-        //    if (data != null && data.UserId == userId)
-        //    {
-        //        resultMode.Data = data;
-        //        resultMode.ResultCode = ResponceCodeEnum.Success;
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
+        /// <summary>
+        /// 获取信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetCostChannelModel(string token,long id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var server = new CostChannelService();
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var userId = tempUserId;
+            var data = server.Get(id);
+            if (data != null && data.UserId == userId)
+            {
+                resultMode.Data = data;
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+                return resultMode;
+            }
+            resultMode.Message = "查询失败";
+            return resultMode;
+        }
 
-        //    resultMode.Message = "查询失败";
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+        /// <summary>
+        /// 保存信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="id"></param>
+        /// <param name="costChannelName"></param>
+        /// <param name="costChannelNo"></param>
+        /// <param name="sort"></param>
+        /// <param name="isValid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> SaveCostChannelInfo(string token,long id, string costChannelName, string costChannelNo, int sort, int isValid)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            if (string.IsNullOrEmpty(costChannelName))
+            {
+                resultMode.Message = "名称不能为空";
+                return resultMode;
+            }
 
-        ///// <summary>
-        ///// 获取账户设置异步数据
-        ///// </summary>
-        ///// <param name="pageIndex"></param>
-        ///// <param name="pageSize"></param>
-        ///// <param name="name"></param>
-        ///// <param name="isValid"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> GetCostChannelPage(int pageIndex = 1, int pageSize = 10, string name = "", int isValid = -1)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //        Message = ""
-        //    };
-        //    var userId = CurrentModel.UserId;
-        //    if (userId < 1)
-        //    {
-        //        resultMode.Message = "登录失效，请重新登录";
-        //    }
-        //    else
-        //    {
-        //        var server = new CostChannelService();
-        //        var dataList = server.GetList(isValid, userId, pageIndex, pageSize, out var count, name);
-        //        resultMode.Data = new { count, dataList };
-        //        resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    }
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+            var server = new CostChannelService();
+            CostChannelModel newModel = new CostChannelModel();
+            if (id > 0)
+            {
+                newModel = server.Get(id);
+                //验证权限
+                if (newModel == null || newModel.UserId != userId)
+                {
+                    resultMode.Message = "非法访问";
+                    return resultMode;
+                }
+            }
+            //验证参数
+            newModel.Id = id;
+            newModel.IsDel = FlagEnum.HadZore;
+            newModel.IsValid = EnumHelper.GetEnumByValue<FlagEnum>(isValid);
+            newModel.CostChannelName = costChannelName;
+            newModel.CostChannelNo = costChannelNo;
+            newModel.UserId = userId;
+            newModel.CreateTime = newModel.CreateTime < new DateTime(1900, 1, 1) ? DateTime.Now : newModel.CreateTime;
+            newModel.CreateUserId = newModel.CreateUserId < 1 ? userId : newModel.CreateUserId;
+            newModel.Sort = sort;
+            newModel.UpdateTime = DateTime.Now;
+            newModel.UpdateUserId = userId;
 
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
-
-        ///// <summary>
-        ///// 获取信息
-        ///// </summary>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> GetCostChannelModel(long id)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //        Message = ""
-        //    };
-        //    var server = new CostChannelService();
-        //    var userId = CurrentModel.UserId;
-        //    var data = server.Get(id);
-        //    if (data != null && data.UserId == userId)
-        //    {
-        //        resultMode.Data = data;
-        //        resultMode.ResultCode = ResponceCodeEnum.Success;
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    resultMode.Message = "查询失败";
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
-
-        ///// <summary>
-        ///// 保存信息
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="costChannelName"></param>
-        ///// <param name="costChannelNo"></param>
-        ///// <param name="sort"></param>
-        ///// <param name="isValid"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> SaveCostChannelInfo(long id, string costChannelName, string costChannelNo, int sort, int isValid)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //    };
-        //    if (string.IsNullOrEmpty(costChannelName))
-        //    {
-        //        resultMode.Message = "名称不能为空";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostChannelService();
-        //    CostChannelModel newModel = new CostChannelModel();
-        //    if (id > 0)
-        //    {
-        //        newModel = server.Get(id);
-        //        //验证权限
-        //        if (newModel == null || newModel.UserId != userId)
-        //        {
-        //            resultMode.Message = "非法访问";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
-        //    }
-        //    //验证参数
-        //    newModel.Id = id;
-        //    newModel.IsDel = FlagEnum.HadZore;
-        //    newModel.IsValid = EnumHelper.GetEnumByValue<FlagEnum>(isValid);
-        //    newModel.CostChannelName = costChannelName;
-        //    newModel.CostChannelNo = costChannelNo;
-        //    newModel.UserId = userId;
-        //    newModel.CreateTime = newModel.CreateTime < new DateTime(1900, 1, 1) ? DateTime.Now : newModel.CreateTime;
-        //    newModel.CreateUserId = newModel.CreateUserId < 1 ? userId : newModel.CreateUserId;
-        //    newModel.Sort = sort;
-        //    newModel.UpdateTime = DateTime.Now;
-        //    newModel.UpdateUserId = userId;
-
-        //    var costTypeInfoList = server.GetList(costChannelName, userId);
-        //    if (costTypeInfoList != null
-        //        && (costTypeInfoList.Count > 1 || costTypeInfoList.Count == 1 && costTypeInfoList[0].Id != id))
-        //    {
-        //        resultMode.Message = "账号名称已经存在";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    server.SaveModel(newModel);
-        //    resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
-
-        ///// <summary>
-        ///// 删除类型
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="isValid"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> DelCostChannelModel(long id, int isValid)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Success,
-        //        Message = "响应成功"
-        //    };
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostChannelService();
-        //    var oldModel = server.Get(id);
-        //    if (oldModel == null || oldModel.UserId != userId)
-        //    {
-        //        resultMode.ResultCode = ResponceCodeEnum.Fail;
-        //        resultMode.Message = "参数错误";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-
-        //    oldModel.IsDel = FlagEnum.HadZore;
-        //    oldModel.IsValid = EnumHelper.GetEnumByValue<FlagEnum>(isValid);
-        //    oldModel.UpdateUserId = userId;
-        //    oldModel.UpdateTime = DateTime.Now;
-        //    try
-        //    {
-        //        server.SaveModel(oldModel);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Trace.WriteLine(e);
-        //    }
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
-
-        ///// <summary>
-        ///// 初始化账户信息
-        ///// </summary>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> InitCostChannelModel()
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Success,
-        //        Message = "响应成功"
-        //    };
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostChannelService();
-        //    var modelList = server.GetList(-1, userId, 1, 10, out _);
-        //    if (modelList != null && modelList.Count > 0)
-        //    {
-        //        resultMode.ResultCode = ResponceCodeEnum.Fail;
-        //        resultMode.Message = "已经初始化过";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    server.InitCostChannel(userId);
-
-        //    resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    resultMode.Message = "初始化成功";
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
-
-        ///// <summary>
-        ///// 获取消费类型设置异步数据
-        ///// </summary>
-        ///// <param name="pageIndex"></param>
-        ///// <param name="pageSize"></param>
-        ///// <param name="name"></param>
-        ///// <param name="spendType"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> GetCostTypePage(int pageIndex = 1, int pageSize = 10, string name = "", int spendType = -1)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //        Message = ""
-        //    };
-        //    var userId = CurrentModel.UserId;
-        //    if (userId < 1)
-        //    {
-        //        resultMode.Message = "登录失效，请重新登录";
-        //    }
-        //    else
-        //    {
-        //        var server = new CostTypeService();
-        //        var dataList = server.GetList(spendType, userId, pageIndex, pageSize, out var count, name);
-        //        resultMode.Data = new { count, dataList };
-        //        resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    }
-
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+            var costTypeInfoList = server.GetList(costChannelName, userId);
+            if (costTypeInfoList != null
+                && (costTypeInfoList.Count > 1 || costTypeInfoList.Count == 1 && costTypeInfoList[0].Id != id))
+            {
+                resultMode.Message = "账号名称已经存在";
+                return resultMode;
+            }
+            server.SaveModel(newModel);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
 
         /// <summary>
         /// 获取类型信息
@@ -637,31 +503,5 @@ namespace WeChatNoteCostApi.Controllers
 
             return resultMode;
         }
-
-        ///// <summary>
-        ///// 初始化消费类型
-        ///// </summary>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> InitCostTypeModel()
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Success,
-        //        Message = "响应成功"
-        //    };
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostTypeService();
-        //    var modelList = server.GetList(-1, userId, 1, 10, out _);
-        //    if (modelList != null && modelList.Count > 0)
-        //    {
-        //        resultMode.ResultCode = ResponceCodeEnum.Fail;
-        //        resultMode.Message = "已经初始化过";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    server.InitCostType(userId);
-        //    resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    resultMode.Message = "初始化成功";
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
     }
 }
