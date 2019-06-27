@@ -81,9 +81,8 @@ namespace WeChatNoteCostApi.Controllers
                 NickName = responseData.nickName
             };
             //TODO：记录Token信息
-            RedisCacheHelper.AddSet(RedisCacheKey.AuthInfoKey + loginInfo.code, resultModel,
-                new TimeSpan(DataTypeConvertHelper.ToLong(responseData.watermark?.timestamp)));
-            RedisCacheHelper.AddSet(RedisCacheKey.AuthTokenKey + resultModel.Token, searchOpenIdModel, new TimeSpan(DataTypeConvertHelper.ToLong(responseData.watermark?.timestamp)));
+            RedisCacheHelper.AddSet(RedisCacheKey.AuthInfoKey + loginInfo.code, resultModel,DateTime.Now.AddHours(2));
+            RedisCacheHelper.AddSet(RedisCacheKey.AuthTokenKey + resultModel.Token, searchOpenIdModel, DateTime.Now.AddHours(2));
             return new ResponseBaseModel<WeChatAuthResponseModel> { ResultCode = ResponceCodeEnum.Success, Message = "微信认证成功", Data = resultModel };
         }
 

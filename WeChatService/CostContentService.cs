@@ -217,7 +217,7 @@ namespace WeChatService
                         : h.CostCount * -1);
                 }
             });
-            var data = channelAcount.Where(r => r.Value != 0).Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
+            var data = channelAcount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
 
             return new
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
 using WeChatCmsCommon.EnumBusiness;
@@ -492,124 +493,150 @@ namespace WeChatNoteCostApi.Controllers
         //    return Json(resultMode, JsonRequestBehavior.AllowGet);
         //}
 
-        ///// <summary>
-        ///// 获取类型信息
-        ///// </summary>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> Result GetCostTypeModel(long id)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //        Message = ""
-        //    };
-        //    var server = new CostTypeService();
-        //    var userId = CurrentModel.UserId;
-        //    var data = server.Get(id);
-        //    if (data != null && data.UserId == userId)
-        //    {
-        //        resultMode.Data = data;
-        //        resultMode.ResultCode = ResponceCodeEnum.Success;
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    resultMode.Message = "查询失败";
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+        /// <summary>
+        /// 获取类型信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetCostTypeModel(string token,long id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var server = new CostTypeService();
+            var userId = tempUserId.Value;
+            var data = server.Get(id);
+            if (data != null && data.UserId == userId)
+            {
+                resultMode.Data = data;
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+                return resultMode;
+            }
+            resultMode.Message = "查询失败";
+            return resultMode;
+        }
 
-        ///// <summary>
-        ///// 保存信息
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="name"></param>
-        ///// <param name="sort"></param>
-        ///// <param name="spendType"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> SaveTypeInfo(long id, string name, int sort, int spendType)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Fail,
-        //    };
-        //    if (string.IsNullOrEmpty(name))
-        //    {
-        //        resultMode.Message = "名称不能为空";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
+        /// <summary>
+        /// 保存信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="sort"></param>
+        /// <param name="spendType"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> SaveTypeInfo(string token,long id, string name, int sort, int spendType)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            if (string.IsNullOrEmpty(name))
+            {
+                resultMode.Message = "名称不能为空";
+                return resultMode;
+            }
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+            var server = new CostTypeService();
+            CostTypeModel newModel = new CostTypeModel();
+            if (id > 0)
+            {
+                newModel = server.Get(id);
+                //验证权限
+                if (newModel == null || newModel.UserId != userId)
+                {
+                    resultMode.Message = "非法访问";
+                    return resultMode;
+                }
+            }
+            //验证参数
+            newModel.Id = id;
+            newModel.SpendType = spendType;
+            newModel.IsDel = FlagEnum.HadZore;
+            newModel.IsValid = FlagEnum.HadOne;
+            newModel.Name = name;
+            newModel.UserId = userId;
+            newModel.CreateTime = newModel.CreateTime < new DateTime(1900, 1, 1) ? DateTime.Now : newModel.CreateTime;
+            newModel.CreateUserId = newModel.CreateUserId < 1 ? userId : newModel.CreateUserId;
+            newModel.Sort = sort;
+            newModel.UpdateTime = DateTime.Now;
+            newModel.UpdateUserId = userId;
 
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostTypeService();
-        //    CostTypeModel newModel = new CostTypeModel();
-        //    if (id > 0)
-        //    {
-        //        newModel = server.Get(id);
-        //        //验证权限
-        //        if (newModel == null || newModel.UserId != userId)
-        //        {
-        //            resultMode.Message = "非法访问";
-        //            return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //        }
-        //    }
-        //    //验证参数
-        //    newModel.Id = id;
-        //    newModel.SpendType = spendType;
-        //    newModel.IsDel = FlagEnum.HadZore;
-        //    newModel.IsValid = FlagEnum.HadOne;
-        //    newModel.Name = name;
-        //    newModel.UserId = userId;
-        //    newModel.CreateTime = newModel.CreateTime < new DateTime(1900, 1, 1) ? DateTime.Now : newModel.CreateTime;
-        //    newModel.CreateUserId = newModel.CreateUserId < 1 ? userId : newModel.CreateUserId;
-        //    newModel.Sort = sort;
-        //    newModel.UpdateTime = DateTime.Now;
-        //    newModel.UpdateUserId = userId;
+            var costTypeInfoList = server.GetList(spendType, userId, name);
+            if (costTypeInfoList != null
+                && (costTypeInfoList.Count > 1 || costTypeInfoList.Count == 1 && costTypeInfoList[0].Id != id))
+            {
+                resultMode.Message = "类型名称已经存在";
+                return resultMode;
+            }
+            server.SaveModel(newModel);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
 
-        //    var costTypeInfoList = server.GetList(spendType, userId, name);
-        //    if (costTypeInfoList != null
-        //        && (costTypeInfoList.Count > 1 || costTypeInfoList.Count == 1 && costTypeInfoList[0].Id != id))
-        //    {
-        //        resultMode.Message = "类型名称已经存在";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
-        //    server.SaveModel(newModel);
-        //    resultMode.ResultCode = ResponceCodeEnum.Success;
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+        /// <summary>
+        /// 删除类型
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> DeleteCostTypeModel(string token,long id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Success,
+                Message = "响应成功"
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+            var server = new CostTypeService();
+            var oldModel = server.Get(id);
+            if (oldModel == null || oldModel.UserId != userId)
+            {
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "参数错误";
+                return resultMode;
+            }
 
-        ///// <summary>
-        ///// 删除类型
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //public ResponseBaseModel<dynamic> InvalidCostTypeModel(long id)
-        //{
-        //    var resultMode = new ResponseBaseModel<dynamic>
-        //    {
-        //        ResultCode = ResponceCodeEnum.Success,
-        //        Message = "响应成功"
-        //    };
-        //    var userId = CurrentModel.UserId;
-        //    var server = new CostTypeService();
-        //    var oldModel = server.Get(id);
-        //    if (oldModel == null || oldModel.UserId != userId)
-        //    {
-        //        resultMode.ResultCode = ResponceCodeEnum.Fail;
-        //        resultMode.Message = "参数错误";
-        //        return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //    }
+            oldModel.IsDel = FlagEnum.HadOne;
+            oldModel.IsValid = FlagEnum.HadZore;
+            oldModel.UpdateUserId = userId;
+            oldModel.UpdateTime = DateTime.Now;
+            try
+            {
+                server.SaveModel(oldModel);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e);
+            }
 
-        //    oldModel.IsDel = FlagEnum.HadOne;
-        //    oldModel.IsValid = FlagEnum.HadZore;
-        //    oldModel.UpdateUserId = userId;
-        //    oldModel.UpdateTime = DateTime.Now;
-        //    try
-        //    {
-        //        server.SaveModel(oldModel);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Trace.WriteLine(e);
-        //    }
-        //    return Json(resultMode, JsonRequestBehavior.AllowGet);
-        //}
+            return resultMode;
+        }
 
         ///// <summary>
         ///// 初始化消费类型
