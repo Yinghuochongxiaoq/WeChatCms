@@ -69,7 +69,45 @@ namespace WeChatNoteCostApi.Controllers
                     Remarks = "新访问用户"
                 };
                 server.SaveModel(newModel);
+
+                var newSysModel = new SysUser
+                {
+                    Birthday = "1900-01-01 00:00:00",
+                    CreateTime = DateTime.Now,
+                    IsDel = FlagEnum.HadZore,
+                    CreateAuth = 1,
+                    HeadUrl = newModel.AvatarUrl,
+                    Password = AesHelper.AesEncrypt("123456"),
+                    Sex = EnumHelper.GetEnumByValue<SexEnum>(newModel.Gender),
+                    UpdateAuth = 1,
+                    UpdateTime = DateTime.Now,
+                    UserType = UserTypeEnum.Usually,
+                    UserName = Guid.NewGuid().ToString()
+                };
+                var accountService = new AccountService();
+                var resultId = accountService.InsertWeChatUserAndBind(newSysModel, newModel.OpenId);
+                newModel.AccountId = resultId;
                 searchOpenIdModel = newModel;
+            }
+            else if (searchOpenIdModel.AccountId < 1)
+            {
+                var newSysModel = new SysUser
+                {
+                    Birthday = "1900-01-01 00:00:00",
+                    CreateTime = DateTime.Now,
+                    IsDel = FlagEnum.HadZore,
+                    CreateAuth = 1,
+                    HeadUrl = searchOpenIdModel.AvatarUrl,
+                    Password = AesHelper.AesEncrypt("123456"),
+                    Sex = EnumHelper.GetEnumByValue<SexEnum>(searchOpenIdModel.Gender),
+                    UpdateAuth = 1,
+                    UpdateTime = DateTime.Now,
+                    UserType = UserTypeEnum.Usually,
+                    UserName = Guid.NewGuid().ToString()
+                };
+                var accountService = new AccountService();
+                var resultId = accountService.InsertWeChatUserAndBind(newSysModel, searchOpenIdModel.OpenId);
+                searchOpenIdModel.AccountId = resultId;
             }
 
             var resultModel = new WeChatAuthResponseModel
@@ -137,7 +175,7 @@ namespace WeChatNoteCostApi.Controllers
                     UpdateAuth = 1,
                     UpdateTime = DateTime.Now,
                     UserType = UserTypeEnum.Usually,
-                    UserName = userData.NickName
+                    UserName = name
                 };
                 var resultId = accountService.InsertWeChatUserAndBind(newModel, userData.OpenId);
                 //处理成功
