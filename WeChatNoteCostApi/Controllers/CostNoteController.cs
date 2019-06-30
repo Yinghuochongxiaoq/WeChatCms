@@ -192,6 +192,7 @@ namespace WeChatNoteCostApi.Controllers
             newModel.UpdateTime = DateTime.Now;
             newModel.UpdateUserId = userId.Value;
             newModel.LinkCostChannel = model.LinkCostChannel;
+            newModel.IsDel = FlagEnum.HadZore;
             if (newModel.Cost < (decimal)0.01)
             {
                 resultMode.Message = "金额设置错误";
@@ -260,11 +261,81 @@ namespace WeChatNoteCostApi.Controllers
         }
 
         /// <summary>
+        /// 删除某条记录
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> DeleteCostInfo(string token, long id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (id < 1)
+            {
+                resultMode.Message = "参数错误";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+
+            var server = new CostContentService();
+            var oldModel = server.GetContentModel(id);
+            CostContentModel linkModel = null;
+            //验证权限
+            if (oldModel == null || oldModel.UserId != userId)
+            {
+                resultMode.Message = "非法访问";
+                return resultMode;
+            }
+
+            if (oldModel.SpendType == 2 && oldModel.LinkCostId < 1)
+            {
+                Trace.WriteLine("转移记录" + oldModel.Id + "异常，没有与之关联的转移记录");
+            }
+            else if (oldModel.SpendType == 2 && oldModel.LinkCostId > 0)
+            {
+                linkModel = server.GetContentModel(oldModel.LinkCostId);
+            }
+
+            if (linkModel != null && linkModel.UserId != userId)
+            {
+                resultMode.Message = "非法访问,关联记录鉴权失败";
+                return resultMode;
+            }
+
+            if (linkModel != null)
+            {
+                linkModel.IsDel = FlagEnum.HadOne;
+                linkModel.UpdateUserId = userId;
+                linkModel.UpdateTime=DateTime.Now;
+            }
+
+            oldModel.IsDel = FlagEnum.HadOne;
+            oldModel.UpdateUserId = userId;
+            oldModel.UpdateTime=DateTime.Now;
+
+            var costContentServer = new CostContentService();
+            costContentServer.UpdateLinkCostContentInfo(oldModel,linkModel);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
+
+        /// <summary>
         /// 获取信息
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> GetCostChannelModel(string token,long id)
+        public ResponseBaseModel<dynamic> GetCostChannelModel(string token, long id)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -302,7 +373,7 @@ namespace WeChatNoteCostApi.Controllers
         /// <param name="isValid"></param>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> SaveCostChannelInfo(string token,long id, string costChannelName, string costChannelNo, int sort, int isValid)
+        public ResponseBaseModel<dynamic> SaveCostChannelInfo(string token, long id, string costChannelName, string costChannelNo, int sort, int isValid)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -364,7 +435,7 @@ namespace WeChatNoteCostApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> GetCostTypeModel(string token,long id)
+        public ResponseBaseModel<dynamic> GetCostTypeModel(string token, long id)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -401,7 +472,7 @@ namespace WeChatNoteCostApi.Controllers
         /// <param name="spendType"></param>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> SaveTypeInfo(string token,long id, string name, int sort, int spendType)
+        public ResponseBaseModel<dynamic> SaveTypeInfo(string token, long id, string name, int sort, int spendType)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -464,7 +535,7 @@ namespace WeChatNoteCostApi.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> DeleteCostTypeModel(string token,long id)
+        public ResponseBaseModel<dynamic> DeleteCostTypeModel(string token, long id)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {

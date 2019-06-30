@@ -7,7 +7,6 @@ using System.Text;
 using Dapper;
 using FreshCommonUtility.Dapper;
 using FreshCommonUtility.DataConvert;
-using FreshCommonUtility.Enum;
 using FreshCommonUtility.SqlHelper;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel.CustomerModel;
@@ -33,7 +32,7 @@ namespace WeChatDataAccess
         /// <returns></returns>
         public List<CostContentModel> GetModels(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int pageIndex, int pageSize)
         {
-            var where = new StringBuilder(" where UserId=@UserId ");
+            var where = new StringBuilder(" where UserId=@UserId and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -76,7 +75,8 @@ namespace WeChatDataAccess
                 StartTime = startTime,
                 EndTime = endTime,
                 CostAddress = "%" + address + "%",
-                CostThing = "%" + costThing + "%"
+                CostThing = "%" + costThing + "%",
+                IsDel = FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
@@ -90,7 +90,7 @@ namespace WeChatDataAccess
         /// <returns></returns>
         public int GetCount(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
-            var where = new StringBuilder(" where UserId=@UserId ");
+            var where = new StringBuilder(" where UserId=@UserId and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -133,7 +133,8 @@ namespace WeChatDataAccess
                 StartTime = startTime,
                 EndTime = endTime,
                 CostAddress = "%" + address + "%",
-                CostThing = "%" + costThing + "%"
+                CostThing = "%" + costThing + "%",
+                IsDel=FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
@@ -156,7 +157,7 @@ namespace WeChatDataAccess
         public Dictionary<int, decimal> GetStatisticsCost(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
             var select = "select CostInOrOut,sum(cost) Sum from costcontent ";
-            var where = new StringBuilder(" where UserId=@UserId ");
+            var where = new StringBuilder(" where UserId=@UserId and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -201,7 +202,8 @@ namespace WeChatDataAccess
                 StartTime = startTime,
                 EndTime = endTime,
                 CostAddress = "%" + address + "%",
-                CostThing = "%" + costThing + "%"
+                CostThing = "%" + costThing + "%",
+                IsDel = FlagEnum.HadZore.GetHashCode()
             };
             var result = new Dictionary<int, decimal>();
             using (var conn = SqlConnectionHelper.GetOpenConnection())
@@ -309,10 +311,11 @@ namespace WeChatDataAccess
         public List<CanPayAcountModel> GetStatisticsCanPay(long userId)
         {
             var select = @"	SELECT CostInOrOut, CostChannel, sum( cost ) CostCount,CostChannelName
-	FROM costcontent WHERE userid = @UserId GROUP BY CostInOrOut, CostChannel ,CostChannelName";
+	FROM costcontent WHERE userid = @UserId and IsDel=@IsDel GROUP BY CostInOrOut, CostChannel ,CostChannelName";
             var param = new
             {
-                UserId = userId
+                UserId = userId,
+                IsDel = FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
@@ -338,7 +341,7 @@ namespace WeChatDataAccess
 FROM
 	costcontent ";
             var groupby = " GROUP BY CostTypeName ORDER BY CostCount DESC";
-            var where = new StringBuilder("WHERE UserId = @UserId  ");
+            var where = new StringBuilder("WHERE UserId = @UserId and IsDel=@IsDel ");
             where.Append(" AND SpendType!=2 ");
             where.Append(" AND CostInOrOut = @CostInOrOut  ");
             if (starTime > new DateTime(1900, 1, 1))
@@ -361,7 +364,8 @@ FROM
                 CostInOrOut = inOrOut.GetHashCode(),
                 StartTime = starTime,
                 EndTime = endTime,
-                CostChannel = channelId
+                CostChannel = channelId,
+                IsDel = FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
@@ -383,7 +387,7 @@ FROM
         {
             var select = @"select DATE(CostTime) as CostDay,sum(cost) as CostCount from costcontent ";
             var groupby = " group by CostDay ORDER BY CostDay";
-            var where = new StringBuilder("WHERE UserId = @UserId  ");
+            var where = new StringBuilder("WHERE UserId = @UserId and IsDel=@IsDel ");
             where.Append(" AND SpendType!=2 ");
             where.Append(" AND CostInOrOut = @CostInOrOut  ");
             if (starTime > new DateTime(1900, 1, 1))
@@ -406,7 +410,8 @@ FROM
                 CostInOrOut = inOrOut.GetHashCode(),
                 StartTime = starTime,
                 EndTime = endTime,
-                CostChannel = channelId
+                CostChannel = channelId,
+                IsDel = FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {

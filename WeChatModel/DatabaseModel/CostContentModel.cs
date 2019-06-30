@@ -116,6 +116,11 @@ namespace WeChatModel.DatabaseModel
         public String LinkCostChannelNo { get; set; }
 
         /// <summary>
+        /// IsDelete 是否删除
+        /// </summary>
+        public FlagEnum IsDel { get; set; }
+
+        /// <summary>
         /// 用户token
         /// </summary>
         [IgnoreInsert]

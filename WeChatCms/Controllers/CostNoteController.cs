@@ -1,10 +1,6 @@
 ﻿using FreshCommonUtility.Web;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.Sockets;
-using System.Web;
 using System.Web.Mvc;
 using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Enum;
@@ -184,6 +180,7 @@ namespace WeChatCms.Controllers
             newModel.UpdateTime = DateTime.Now;
             newModel.UpdateUserId = userId;
             newModel.LinkCostChannel = model.LinkCostChannel;
+            newModel.IsDel = FlagEnum.HadZore;
             if (newModel.Cost < (decimal)0.01)
             {
                 resultMode.Message = "金额设置错误";

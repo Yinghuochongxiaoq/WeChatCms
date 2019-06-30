@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatDataAccess;
 using WeChatModel.CustomerModel;
@@ -80,12 +78,36 @@ namespace WeChatService
                     CostYear = model.CostYear,
                     UpdateUserId = model.UpdateUserId,
                     CostTypeName = model.CostTypeName,
-                    CreateUserId = model.CreateUserId
+                    CreateUserId = model.CreateUserId,
+                    IsDel = model.IsDel
                 };
                 return _dataAccess.SaveLinkCostModel(model, inModel);
             }
 
             return _dataAccess.SaveModel(model);
+        }
+
+        /// <summary>
+        /// 更新两个对象，通过事务
+        /// </summary>
+        /// <param name="modelItem1"></param>
+        /// <param name="modelItem2"></param>
+        /// <returns></returns>
+        public long UpdateLinkCostContentInfo(CostContentModel modelItem1, CostContentModel modelItem2)
+        {
+            switch (modelItem1)
+            {
+                case null when modelItem2 == null:
+                    return 0;
+                case null when modelItem2.Id > 0:
+                    return _dataAccess.SaveModel(modelItem2);
+            }
+
+            if (modelItem2 == null && modelItem1.Id > 0)
+            {
+                return _dataAccess.SaveModel(modelItem1);
+            }
+            return _dataAccess.SaveLinkCostModel(modelItem1, modelItem2);
         }
 
         /// <summary>
@@ -221,7 +243,7 @@ namespace WeChatService
 
             return new
             {
-                StatisticsModel = new { allCouldCost, allInCost, allOutCost },
+                StatisticsModel = new { allCouldCost = $"{allCouldCost:N2}", allInCost = $"{allInCost:N2}", allOutCost = $"{allOutCost:N2}" },
                 channelAcount = data
             };
         }
