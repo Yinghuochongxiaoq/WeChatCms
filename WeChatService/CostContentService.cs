@@ -184,7 +184,7 @@ namespace WeChatService
             });
             var data = channelAcount.Where(r => r.Value != 0).Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
 
-            var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            var costTypeList = GetCostTypeStatistics(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
             var allTypeCost = costTypeList.Sum(f => f.CostCount);
 
             var costDayList = _dataAccess.GetStatisticsCostDayPay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
@@ -246,6 +246,38 @@ namespace WeChatService
                 StatisticsModel = new { allCouldCost = $"{allCouldCost:N2}", allInCost = $"{allInCost:N2}", allOutCost = $"{allOutCost:N2}" },
                 channelAcount = data
             };
+        }
+
+        /// <summary>
+        /// 获取分类统计
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="userId"></param>
+        /// <param name="inOrOut"></param>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        public List<CanPayAcountModel> GetCostTypeStatistics(DateTime starTime, DateTime endTime, long userId,
+            CostInOrOutEnum inOrOut, long channelId)
+        {
+            var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            return costTypeList;
+        }
+
+        /// <summary>
+        /// 获取分类统计
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="userId"></param>
+        /// <param name="inOrOut"></param>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        public Dictionary<string, decimal> GetCostMonthStatistics(DateTime starTime, DateTime endTime, long userId,
+            CostInOrOutEnum inOrOut, long channelId)
+        {
+            var costDic = _dataAccess.GetStatisticsCostMonth(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            return costDic;
         }
     }
 }

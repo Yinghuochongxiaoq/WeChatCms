@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
 using FreshCommonUtility.Enum;
@@ -317,15 +319,15 @@ namespace WeChatNoteCostApi.Controllers
             {
                 linkModel.IsDel = FlagEnum.HadOne;
                 linkModel.UpdateUserId = userId;
-                linkModel.UpdateTime=DateTime.Now;
+                linkModel.UpdateTime = DateTime.Now;
             }
 
             oldModel.IsDel = FlagEnum.HadOne;
             oldModel.UpdateUserId = userId;
-            oldModel.UpdateTime=DateTime.Now;
+            oldModel.UpdateTime = DateTime.Now;
 
             var costContentServer = new CostContentService();
-            costContentServer.UpdateLinkCostContentInfo(oldModel,linkModel);
+            costContentServer.UpdateLinkCostContentInfo(oldModel, linkModel);
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
@@ -572,6 +574,112 @@ namespace WeChatNoteCostApi.Controllers
                 Trace.WriteLine(e);
             }
 
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 获取统计表格的数据
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="pieIndex"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> ChartPieData(string token, int pieIndex)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var server = new CostContentService();
+            var userId = tempUserId.Value;
+            var currentTime = DateTime.Now;
+            var endTime = new DateTime(currentTime.Year, currentTime.Month + 1, 1).AddSeconds(-1);
+            var pieStartTime = currentTime;
+            //本月
+            if (pieIndex == 0)
+            {
+                pieStartTime = endTime.AddMonths(-1).AddSeconds(1);
+            }
+            //季度
+            else if (pieIndex == 1)
+            {
+                pieStartTime = endTime.AddMonths(-3).AddSeconds(1);
+            }
+            //半年
+            else if (pieIndex == 2)
+            {
+                pieStartTime = endTime.AddMonths(-6).AddSeconds(1);
+            }
+            else if (pieIndex == 3)
+            {
+                pieStartTime = endTime.AddMonths(-12).AddSeconds(1);
+            }
+
+            var costTypeList = server.GetCostTypeStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.Out, 0);
+            var resultData = costTypeList?.Select(f => new { name = f.CostTypeName, data = f.CostCount }).ToList();
+            resultMode.Data = resultData;
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 获取统计消费折线图数据
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="lineIndex"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> ChartLineData(string token, int lineIndex)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var server = new CostContentService();
+            var userId = tempUserId.Value;
+            var currentTime = DateTime.Now;
+            var endTime = new DateTime(currentTime.Year, currentTime.Month + 1, 1).AddSeconds(-1);
+            var pieStartTime = currentTime;
+            //季度
+            if (lineIndex == 1)
+            {
+                pieStartTime = endTime.AddMonths(-3).AddSeconds(1);
+            }
+            //半年
+            else if (lineIndex == 2)
+            {
+                pieStartTime = endTime.AddMonths(-6).AddSeconds(1);
+            }
+            else if (lineIndex == 3)
+            {
+                pieStartTime = endTime.AddMonths(-12).AddSeconds(1);
+            }
+
+            var costTypeList = server.GetCostMonthStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.Out, 0);
+            var nameArray = costTypeList.Keys;
+            var dataArray = costTypeList.Values;
+            resultMode.Data = new
+            {
+                nameArray,
+                dataArray
+            };
+            resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
     }

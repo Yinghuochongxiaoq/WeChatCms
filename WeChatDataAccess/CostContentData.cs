@@ -134,7 +134,7 @@ namespace WeChatDataAccess
                 EndTime = endTime,
                 CostAddress = "%" + address + "%",
                 CostThing = "%" + costThing + "%",
-                IsDel=FlagEnum.HadZore.GetHashCode()
+                IsDel = FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
@@ -418,6 +418,66 @@ FROM
                 IEnumerable<CanPayAcountModel> query = conn.Query<CanPayAcountModel>(select + where + groupby, param);
                 return query.ToList();
             }
+        }
+
+        /// <summary>
+        /// 获取消费分类记录
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="userId"></param>
+        /// <param name="inOrOut"></param>
+        /// <param name="channelId"></param>
+        /// <returns></returns>
+        public Dictionary<string, decimal> GetStatisticsCostMonth(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
+        {
+            var select = @"SELECT
+	CostYear,CostMonth,
+	sum( cost ) CostCount 
+FROM 
+	costcontent ";
+            var groupby = " GROUP BY CostYear,CostMonth ORDER BY CostYear desc,CostMonth desc";
+            var where = new StringBuilder("WHERE UserId = @UserId and IsDel=@IsDel ");
+            where.Append(" AND SpendType!=2 ");
+            where.Append(" AND CostInOrOut = @CostInOrOut  ");
+            if (starTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" and  CostTime>@StartTime  ");
+            }
+
+            if (endTime > new DateTime(1900, 1, 1))
+            {
+                where.Append(" and  CostTime<=@EndTime  ");
+            }
+
+            if (channelId > 0)
+            {
+                where.Append(" and  CostChannel=@CostChannel  ");
+            }
+            var param = new
+            {
+                UserId = userId,
+                CostInOrOut = inOrOut.GetHashCode(),
+                StartTime = starTime,
+                EndTime = endTime,
+                CostChannel = channelId,
+                IsDel = FlagEnum.HadZore.GetHashCode()
+            };
+            var resultMap = new Dictionary<string, decimal>();
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                IEnumerable<dynamic> query = conn.Query(select + where + groupby, param);
+                foreach (var rows in query)
+                {
+                    if (!(rows is IDictionary<string, object> fields)) continue;
+                    var sum = fields["CostCount"];
+                    var costYear = fields["CostYear"];
+                    var costMonth = fields["CostMonth"];
+                    resultMap.Add(costYear + "年" + costMonth + "月", DataTypeConvertHelper.ToDecimal(sum));
+                }
+            }
+
+            return resultMap;
         }
     }
 }
