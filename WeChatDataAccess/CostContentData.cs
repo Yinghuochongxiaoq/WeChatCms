@@ -429,7 +429,7 @@ FROM
         /// <param name="inOrOut"></param>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public Dictionary<string, decimal> GetStatisticsCostMonth(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
+        public Dictionary<int, decimal> GetStatisticsCostMonth(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
         {
             var select = @"SELECT
 	CostYear,CostMonth,
@@ -463,7 +463,7 @@ FROM
                 CostChannel = channelId,
                 IsDel = FlagEnum.HadZore.GetHashCode()
             };
-            var resultMap = new Dictionary<string, decimal>();
+            var resultMap = new Dictionary<int, decimal>();
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
                 IEnumerable<dynamic> query = conn.Query(select + where + groupby, param);
@@ -473,7 +473,7 @@ FROM
                     var sum = fields["CostCount"];
                     var costYear = fields["CostYear"];
                     var costMonth = fields["CostMonth"];
-                    resultMap.Add(costYear + "年" + costMonth + "月", DataTypeConvertHelper.ToDecimal(sum));
+                    resultMap.Add(DataTypeConvertHelper.ToInt(costYear) * 100 + DataTypeConvertHelper.ToInt(costMonth), DataTypeConvertHelper.ToDecimal(sum));
                 }
             }
 

@@ -273,10 +273,10 @@ namespace WeChatService
         /// <param name="inOrOut"></param>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public Dictionary<string, decimal> GetCostMonthStatistics(DateTime starTime, DateTime endTime, long userId,
+        public Dictionary<int, decimal> GetCostMonthStatistics(DateTime starTime, DateTime endTime, long userId,
             CostInOrOutEnum inOrOut, long channelId)
         {
-            var costDic = _dataAccess.GetStatisticsCostMonth(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            var costDic = _dataAccess.GetStatisticsCostMonth(starTime, endTime, userId, inOrOut, channelId);
             return costDic;
         }
     }

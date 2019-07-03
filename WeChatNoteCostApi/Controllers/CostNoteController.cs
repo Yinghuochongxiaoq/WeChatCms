@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -671,13 +672,36 @@ namespace WeChatNoteCostApi.Controllers
                 pieStartTime = endTime.AddMonths(-12).AddSeconds(1);
             }
 
-            var costTypeList = server.GetCostMonthStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.Out, 0);
-            var nameArray = costTypeList.Keys;
-            var dataArray = costTypeList.Values;
+            var costOutList = server.GetCostMonthStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.Out, 0);
+            var costIntList = server.GetCostMonthStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.In, 0);
+            var resultMap = new Dictionary<int, Tuple<decimal, decimal>>();
+            foreach (var outItem in costOutList)
+            {
+                resultMap.Add(outItem.Key, new Tuple<decimal, decimal>(outItem.Value, 0));
+            }
+            foreach (var inItem in costIntList)
+            {
+                if (resultMap.ContainsKey(inItem.Key))
+                {
+                    var tempValue = resultMap[inItem.Key];
+                    var secondValue = new Tuple<decimal, decimal>(tempValue.Item1, inItem.Value);
+                    resultMap[inItem.Key] = secondValue;
+                }
+                else
+                {
+                    resultMap.Add(inItem.Key, new Tuple<decimal, decimal>(0, inItem.Value));
+                }
+            }
+
+            resultMap = resultMap.OrderBy(f => f.Key).ToDictionary(k => k.Key, v => v.Value);
+            var nameArray = resultMap.Keys.Select(e => e / 100 + "年" + e % 100 + "月").ToList();
+            var dataOutArray = resultMap.Values.Select(s=>s.Item1).ToList();
+            var dataInArray = resultMap.Values.Select(s => s.Item2).ToList();
             resultMode.Data = new
             {
                 nameArray,
-                dataArray
+                dataOutArray,
+                dataInArray
             };
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
