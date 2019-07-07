@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace WeChatNoteCostApi.WeChatInnerModel
+﻿namespace WeChatNoteCostApi.WeChatInnerModel
 {
     public class RedisCacheKey
     {
@@ -21,5 +16,10 @@ namespace WeChatNoteCostApi.WeChatInnerModel
         /// token信息
         /// </summary>
         public static string AuthTokenKey = "AuthTokenKey_";
+
+        /// <summary>
+        /// 缓存邀请码缓存key
+        /// </summary>
+        public static string InviteCodeKey = "Get_Invite_Code_";
     }
 }

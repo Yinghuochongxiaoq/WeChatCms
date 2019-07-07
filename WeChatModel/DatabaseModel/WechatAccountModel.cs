@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using WeChatCmsCommon.EnumBusiness;
 
 namespace WeChatModel.DatabaseModel
 {
@@ -58,5 +59,13 @@ namespace WeChatModel.DatabaseModel
         /// AccountId 关联的用户id
         /// </summary>
         public Int64 AccountId { get; set; }
+        /// <summary>
+        /// 关联的家庭code
+        /// </summary>
+        public String FamilyCode { get; set; }
+        /// <summary>
+        /// 是否关联了家庭0：未关联；1：已经关联
+        /// </summary>
+        public FlagEnum HadBindFamily { get; set; }
     }
 }

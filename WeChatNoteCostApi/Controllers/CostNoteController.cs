@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
+using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Enum;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
@@ -695,7 +696,7 @@ namespace WeChatNoteCostApi.Controllers
 
             resultMap = resultMap.OrderBy(f => f.Key).ToDictionary(k => k.Key, v => v.Value);
             var nameArray = resultMap.Keys.Select(e => e / 100 + "年" + e % 100 + "月").ToList();
-            var dataOutArray = resultMap.Values.Select(s=>s.Item1).ToList();
+            var dataOutArray = resultMap.Values.Select(s => s.Item1).ToList();
             var dataInArray = resultMap.Values.Select(s => s.Item2).ToList();
             resultMode.Data = new
             {
@@ -704,6 +705,109 @@ namespace WeChatNoteCostApi.Controllers
                 dataInArray
             };
             resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 获取家庭邀请码
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetInviteCode(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            var cacheKey = RedisCacheKey.InviteCodeKey + tempUserId;
+            var inviteCode = RedisCacheHelper.Get<string>(cacheKey);
+            //缓存还没有过期
+            if (!string.IsNullOrEmpty(inviteCode))
+            {
+                resultMode.Data = inviteCode;
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+                return resultMode;
+            }
+            //缓存过期了，重新生成
+            inviteCode = Guid.NewGuid().ToString().ToUpper();
+            RedisCacheHelper.AddSet(cacheKey, inviteCode, new TimeSpan(0, 0, 5));
+            RedisCacheHelper.AddSet(inviteCode, userData.OpenId, new TimeSpan(0, 0, 5, 0));
+            resultMode.Data = inviteCode;
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 加入家庭中
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="inviteCode"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> AddSelfToFamily(string token, string inviteCode)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (string.IsNullOrEmpty(inviteCode))
+            {
+                resultMode.Message = "邀请码不能为空";
+                return resultMode;
+            }
+
+            if (userData.HadBindFamily == FlagEnum.HadOne)
+            {
+                resultMode.Message = "您已经是家庭成员无需再次绑定";
+                return resultMode;
+            }
+
+            var wechatAccountService = new WechatAccountService();
+            //获取邀请人id
+            var masterOpenId = RedisCacheHelper.Get<string>(inviteCode);
+            var masterInfo = wechatAccountService.GetByOpenId(masterOpenId);
+            if (masterInfo == null)
+            {
+                RedisCacheHelper.Remove(inviteCode);
+                resultMode.Message = "邀请码已过期，请重新输入";
+                return resultMode;
+            }
+
+            if (masterInfo.AccountId == tempUserId.Value)
+            {
+                resultMode.Message = "不能自己邀请自己";
+                return resultMode;
+            }
+
+            var masterInviteCode = RedisCacheHelper.Get<string>(RedisCacheKey.InviteCodeKey + masterInfo.AccountId);
+            if (!masterInviteCode.Equals(inviteCode, StringComparison.OrdinalIgnoreCase))
+            {
+                resultMode.Message = "邀请码错误，请重新输入";
+                return resultMode;
+            }
+            //接受邀请，并写入家庭数据
+            //邀请者已经是家庭成员了
+            //邀请者还不是家庭成员，首次邀请
+
             return resultMode;
         }
     }
