@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
-using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Enum;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
@@ -120,8 +118,6 @@ namespace WeChatNoteCostApi.Controllers
                 resultMode.Message = "登录失效，请重新登录";
                 return resultMode;
             }
-
-            var _ = 0;
             var server = new CostContentService();
             var userId = userData.AccountId;
             var resultData = server.GetStatisticsAllChannel(userId);
@@ -739,7 +735,7 @@ namespace WeChatNoteCostApi.Controllers
                 return resultMode;
             }
             //缓存过期了，重新生成
-            inviteCode = Guid.NewGuid().ToString().ToUpper();
+            inviteCode = Guid.NewGuid().ToString().Replace("-","").Substring(0,26).ToUpper();
             RedisCacheHelper.AddSet(cacheKey, inviteCode, new TimeSpan(0, 0, 5));
             RedisCacheHelper.AddSet(inviteCode, userData.OpenId, new TimeSpan(0, 0, 5, 0));
             resultMode.Data = inviteCode;
@@ -782,6 +778,7 @@ namespace WeChatNoteCostApi.Controllers
             }
 
             var wechatAccountService = new WechatAccountService();
+            var wechatFamilyService = new WechatFamilyService();
             //获取邀请人id
             var masterOpenId = RedisCacheHelper.Get<string>(inviteCode);
             var masterInfo = wechatAccountService.GetByOpenId(masterOpenId);
@@ -804,10 +801,74 @@ namespace WeChatNoteCostApi.Controllers
                 resultMode.Message = "邀请码错误，请重新输入";
                 return resultMode;
             }
+            var currentUserInfo = wechatAccountService.GetByOpenId(userData.OpenId);
             //接受邀请，并写入家庭数据
-            //邀请者已经是家庭成员了
-            //邀请者还不是家庭成员，首次邀请
+            if (masterInfo.HadBindFamily == FlagEnum.HadOne && !string.IsNullOrEmpty(masterInfo.FamilyCode))
+            {
+                //邀请者已经是家庭成员了
+                currentUserInfo.FamilyCode = masterInfo.FamilyCode;
+                currentUserInfo.HadBindFamily = masterInfo.HadBindFamily;
+                var wechatFamilyInfo = new WechatFamilyModel
+                {
+                    CreateTime = DateTime.Now,
+                    FamilyCode = currentUserInfo.FamilyCode,
+                    IsDel = FlagEnum.HadZore,
+                    Remarks = "",
+                    UserId = currentUserInfo.AccountId
+                };
+                var familys = new List<WechatFamilyModel> { wechatFamilyInfo };
+                var wechatUsers = new List<WeChatAccountModel> { currentUserInfo };
+                var result = wechatFamilyService.BindFamilyAndUser(familys, wechatUsers);
+                if (result)
+                {
+                    resultMode.Message = "绑定成功";
+                    resultMode.ResultCode = ResponceCodeEnum.Success;
+                }
+                else
+                {
+                    resultMode.Message = "绑定失败";
+                }
+            }
+            else
+            {
+                //邀请者还不是家庭成员，首次邀请
+                var newFaimlyCode = Guid.NewGuid().ToString();
+                masterInfo.FamilyCode = newFaimlyCode;
+                masterInfo.HadBindFamily = FlagEnum.HadOne;
+                currentUserInfo.FamilyCode = newFaimlyCode;
+                currentUserInfo.HadBindFamily = FlagEnum.HadOne;
 
+                var masterFamilyInfo = new WechatFamilyModel
+                {
+                    CreateTime = DateTime.Now,
+                    FamilyCode = masterInfo.FamilyCode,
+                    IsDel = FlagEnum.HadZore,
+                    Remarks = "",
+                    UserId = masterInfo.AccountId
+                };
+                var newUserFamilyInfo = new WechatFamilyModel
+                {
+                    CreateTime = DateTime.Now,
+                    FamilyCode = currentUserInfo.FamilyCode,
+                    IsDel = FlagEnum.HadZore,
+                    Remarks = "",
+                    UserId = currentUserInfo.AccountId
+                };
+                var familys = new List<WechatFamilyModel> { masterFamilyInfo, newUserFamilyInfo };
+                var wechatUsers = new List<WeChatAccountModel> { currentUserInfo, masterInfo };
+                var result = wechatFamilyService.BindFamilyAndUser(familys, wechatUsers);
+                if (result)
+                {
+                    resultMode.Message = "绑定成功";
+                    resultMode.ResultCode = ResponceCodeEnum.Success;
+                }
+                else
+                {
+                    resultMode.Message = "绑定失败";
+                }
+            }
+            RedisCacheHelper.Remove(inviteCode);
+            RedisCacheHelper.Remove(RedisCacheKey.InviteCodeKey + masterInfo.AccountId);
             return resultMode;
         }
     }
