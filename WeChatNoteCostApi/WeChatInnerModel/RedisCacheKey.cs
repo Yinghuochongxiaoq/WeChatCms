@@ -20,6 +20,6 @@
         /// <summary>
         /// 缓存邀请码缓存key
         /// </summary>
-        public static string InviteCodeKey = "Get_Invite_Code_";
+        public static string InviteCodeKey = "GetInviteCode_";
     }
 }

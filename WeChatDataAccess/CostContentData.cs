@@ -19,7 +19,7 @@ namespace WeChatDataAccess
         /// <summary>
         /// 获取信息
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="spendType"></param>
         /// <param name="address"></param>
         /// <param name="costThing"></param>
@@ -30,9 +30,9 @@ namespace WeChatDataAccess
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public List<CostContentModel> GetModels(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int pageIndex, int pageSize)
+        public List<CostContentModel> GetModels(List<long> userIds, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int pageIndex, int pageSize)
         {
-            var where = new StringBuilder(" where UserId=@UserId and IsDel=@IsDel ");
+            var where = new StringBuilder(" where UserId in('+@UserIds+') and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -68,7 +68,7 @@ namespace WeChatDataAccess
             }
             var param = new
             {
-                UserId = userId,
+                UserIds = string.Join(",", userIds),
                 SpendType = spendType,
                 CostType = costType,
                 CostChannel = costchannel,
@@ -88,9 +88,9 @@ namespace WeChatDataAccess
         /// 获取总记录数
         /// </summary>
         /// <returns></returns>
-        public int GetCount(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
+        public int GetCount(List<long> userIds, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
-            var where = new StringBuilder(" where UserId=@UserId and IsDel=@IsDel ");
+            var where = new StringBuilder(" where UserId in('+@UserIds+') and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -126,7 +126,7 @@ namespace WeChatDataAccess
             }
             var param = new
             {
-                UserId = userId,
+                UserIds =string.Join(",",userIds),
                 SpendType = spendType,
                 CostType = costType,
                 CostChannel = costchannel,

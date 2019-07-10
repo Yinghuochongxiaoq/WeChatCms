@@ -1,5 +1,6 @@
 ﻿using FreshCommonUtility.Web;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Web.Mvc;
 using FreshCommonUtility.DataConvert;
@@ -57,7 +58,7 @@ namespace WeChatCms.Controllers
             else
             {
                 var server = new CostContentService();
-                var dataList = server.GetList(userId, spendtype, costaddress, costthing, costtype, costchannel, starttime, endtime,
+                var dataList = server.GetList(new List<long> { userId }, spendtype, costaddress, costthing, costtype, costchannel, starttime, endtime,
                     pageIndex, pageSize, out var count);
                 var dic = server.GetStatisticsCost(userId, spendtype, costaddress, costthing, costtype, costchannel,
                     starttime, endtime);

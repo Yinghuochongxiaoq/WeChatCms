@@ -40,8 +40,15 @@ namespace WeChatNoteCostApi.Controllers
             {
                 var userId = tempUserId.Value;
                 int count;
+                var userIds = new List<long> {userId};
+                var familyServer=new WechatFamilyService();
+                var members = familyServer.GetFamilyMembers(userData.FamilyCode);
+                if (members != null && members.Count > 0)
+                {
+                    userIds.AddRange(members.Select(f=>f.UserId));
+                }
                 var server = new CostContentService();
-                var dataList = server.GetList(userId, spendType, null, null, costType, costchannel, starttime, endtime,
+                var dataList = server.GetList(userIds, spendType, null, null, costType, costchannel, starttime, endtime,
                     pageIndex, pageSize, out count);
                 var dic = server.GetStatisticsCost(userId, spendType, null, null, costType, costchannel,
                     starttime, endtime);
@@ -736,7 +743,7 @@ namespace WeChatNoteCostApi.Controllers
             }
             //缓存过期了，重新生成
             inviteCode = Guid.NewGuid().ToString().Replace("-","").Substring(0,26).ToUpper();
-            RedisCacheHelper.AddSet(cacheKey, inviteCode, new TimeSpan(0, 0, 5));
+            RedisCacheHelper.AddSet(cacheKey, inviteCode, new TimeSpan(0, 0, 5,0));
             RedisCacheHelper.AddSet(inviteCode, userData.OpenId, new TimeSpan(0, 0, 5, 0));
             resultMode.Data = inviteCode;
             resultMode.ResultCode = ResponceCodeEnum.Success;

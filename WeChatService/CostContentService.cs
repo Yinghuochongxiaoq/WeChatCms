@@ -113,7 +113,7 @@ namespace WeChatService
         /// <summary>
         /// 获取内容
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="costType"></param>
         /// <param name="costchannel"></param>
         /// <param name="startTime"></param>
@@ -125,10 +125,10 @@ namespace WeChatService
         /// <param name="address"></param>
         /// <param name="costThing"></param>
         /// <returns></returns>
-        public List<CostContentModel> GetList(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int indexPage, int pageSize, out int count)
+        public List<CostContentModel> GetList(List<long> userIds, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int indexPage, int pageSize, out int count)
         {
-            count = _dataAccess.GetCount(userId, spendType, address, costThing, costType, costchannel, startTime, endTime);
-            var list = _dataAccess.GetModels(userId, spendType, address, costThing, costType, costchannel, startTime, endTime, indexPage, pageSize);
+            count = _dataAccess.GetCount(userIds, spendType, address, costThing, costType, costchannel, startTime, endTime);
+            var list = _dataAccess.GetModels(userIds, spendType, address, costThing, costType, costchannel, startTime, endTime, indexPage, pageSize);
             return list;
         }
 
