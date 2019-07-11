@@ -135,7 +135,7 @@ namespace WeChatService
         /// <summary>
         /// 获取统计信息
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="spendType"></param>
         /// <param name="address"></param>
         /// <param name="costThing"></param>
@@ -144,10 +144,10 @@ namespace WeChatService
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
         /// <returns></returns>
-        public Dictionary<int, decimal> GetStatisticsCost(long userId, int spendType, string address, string costThing,
+        public Dictionary<int, decimal> GetStatisticsCost(List<long> userIds, int spendType, string address, string costThing,
             int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
-            return _dataAccess.GetStatisticsCost(userId, spendType, address, costThing, costType, costchannel,
+            return _dataAccess.GetStatisticsCost(userIds, spendType, address, costThing, costType, costchannel,
                 startTime, endTime);
         }
 
@@ -218,7 +218,7 @@ namespace WeChatService
             var allCouldCost = allInCost - allOutCost;
             var channelAcount = new Dictionary<string, decimal>();
             var channelServer = new CostChannelService();
-            var channelList = channelServer.GetList(-1, userId, 1, 10000, out _);
+            var channelList = channelServer.GetList(-1, new List<long> { userId }, 1, 10000, out _);
             if (channelList != null && channelList.Any())
             {
                 channelList.ForEach(f => channelAcount.Add(f.CostChannelName, 0));

@@ -56,6 +56,17 @@ namespace WeChatService
         }
 
         /// <summary>
+        /// 获取多个用户的信息
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <returns></returns>
+        public List<WeChatAccountModel> Get(List<long> userIds)
+        {
+            var data = _dataAccess.Get(userIds);
+            return data;
+        }
+
+        /// <summary>
         /// 通过绑定的id获取用户信息
         /// </summary>
         /// <param name="accountId"></param>

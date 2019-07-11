@@ -18,16 +18,16 @@ namespace WeChatService
         /// 获取内容
         /// </summary>
         /// <param name="type"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="indexPage"></param>
         /// <param name="pageSize"></param>
         /// <param name="count"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<CostTypeModel> GetList(int type, long userId, int indexPage, int pageSize, out int count, string name = "")
+        public List<CostTypeModel> GetList(int type, List<long> userIds, int indexPage, int pageSize, out int count, string name = "")
         {
-            count = _dataAccess.GetCount(type, userId, name);
-            return _dataAccess.GetModels(type, userId, indexPage, pageSize, name);
+            count = _dataAccess.GetCount(type, userIds, name);
+            return _dataAccess.GetModels(type, userIds, indexPage, pageSize, name);
         }
 
         /// <summary>

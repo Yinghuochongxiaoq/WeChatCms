@@ -80,7 +80,7 @@ namespace WeChatDataAccess
 
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
-                return conn.GetList<WechatFamilyModel>(new { IsDel = FlagEnum.HadOne.GetHashCode(), FamilyCode = familyCode })
+                return conn.GetList<WechatFamilyModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), FamilyCode = familyCode })
                     .ToList();
             }
         }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Description;
 using FreshCommonUtility.Cache;
 using FreshCommonUtility.Configure;
 using FreshCommonUtility.DataConvert;
@@ -22,6 +24,7 @@ namespace WeChatNoteCostApi.Controllers
     public class AccountController : ApiControllerBase
     {
         #region [1、小程序注册登录绑定]
+        readonly WechatFamilyService _familyServer = new WechatFamilyService();
 
         /// <summary>
         /// 获取微信小程序授权信息
@@ -66,7 +69,9 @@ namespace WeChatNoteCostApi.Controllers
                     IsDel = FlagEnum.HadZore.GetHashCode(),
                     NickName = responseData.nickName,
                     OpenId = responseData.openId,
-                    Remarks = "新访问用户"
+                    Remarks = "新访问用户",
+                    FamilyCode = "",
+                    HadBindFamily = FlagEnum.HadZore
                 };
                 server.SaveModel(newModel);
 
@@ -89,6 +94,7 @@ namespace WeChatNoteCostApi.Controllers
                 newModel.AccountId = resultId;
                 searchOpenIdModel = newModel;
             }
+            //TODO:未绑定用户，自动注册绑定
             else if (searchOpenIdModel.AccountId < 1)
             {
                 var newSysModel = new SysUser
@@ -109,6 +115,36 @@ namespace WeChatNoteCostApi.Controllers
                 var resultId = accountService.InsertWeChatUserAndBind(newSysModel, searchOpenIdModel.OpenId);
                 searchOpenIdModel.AccountId = resultId;
             }
+            //TODO:更新用户的昵称，头像
+            else
+            {
+                searchOpenIdModel.AvatarUrl = responseData.avatarUrl;
+                searchOpenIdModel.NickName = responseData.nickName;
+                server.SaveModel(searchOpenIdModel);
+            }
+
+            //TODO:获取家庭成员信息
+            var userIds = new List<long>();
+            var members = _familyServer.GetFamilyMembers(searchOpenIdModel.FamilyCode);
+            if (members != null && members.Count > 0)
+            {
+                userIds.AddRange(members.Select(f => f.UserId));
+            }
+
+            var weChatMemberList = new List<WeChatAuthResponseModel>();
+            if (userIds.Count > 0)
+            {
+                var weChatMembers = server.Get(userIds);
+                if (weChatMembers != null && weChatMembers.Count > 0)
+                {
+                    weChatMemberList = weChatMembers.Select(f => new WeChatAuthResponseModel
+                    {
+                        AvatarUrl = f.AvatarUrl,
+                        AccountId = f.AccountId,
+                        NickName = f.NickName
+                    }).ToList();
+                }
+            }
 
             var resultModel = new WeChatAuthResponseModel
             {
@@ -116,10 +152,11 @@ namespace WeChatNoteCostApi.Controllers
                 CodeTimeSpan = responseData.watermark?.timestamp,
                 AvatarUrl = responseData.avatarUrl,
                 AccountId = searchOpenIdModel.AccountId,
-                NickName = responseData.nickName
+                NickName = responseData.nickName,
+                WechatMemberList = weChatMemberList
             };
             //TODO：记录Token信息
-            RedisCacheHelper.AddSet(RedisCacheKey.AuthInfoKey + loginInfo.code, resultModel,DateTime.Now.AddHours(2));
+            RedisCacheHelper.AddSet(RedisCacheKey.AuthInfoKey + loginInfo.code, resultModel, DateTime.Now.AddHours(2));
             RedisCacheHelper.AddSet(RedisCacheKey.AuthTokenKey + resultModel.Token, searchOpenIdModel, DateTime.Now.AddHours(2));
             return new ResponseBaseModel<WeChatAuthResponseModel> { ResultCode = ResponceCodeEnum.Success, Message = "微信认证成功", Data = resultModel };
         }

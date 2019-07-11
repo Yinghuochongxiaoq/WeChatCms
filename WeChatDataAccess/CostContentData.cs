@@ -32,7 +32,7 @@ namespace WeChatDataAccess
         /// <returns></returns>
         public List<CostContentModel> GetModels(List<long> userIds, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime, int pageIndex, int pageSize)
         {
-            var where = new StringBuilder(" where UserId in('+@UserIds+') and IsDel=@IsDel ");
+            var where = new StringBuilder(" where UserId in @UserIds and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -68,7 +68,7 @@ namespace WeChatDataAccess
             }
             var param = new
             {
-                UserIds = string.Join(",", userIds),
+                UserIds = userIds.ToArray(),
                 SpendType = spendType,
                 CostType = costType,
                 CostChannel = costchannel,
@@ -90,7 +90,7 @@ namespace WeChatDataAccess
         /// <returns></returns>
         public int GetCount(List<long> userIds, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
-            var where = new StringBuilder(" where UserId in('+@UserIds+') and IsDel=@IsDel ");
+            var where = new StringBuilder(" where UserId in @UserIds and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -126,7 +126,7 @@ namespace WeChatDataAccess
             }
             var param = new
             {
-                UserIds =string.Join(",",userIds),
+                UserIds =userIds.ToArray(),
                 SpendType = spendType,
                 CostType = costType,
                 CostChannel = costchannel,
@@ -145,7 +145,7 @@ namespace WeChatDataAccess
         /// <summary>
         /// 获取统计数据
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="spendType"></param>
         /// <param name="address"></param>
         /// <param name="costThing"></param>
@@ -154,10 +154,10 @@ namespace WeChatDataAccess
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
         /// <returns></returns>
-        public Dictionary<int, decimal> GetStatisticsCost(long userId, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
+        public Dictionary<int, decimal> GetStatisticsCost(List<long> userIds, int spendType, string address, string costThing, int costType, long costchannel, DateTime startTime, DateTime endTime)
         {
             var select = "select CostInOrOut,sum(cost) Sum from costcontent ";
-            var where = new StringBuilder(" where UserId=@UserId and IsDel=@IsDel ");
+            var where = new StringBuilder(" where UserId in @UserIds and IsDel=@IsDel ");
 
             if (spendType != -1)
             {
@@ -195,7 +195,7 @@ namespace WeChatDataAccess
             var groupby = " GROUP BY CostInOrOut ";
             var param = new
             {
-                UserId = userId,
+                UserIds = userIds.ToArray(),
                 SpendType = spendType,
                 CostType = costType,
                 CostChannel = costchannel,

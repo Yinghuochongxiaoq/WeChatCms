@@ -17,15 +17,15 @@ namespace WeChatDataAccess
         /// 获取信息
         /// </summary>
         /// <param name="spendType"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<CostTypeModel> GetModels(int spendType, long userId, int pageIndex, int pageSize, string name)
+        public List<CostTypeModel> GetModels(int spendType, List<long> userIds, int pageIndex, int pageSize, string name)
         {
-            var where = new StringBuilder(" where IsDel=@IsDel ");
-            where.Append(" and UserId=@UserId");
+            var where = new StringBuilder(" where UserId in @UserId ");
+            where.Append(" and IsDel=@IsDel ");
             if (spendType != -1)
             {
                 where.Append(" and SpendType= @Type ");
@@ -38,7 +38,7 @@ namespace WeChatDataAccess
             {
                 IsDel = FlagEnum.HadZore.GetHashCode(),
                 Type = spendType,
-                UserId = userId,
+                UserId = userIds.ToArray(),
                 Name = "%" + name + "%"
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
@@ -51,10 +51,10 @@ namespace WeChatDataAccess
         /// 获取总记录数
         /// </summary>
         /// <returns></returns>
-        public int GetCount(int spendType, long userId, string name)
+        public int GetCount(int spendType, List<long> userIds, string name)
         {
-            var where = new StringBuilder(" where IsDel=@IsDel ");
-            where.Append(" and UserId=@UserId");
+            var where = new StringBuilder(" where UserId in @UserId ");
+            where.Append(" and IsDel=@IsDel ");
             if (spendType != -1)
             {
                 where.Append(" and SpendType= @Type ");
@@ -68,7 +68,7 @@ namespace WeChatDataAccess
             {
                 IsDel = FlagEnum.HadZore.GetHashCode(),
                 Type = spendType,
-                UserId = userId,
+                UserId = userIds.ToArray(),
                 Name = "%" + name + "%"
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())

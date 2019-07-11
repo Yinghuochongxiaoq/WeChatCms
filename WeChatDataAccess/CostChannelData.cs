@@ -15,16 +15,16 @@ namespace WeChatDataAccess
         /// <summary>
         /// 获取信息
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="isValid"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<CostChannelModel> GetModels(long userId, int isValid, int pageIndex, int pageSize, string name)
+        public List<CostChannelModel> GetModels(List<long> userIds, int isValid, int pageIndex, int pageSize, string name)
         {
-            var where = new StringBuilder(" where IsDel=@IsDel ");
-            where.Append(" and UserId=@UserId");
+            var where = new StringBuilder(" where UserId in @UserId ");
+            where.Append(" and IsDel=@IsDel ");
             if (isValid >= 0)
             {
                 where.Append(" and IsValid=@IsValid ");
@@ -36,7 +36,7 @@ namespace WeChatDataAccess
             var param = new
             {
                 IsDel = FlagEnum.HadZore.GetHashCode(),
-                UserId = userId,
+                UserId = userIds.ToArray(),
                 IsValid = isValid,
                 CostChannelName = "%" + name + "%"
             };
@@ -50,10 +50,10 @@ namespace WeChatDataAccess
         /// 获取总记录数
         /// </summary>
         /// <returns></returns>
-        public int GetCount(long userId, int isValid, string name)
+        public int GetCount(List<long> userIds, int isValid, string name)
         {
-            var where = new StringBuilder(" where IsDel=@IsDel ");
-            where.Append(" and UserId=@UserId");
+            var where = new StringBuilder(" where UserId in @UserId ");
+            where.Append(" and IsDel=@IsDel ");
             if (isValid >= 0)
             {
                 where.Append(" and IsValid=@IsValid ");
@@ -66,7 +66,7 @@ namespace WeChatDataAccess
             var param = new
             {
                 IsDel = FlagEnum.HadZore.GetHashCode(),
-                UserId = userId,
+                UserId = userIds.ToArray(),
                 IsValid = isValid,
                 CostChannelName = "%" + name + "%"
             };

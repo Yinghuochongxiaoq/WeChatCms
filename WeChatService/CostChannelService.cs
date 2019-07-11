@@ -21,16 +21,16 @@ namespace WeChatService
         /// 获取内容
         /// </summary>
         /// <param name="isValid"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="indexPage"></param>
         /// <param name="pageSize"></param>
         /// <param name="count"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<CostChannelModel> GetList(int isValid, long userId, int indexPage, int pageSize, out int count, string name = "")
+        public List<CostChannelModel> GetList(int isValid, List<long> userIds, int indexPage, int pageSize, out int count, string name = "")
         {
-            count = _dataAccess.GetCount(userId, isValid, name);
-            return _dataAccess.GetModels(userId, isValid, indexPage, pageSize, name);
+            count = _dataAccess.GetCount(userIds, isValid, name);
+            return _dataAccess.GetModels(userIds, isValid, indexPage, pageSize, name);
         }
 
         /// <summary>

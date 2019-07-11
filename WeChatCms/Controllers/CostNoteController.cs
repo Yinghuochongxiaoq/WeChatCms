@@ -60,8 +60,7 @@ namespace WeChatCms.Controllers
                 var server = new CostContentService();
                 var dataList = server.GetList(new List<long> { userId }, spendtype, costaddress, costthing, costtype, costchannel, starttime, endtime,
                     pageIndex, pageSize, out var count);
-                var dic = server.GetStatisticsCost(userId, spendtype, costaddress, costthing, costtype, costchannel,
-                    starttime, endtime);
+                var dic = server.GetStatisticsCost(new List<long> { userId }, spendtype, costaddress, costthing, costtype, costchannel, starttime, endtime);
                 var allOutCost = dic.ContainsKey(CostInOrOutEnum.Out.GetHashCode())
                     ? dic[CostInOrOutEnum.Out.GetHashCode()]
                     : 0;
@@ -95,7 +94,7 @@ namespace WeChatCms.Controllers
             };
             var server = new CostTypeService();
             var userId = CurrentModel.UserId;
-            var data = server.GetList(spendType, userId, 1, 100000, out _);
+            var data = server.GetList(spendType, new List<long> { userId }, 1, 100000, out _);
             resultMode.Data = data;
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return Json(resultMode, JsonRequestBehavior.AllowGet);
@@ -115,7 +114,7 @@ namespace WeChatCms.Controllers
             };
             var server = new CostChannelService();
             var userId = CurrentModel.UserId;
-            var data = server.GetList(FlagEnum.HadOne.GetHashCode(), userId, 1, 100000, out _);
+            var data = server.GetList(FlagEnum.HadOne.GetHashCode(), new List<long> { userId }, 1, 100000, out _);
             resultMode.Data = data;
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return Json(resultMode, JsonRequestBehavior.AllowGet);
@@ -312,7 +311,7 @@ namespace WeChatCms.Controllers
             else
             {
                 var server = new CostChannelService();
-                var dataList = server.GetList(isValid, userId, pageIndex, pageSize, out var count, name);
+                var dataList = server.GetList(isValid, new List<long> { userId }, pageIndex, pageSize, out var count, name);
                 resultMode.Data = new { count, dataList };
                 resultMode.ResultCode = ResponceCodeEnum.Success;
             }
@@ -458,7 +457,7 @@ namespace WeChatCms.Controllers
             };
             var userId = CurrentModel.UserId;
             var server = new CostChannelService();
-            var modelList = server.GetList(-1, userId, 1, 10, out _);
+            var modelList = server.GetList(-1, new List<long> { userId }, 1, 10, out _);
             if (modelList != null && modelList.Count > 0)
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;
@@ -505,7 +504,7 @@ namespace WeChatCms.Controllers
             else
             {
                 var server = new CostTypeService();
-                var dataList = server.GetList(spendType, userId, pageIndex, pageSize, out var count, name);
+                var dataList = server.GetList(spendType, new List<long> { userId }, pageIndex, pageSize, out var count, name);
                 resultMode.Data = new { count, dataList };
                 resultMode.ResultCode = ResponceCodeEnum.Success;
             }
@@ -649,7 +648,7 @@ namespace WeChatCms.Controllers
             };
             var userId = CurrentModel.UserId;
             var server = new CostTypeService();
-            var modelList = server.GetList(-1, userId, 1, 10, out _);
+            var modelList = server.GetList(-1, new List<long> { userId }, 1, 10, out _);
             if (modelList != null && modelList.Count > 0)
             {
                 resultMode.ResultCode = ResponceCodeEnum.Fail;

@@ -15,12 +15,15 @@ namespace WeChatNoteCostApi.Controllers
 {
     public class CostNoteController : ApiControllerBase
     {
+        readonly WechatFamilyService _familyServer = new WechatFamilyService();
+
+        #region [1、消费流水页面记录]
         /// <summary>
         /// 获取消费记录异步数据
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> GetCostPage(string token, int pageIndex = 1, int pageSize = 10, int costType = -1, int spendType = -1, long costchannel = -1)
+        public ResponseBaseModel<dynamic> GetCostPage(string token, int pageIndex = 1, int pageSize = 10, int costType = -1, int spendType = -1, long costchannel = -1, long memberId = -1)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -40,17 +43,24 @@ namespace WeChatNoteCostApi.Controllers
             {
                 var userId = tempUserId.Value;
                 int count;
-                var userIds = new List<long> {userId};
-                var familyServer=new WechatFamilyService();
-                var members = familyServer.GetFamilyMembers(userData.FamilyCode);
+                var userIds = new List<long> { userId };
+                var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
                 if (members != null && members.Count > 0)
                 {
-                    userIds.AddRange(members.Select(f=>f.UserId));
+                    userIds.AddRange(members.Select(f => f.UserId));
                 }
+                //查询成员的信息
+                if (memberId > 0 && userIds.Contains(memberId))
+                {
+                    userIds.Clear();
+                    userIds.Add(memberId);
+                }
+                userIds = userIds.Distinct().ToList();
+
                 var server = new CostContentService();
                 var dataList = server.GetList(userIds, spendType, null, null, costType, costchannel, starttime, endtime,
                     pageIndex, pageSize, out count);
-                var dic = server.GetStatisticsCost(userId, spendType, null, null, costType, costchannel,
+                var dic = server.GetStatisticsCost(userIds, spendType, null, null, costType, costchannel,
                     starttime, endtime);
                 var allOutCost = dic.ContainsKey(CostInOrOutEnum.Out.GetHashCode())
                     ? dic[CostInOrOutEnum.Out.GetHashCode()]
@@ -76,7 +86,7 @@ namespace WeChatNoteCostApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> GetCostChannelType(string token)
+        public ResponseBaseModel<dynamic> GetCostChannelType(string token, long memberId = -1)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -94,9 +104,24 @@ namespace WeChatNoteCostApi.Controllers
             var _ = 0;
             var server = new CostTypeService();
             var userId = userData.AccountId;
-            var costTypeData = server.GetList(-1, userId, 1, 100000, out _);
+
+            var userIds = new List<long> { userId };
+            var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
+            if (members != null && members.Count > 0)
+            {
+                userIds.AddRange(members.Select(f => f.UserId));
+            }
+            //查询成员的信息
+            if (memberId > 0 && userIds.Contains(memberId))
+            {
+                userIds.Clear();
+                userIds.Add(memberId);
+            }
+            userIds = userIds.Distinct().ToList();
+
+            var costTypeData = server.GetList(-1, userIds, 1, 100000, out _);
             var channelServer = new CostChannelService();
-            var channelData = channelServer.GetList(FlagEnum.HadOne.GetHashCode(), userId, 1, 100000, out _);
+            var channelData = channelServer.GetList(FlagEnum.HadOne.GetHashCode(), userIds, 1, 100000, out _);
             resultMode.Data = new
             {
                 costTypeData,
@@ -105,6 +130,7 @@ namespace WeChatNoteCostApi.Controllers
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
+        #endregion
 
         /// <summary>
         /// 统计用户账户信息
@@ -301,7 +327,7 @@ namespace WeChatNoteCostApi.Controllers
             //验证权限
             if (oldModel == null || oldModel.UserId != userId)
             {
-                resultMode.Message = "非法访问";
+                resultMode.Message = "只能本人删除";
                 return resultMode;
             }
 
@@ -742,8 +768,8 @@ namespace WeChatNoteCostApi.Controllers
                 return resultMode;
             }
             //缓存过期了，重新生成
-            inviteCode = Guid.NewGuid().ToString().Replace("-","").Substring(0,26).ToUpper();
-            RedisCacheHelper.AddSet(cacheKey, inviteCode, new TimeSpan(0, 0, 5,0));
+            inviteCode = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 26).ToUpper();
+            RedisCacheHelper.AddSet(cacheKey, inviteCode, new TimeSpan(0, 0, 5, 0));
             RedisCacheHelper.AddSet(inviteCode, userData.OpenId, new TimeSpan(0, 0, 5, 0));
             resultMode.Data = inviteCode;
             resultMode.ResultCode = ResponceCodeEnum.Success;

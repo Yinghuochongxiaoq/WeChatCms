@@ -32,5 +32,10 @@ namespace WeChatModel.WeChatAuthModel
         /// 用户昵称
         /// </summary>
         public string NickName { get; set; }
+
+        /// <summary>
+        /// 家庭成员
+        /// </summary>
+        public List<WeChatAuthResponseModel> WechatMemberList { get; set; }
     }
 }
