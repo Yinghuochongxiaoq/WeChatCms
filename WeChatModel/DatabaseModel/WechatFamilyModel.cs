@@ -46,5 +46,9 @@ namespace WeChatModel.DatabaseModel
         /// Remarks 备注
         /// </summary>
         public String Remarks { get; set; }
+        /// <summary>
+        /// 解绑时间
+        /// </summary>
+        public DateTime UnBindTime { get; set; }
     }
 }

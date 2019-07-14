@@ -33,6 +33,17 @@ namespace WeChatService
         }
 
         /// <summary>
+        /// 解除绑定/重新绑定
+        /// </summary>
+        /// <param name="familyModel"></param>
+        /// <param name="weChatAccountModel"></param>
+        /// <returns></returns>
+        public bool UnBindFamilyAndUser(WechatFamilyModel familyModel, WeChatAccountModel weChatAccountModel)
+        {
+            return _dataAccess.UnBindFamilyAndUser(familyModel, weChatAccountModel);
+        }
+
+        /// <summary>
         /// 根据家庭code获得家庭成员信息
         /// </summary>
         /// <param name="familyCode"></param>
@@ -45,6 +56,29 @@ namespace WeChatService
             }
 
             return _dataAccess.GetFamilyMembers(familyCode);
+        }
+
+        /// <summary>
+        /// 根据家庭code获得家庭成员信息
+        /// </summary>
+        /// <param name="familyCode"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public WechatFamilyModel GetFamilyMember(string familyCode, long userId)
+        {
+            return _dataAccess.GetFamilyMember(familyCode, userId);
+        }
+
+        /// <summary>
+        /// 获取用户的家庭成员信息
+        /// </summary>
+        /// <param name="familyCode"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<WeChatAccountModel> GetMemberInfoByCode(string familyCode,long userId)
+        {
+            if (string.IsNullOrEmpty(familyCode)) return null;
+            return _dataAccess.GetMembersAccount(familyCode, userId);
         }
     }
 }

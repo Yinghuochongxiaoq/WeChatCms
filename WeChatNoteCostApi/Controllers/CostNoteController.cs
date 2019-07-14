@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
+using FreshCommonUtility.Dynamic;
 using FreshCommonUtility.Enum;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
@@ -44,10 +45,13 @@ namespace WeChatNoteCostApi.Controllers
                 var userId = tempUserId.Value;
                 int count;
                 var userIds = new List<long> { userId };
-                var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
-                if (members != null && members.Count > 0)
+                if (userData.HadBindFamily == FlagEnum.HadOne && !string.IsNullOrEmpty(userData.FamilyCode))
                 {
-                    userIds.AddRange(members.Select(f => f.UserId));
+                    var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
+                    if (members != null && members.Count > 0)
+                    {
+                        userIds.AddRange(members.Select(f => f.UserId));
+                    }
                 }
                 //查询成员的信息
                 if (memberId > 0 && userIds.Contains(memberId))
@@ -106,11 +110,15 @@ namespace WeChatNoteCostApi.Controllers
             var userId = userData.AccountId;
 
             var userIds = new List<long> { userId };
-            var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
-            if (members != null && members.Count > 0)
+            if (userData.HadBindFamily == FlagEnum.HadOne && !string.IsNullOrEmpty(userData.FamilyCode))
             {
-                userIds.AddRange(members.Select(f => f.UserId));
+                var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
+                if (members != null && members.Count > 0)
+                {
+                    userIds.AddRange(members.Select(f => f.UserId));
+                }
             }
+
             //查询成员的信息
             if (memberId > 0 && userIds.Contains(memberId))
             {
@@ -132,6 +140,7 @@ namespace WeChatNoteCostApi.Controllers
         }
         #endregion
 
+        #region [2、获取统计信息]
         /// <summary>
         /// 统计用户账户信息
         /// </summary>
@@ -151,14 +160,27 @@ namespace WeChatNoteCostApi.Controllers
                 resultMode.Message = "登录失效，请重新登录";
                 return resultMode;
             }
+
+            var userIds = new List<long> { tempUserId.Value };
+            if (userData.HadBindFamily == FlagEnum.HadOne && !string.IsNullOrEmpty(userData.FamilyCode))
+            {
+                var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
+                if (members != null && members.Count > 0)
+                {
+                    userIds.AddRange(members.Select(f => f.UserId));
+                }
+            }
+            userIds = userIds.Distinct().ToList();
+
             var server = new CostContentService();
-            var userId = userData.AccountId;
-            var resultData = server.GetStatisticsAllChannel(userId);
+            var resultData = server.GetStatisticsAllChannel(userIds);
             resultMode.Data = resultData;
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
+        #endregion
 
+        #region [3、编辑消费记录]
         /// <summary>
         /// 添加信息
         /// </summary>
@@ -192,7 +214,7 @@ namespace WeChatNoteCostApi.Controllers
                 //验证权限
                 if (newModel == null || newModel.UserId != userId)
                 {
-                    resultMode.Message = "非法访问";
+                    resultMode.Message = "只能修改自己的账户哦~";
                     return resultMode;
                 }
 
@@ -362,7 +384,9 @@ namespace WeChatNoteCostApi.Controllers
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
+        #endregion
 
+        #region [4、编辑账户信息]
         /// <summary>
         /// 获取信息
         /// </summary>
@@ -462,7 +486,9 @@ namespace WeChatNoteCostApi.Controllers
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
+        #endregion
 
+        #region [5、编辑类型信息]
         /// <summary>
         /// 获取类型信息
         /// </summary>
@@ -607,15 +633,19 @@ namespace WeChatNoteCostApi.Controllers
 
             return resultMode;
         }
+        #endregion
+
+        #region [6、获取统计表格]
 
         /// <summary>
         /// 获取统计表格的数据
         /// </summary>
         /// <param name="token"></param>
         /// <param name="pieIndex"></param>
+        /// <param name="memberId"></param>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> ChartPieData(string token, int pieIndex)
+        public ResponseBaseModel<dynamic> ChartPieData(string token, int pieIndex, long memberId = -1)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -634,6 +664,23 @@ namespace WeChatNoteCostApi.Controllers
             var currentTime = DateTime.Now;
             var endTime = new DateTime(currentTime.Year, currentTime.Month + 1, 1).AddSeconds(-1);
             var pieStartTime = currentTime;
+            //获取成员信息
+            var userIds = new List<long> { userId };
+            if (userData.HadBindFamily == FlagEnum.HadOne && !string.IsNullOrEmpty(userData.FamilyCode))
+            {
+                var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
+                if (members != null && members.Count > 0)
+                {
+                    userIds.AddRange(members.Select(f => f.UserId));
+                }
+            }
+            //查询成员的信息
+            if (memberId > 0 && userIds.Contains(memberId))
+            {
+                userIds.Clear();
+                userIds.Add(memberId);
+            }
+            userIds = userIds.Distinct().ToList();
             //本月
             if (pieIndex == 0)
             {
@@ -654,7 +701,7 @@ namespace WeChatNoteCostApi.Controllers
                 pieStartTime = endTime.AddMonths(-12).AddSeconds(1);
             }
 
-            var costTypeList = server.GetCostTypeStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.Out, 0);
+            var costTypeList = server.GetCostTypeStatistics(pieStartTime, endTime, userIds, CostInOrOutEnum.Out, 0);
             var resultData = costTypeList?.Select(f => new { name = f.CostTypeName, data = f.CostCount }).ToList();
             resultMode.Data = resultData;
             resultMode.ResultCode = ResponceCodeEnum.Success;
@@ -666,9 +713,10 @@ namespace WeChatNoteCostApi.Controllers
         /// </summary>
         /// <param name="token"></param>
         /// <param name="lineIndex"></param>
+        /// <param name="memberId"></param>
         /// <returns></returns>
         [HttpGet]
-        public ResponseBaseModel<dynamic> ChartLineData(string token, int lineIndex)
+        public ResponseBaseModel<dynamic> ChartLineData(string token, int lineIndex, long memberId = -1)
         {
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -687,6 +735,23 @@ namespace WeChatNoteCostApi.Controllers
             var currentTime = DateTime.Now;
             var endTime = new DateTime(currentTime.Year, currentTime.Month + 1, 1).AddSeconds(-1);
             var pieStartTime = currentTime;
+
+            //查询成员的信息
+            var userIds = new List<long> { userId };
+            if (userData.HadBindFamily == FlagEnum.HadOne && !string.IsNullOrEmpty(userData.FamilyCode))
+            {
+                var members = _familyServer.GetFamilyMembers(userData.FamilyCode);
+                if (members != null && members.Count > 0)
+                {
+                    userIds.AddRange(members.Select(f => f.UserId));
+                }
+            }
+            if (memberId > 0 && userIds.Contains(memberId))
+            {
+                userIds.Clear();
+                userIds.Add(memberId);
+            }
+            userIds = userIds.Distinct().ToList();
             //季度
             if (lineIndex == 1)
             {
@@ -702,8 +767,8 @@ namespace WeChatNoteCostApi.Controllers
                 pieStartTime = endTime.AddMonths(-12).AddSeconds(1);
             }
 
-            var costOutList = server.GetCostMonthStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.Out, 0);
-            var costIntList = server.GetCostMonthStatistics(pieStartTime, endTime, userId, CostInOrOutEnum.In, 0);
+            var costOutList = server.GetCostMonthStatistics(pieStartTime, endTime, userIds, CostInOrOutEnum.Out, 0);
+            var costIntList = server.GetCostMonthStatistics(pieStartTime, endTime, userIds, CostInOrOutEnum.In, 0);
             var resultMap = new Dictionary<int, Tuple<decimal, decimal>>();
             foreach (var outItem in costOutList)
             {
@@ -736,7 +801,9 @@ namespace WeChatNoteCostApi.Controllers
             resultMode.ResultCode = ResponceCodeEnum.Success;
             return resultMode;
         }
+        #endregion
 
+        #region [7、绑定家庭信息]
         /// <summary>
         /// 获取家庭邀请码
         /// </summary>
@@ -904,5 +971,172 @@ namespace WeChatNoteCostApi.Controllers
             RedisCacheHelper.Remove(RedisCacheKey.InviteCodeKey + masterInfo.AccountId);
             return resultMode;
         }
+
+        /// <summary>
+        /// 解除绑定
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> UnBindFamily(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (userData.HadBindFamily == FlagEnum.HadZore)
+            {
+                resultMode.Message = "您已经解除绑定";
+                return resultMode;
+            }
+
+            var weChatAccountService = new WechatAccountService();
+            var weChatFamilyService = new WechatFamilyService();
+
+            var currentUserInfo = weChatAccountService.GetByOpenId(userData.OpenId);
+            var weChatFamilyInfo =
+                weChatFamilyService.GetFamilyMember(currentUserInfo?.FamilyCode, currentUserInfo?.AccountId ?? 0);
+            //解除绑定
+            if (currentUserInfo == null || weChatFamilyInfo == null)
+            {
+                resultMode.Message = "用户信息获取失败";
+            }
+            else
+            {
+                currentUserInfo.HadBindFamily = FlagEnum.HadZore;
+                currentUserInfo.UpDateTime = DateTime.Now;
+                weChatFamilyInfo.IsDel = FlagEnum.HadOne;
+                weChatFamilyInfo.UnBindTime = DateTime.Now;
+                weChatFamilyService.UnBindFamilyAndUser(weChatFamilyInfo, currentUserInfo);
+                resultMode.Message = "解除绑定成功";
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+            }
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 重新绑定绑定
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> ReBindFamily(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (userData.HadBindFamily == FlagEnum.HadOne)
+            {
+                resultMode.Message = "您已经绑定成功";
+                return resultMode;
+            }
+
+            var weChatAccountService = new WechatAccountService();
+            var weChatFamilyService = new WechatFamilyService();
+
+            var currentUserInfo = weChatAccountService.GetByOpenId(userData.OpenId);
+            var weChatFamilyInfo =
+                weChatFamilyService.GetFamilyMember(currentUserInfo?.FamilyCode, currentUserInfo?.AccountId ?? 0);
+            //重新绑定
+            if (currentUserInfo == null || weChatFamilyInfo == null)
+            {
+                resultMode.Message = "用户信息获取失败";
+            }
+            else if (weChatFamilyInfo.UnBindTime<DateTime.Now.AddDays(-3))
+            {
+                resultMode.Message = "72小时时限已过，请让原家庭成员重新邀请吧~";
+            }
+            else
+            {
+                currentUserInfo.HadBindFamily = FlagEnum.HadOne;
+                currentUserInfo.UpDateTime = DateTime.Now;
+                weChatFamilyInfo.IsDel = FlagEnum.HadZore;
+                weChatFamilyInfo.UnBindTime = new DateTime(1900, 1, 1);
+                weChatFamilyService.UnBindFamilyAndUser(weChatFamilyInfo, currentUserInfo);
+                resultMode.Message = "重新绑定成功";
+                resultMode.ResultCode = ResponceCodeEnum.Success;
+            }
+            return resultMode;
+        }
+        #endregion
+
+        #region [8、获取用户的家庭成员]
+
+        /// <summary>
+        /// 统计用户账户信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetCurrentUserFamilyMembers(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (!string.IsNullOrEmpty(userData.FamilyCode))
+            {
+                var members = _familyServer.GetMemberInfoByCode(userData.FamilyCode, tempUserId.Value);
+                if (members != null && members.Count > 0)
+                {
+                    if (userData.HadBindFamily == FlagEnum.HadOne)
+                    {
+                        resultMode.Data = new { members, state = 1 };
+                        resultMode.ResultCode = ResponceCodeEnum.Success;
+                    }
+                    else
+                    {
+                        var currentIndex = members.FindIndex(f => f.AccountId == tempUserId.Value);
+                        if (currentIndex > 0)
+                        {
+                            var tempUser = members[currentIndex];
+                            members[currentIndex] = members[0];
+                            members[0] = tempUser;
+                        }
+                        resultMode.Data = new
+                        {
+                            members = members[0].UpDateTime > DateTime.Now.AddDays(-3) ? members : new List<WeChatAccountModel>(),
+                            state = members[0].UpDateTime > DateTime.Now.AddDays(-3) ? 2 : 0
+                        };
+                        resultMode.ResultCode = ResponceCodeEnum.Success;
+                    }
+                }
+            }
+            else
+            {
+                resultMode.Data = new { members = new List<int>(), state = 0 };
+                resultMode.ResultCode = ResponceCodeEnum.Fail;
+                resultMode.Message = "还没有绑定家庭哦";
+            }
+            return resultMode;
+        }
+        #endregion
     }
 }

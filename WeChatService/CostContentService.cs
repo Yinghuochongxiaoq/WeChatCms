@@ -161,7 +161,7 @@ namespace WeChatService
         /// <returns></returns>
         public dynamic GetStatisticsCanPay(long userId, DateTime starTime, DateTime endTime, long channelId)
         {
-            List<CanPayAcountModel> channelCanPayList = _dataAccess.GetStatisticsCanPay(userId);
+            List<CanPayAcountModel> channelCanPayList = _dataAccess.GetStatisticsCanPay(new List<long> { userId });
             var inCostList = channelCanPayList.Where(f => f.CostInOrOut == CostInOrOutEnum.In);
             var outCostList = channelCanPayList.Where(e => e.CostInOrOut == CostInOrOutEnum.Out);
             var allCanPay = inCostList.Sum(r => r.CostCount) - outCostList.Sum(s => s.CostCount);
@@ -184,7 +184,7 @@ namespace WeChatService
             });
             var data = channelAcount.Where(r => r.Value != 0).Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key }).ToList();
 
-            var costTypeList = GetCostTypeStatistics(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            var costTypeList = GetCostTypeStatistics(starTime, endTime, new List<long> { userId }, CostInOrOutEnum.Out, channelId);
             var allTypeCost = costTypeList.Sum(f => f.CostCount);
 
             var costDayList = _dataAccess.GetStatisticsCostDayPay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
@@ -207,45 +207,146 @@ namespace WeChatService
         /// <summary>
         /// 获取用户的所有账户信息
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <returns></returns>
-        public dynamic GetStatisticsAllChannel(long userId)
+        public List<dynamic> GetStatisticsAllChannel(List<long> userIds)
         {
-            List<CanPayAcountModel> channelCanPayList = _dataAccess.GetStatisticsCanPay(userId);
-
-            var allOutCost = channelCanPayList.Where(e => e.CostInOrOut == CostInOrOutEnum.Out).Sum(e => e.CostCount);
-            var allInCost = channelCanPayList.Where(f => f.CostInOrOut == CostInOrOutEnum.In).Sum(s => s.CostCount);
-            var allCouldCost = allInCost - allOutCost;
-            var channelAcount = new Dictionary<string, decimal>();
             var channelServer = new CostChannelService();
-            var channelList = channelServer.GetList(-1, new List<long> { userId }, 1, 10000, out _);
-            if (channelList != null && channelList.Any())
+            //获取所有用户的统计信息
+            List<CanPayAcountModel> channelCanPayList = _dataAccess.GetStatisticsCanPay(userIds);
+            //获取所有用户账户
+            var channelList = channelServer.GetList(-1, userIds, 1, 10000, out _);
+            var result = new List<dynamic>();
+            if (channelList == null || channelList.Count < 1)
             {
-                channelList.ForEach(f => channelAcount.Add(f.CostChannelName, 0));
+                return result;
             }
-            channelCanPayList.ForEach(h =>
-            {
-                if (channelAcount.ContainsKey(h.CostChannelName))
-                {
-                    channelAcount[h.CostChannelName] = channelAcount[h.CostChannelName] +
-                                                       (h.CostInOrOut == CostInOrOutEnum.In
-                                                           ? h.CostCount
-                                                           : h.CostCount * -1);
-                }
-                else
-                {
-                    channelAcount.Add(h.CostChannelName, h.CostInOrOut == CostInOrOutEnum.In
-                        ? h.CostCount
-                        : h.CostCount * -1);
-                }
-            });
-            var data = channelAcount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key, CostChannel = channelList?.FirstOrDefault(r => r.CostChannelName == f.Key)?.Id }).ToList();
 
-            return new
+            #region [家庭成员所有]
+
+            if (userIds.Count > 1)
             {
-                StatisticsModel = new { allCouldCost = $"{allCouldCost:N2}", allInCost = $"{allInCost:N2}", allOutCost = $"{allOutCost:N2}" },
-                channelAcount = data
-            };
+                var allOutCost = channelCanPayList.Where(e => e.CostInOrOut == CostInOrOutEnum.Out)
+                    .Sum(e => e.CostCount);
+                var allInCost = channelCanPayList.Where(f => f.CostInOrOut == CostInOrOutEnum.In).Sum(s => s.CostCount);
+                var allCouldCost = allInCost - allOutCost;
+                var channelAccount = new Dictionary<string, decimal>();
+                if (channelList.Any())
+                {
+                    channelList.ForEach(f =>
+                        {
+                            if (!channelAccount.ContainsKey(f.CostChannelName))
+                            {
+                                channelAccount.Add(f.CostChannelName, 0);
+                            }
+                        }
+                    );
+                }
+
+                channelCanPayList.ForEach(h =>
+                {
+                    if (channelAccount.ContainsKey(h.CostChannelName))
+                    {
+                        channelAccount[h.CostChannelName] = channelAccount[h.CostChannelName] +
+                                                            (h.CostInOrOut == CostInOrOutEnum.In
+                                                                ? h.CostCount
+                                                                : h.CostCount * -1);
+                    }
+                    else
+                    {
+                        channelAccount.Add(h.CostChannelName, h.CostInOrOut == CostInOrOutEnum.In
+                            ? h.CostCount
+                            : h.CostCount * -1);
+                    }
+                });
+                var data = channelAccount.Select(f => new CanPayAcountModel
+                {
+                    CostCount = f.Value,
+                    CostChannelName = f.Key,
+                    CostChannel = channelList.FirstOrDefault(r => r.CostChannelName == f.Key)?.Id
+                }).ToList();
+                result.Add(new
+                {
+                    StatisticsModel = new
+                    {
+                        allCouldCost = $"{allCouldCost:N2}",
+                        allInCost = $"{allInCost:N2}",
+                        allOutCost = $"{allOutCost:N2}"
+                    },
+                    channelAcount = data,
+                    userId = -1
+                });
+            }
+
+            #endregion
+
+            #region [计算成员的统计信息]
+            foreach (var canPayAccountModels in channelCanPayList.GroupBy(f => f.UserId))
+            {
+                var itemOutCost = canPayAccountModels.Where(e => e.CostInOrOut == CostInOrOutEnum.Out).Sum(e => e.CostCount);
+                var itemInCost = canPayAccountModels.Where(f => f.CostInOrOut == CostInOrOutEnum.In).Sum(s => s.CostCount);
+                var itemCouldCost = itemInCost - itemOutCost;
+                var itemChannelAccount = new Dictionary<string, decimal>();
+                var itemChannelList = channelList.Where(r => r.UserId == canPayAccountModels.Key).ToList();
+                if (itemChannelList.Any())
+                {
+                    itemChannelList.ForEach(r => itemChannelAccount.Add(r.CostChannelName, 0));
+                }
+                foreach (var h in canPayAccountModels)
+                {
+                    if (itemChannelAccount.ContainsKey(h.CostChannelName))
+                    {
+                        itemChannelAccount[h.CostChannelName] = itemChannelAccount[h.CostChannelName] +
+                                                               (h.CostInOrOut == CostInOrOutEnum.In
+                                                                   ? h.CostCount
+                                                                   : h.CostCount * -1);
+                    }
+                    else
+                    {
+                        itemChannelAccount.Add(h.CostChannelName, h.CostInOrOut == CostInOrOutEnum.In
+                            ? h.CostCount
+                            : h.CostCount * -1);
+                    }
+                }
+                var itemData = itemChannelAccount.Select(f => new CanPayAcountModel { CostCount = f.Value, CostChannelName = f.Key, CostChannel = itemChannelList.FirstOrDefault(r => r.CostChannelName == f.Key)?.Id }).ToList();
+                result.Add(new
+                {
+                    StatisticsModel = new
+                    {
+                        allCouldCost = $"{itemCouldCost:N2}",
+                        allInCost = $"{itemInCost:N2}",
+                        allOutCost = $"{itemOutCost:N2}"
+                    },
+                    channelAcount = itemData,
+                    userId = canPayAccountModels.Key
+                });
+                userIds.Remove(canPayAccountModels.Key);
+            }
+            #endregion
+
+            #region 处理没有数据的情况
+
+            if (userIds.Count > 0)
+            {
+                userIds.ForEach(f =>
+                {
+                    result.Add(new
+                    {
+                        StatisticsModel = new
+                        {
+                            allCouldCost = $"{0:N2}",
+                            allInCost = $"{0:N2}",
+                            allOutCost = $"{0:N2}"
+                        },
+                        channelAcount = new List<CanPayAcountModel>(),
+                        userId = f
+                    });
+                });
+            }
+
+            #endregion
+
+            return result;
         }
 
         /// <summary>
@@ -253,14 +354,14 @@ namespace WeChatService
         /// </summary>
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="inOrOut"></param>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public List<CanPayAcountModel> GetCostTypeStatistics(DateTime starTime, DateTime endTime, long userId,
+        public List<CanPayAcountModel> GetCostTypeStatistics(DateTime starTime, DateTime endTime, List<long> userIds,
             CostInOrOutEnum inOrOut, long channelId)
         {
-            var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userId, CostInOrOutEnum.Out, channelId);
+            var costTypeList = _dataAccess.GetStatisticsCostTypePay(starTime, endTime, userIds, CostInOrOutEnum.Out, channelId);
             return costTypeList;
         }
 
@@ -269,14 +370,14 @@ namespace WeChatService
         /// </summary>
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="inOrOut"></param>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public Dictionary<int, decimal> GetCostMonthStatistics(DateTime starTime, DateTime endTime, long userId,
+        public Dictionary<int, decimal> GetCostMonthStatistics(DateTime starTime, DateTime endTime, List<long> userIds,
             CostInOrOutEnum inOrOut, long channelId)
         {
-            var costDic = _dataAccess.GetStatisticsCostMonth(starTime, endTime, userId, inOrOut, channelId);
+            var costDic = _dataAccess.GetStatisticsCostMonth(starTime, endTime, userIds, inOrOut, channelId);
             return costDic;
         }
     }

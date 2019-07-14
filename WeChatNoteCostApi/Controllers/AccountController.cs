@@ -120,15 +120,20 @@ namespace WeChatNoteCostApi.Controllers
             {
                 searchOpenIdModel.AvatarUrl = responseData.avatarUrl;
                 searchOpenIdModel.NickName = responseData.nickName;
+                searchOpenIdModel.UpDateTime = DateTime.Now;
                 server.SaveModel(searchOpenIdModel);
             }
 
             //TODO:获取家庭成员信息
             var userIds = new List<long>();
-            var members = _familyServer.GetFamilyMembers(searchOpenIdModel.FamilyCode);
-            if (members != null && members.Count > 0)
+            if (searchOpenIdModel.HadBindFamily == FlagEnum.HadOne &&
+                !string.IsNullOrEmpty(searchOpenIdModel.FamilyCode))
             {
-                userIds.AddRange(members.Select(f => f.UserId));
+                var members = _familyServer.GetFamilyMembers(searchOpenIdModel.FamilyCode);
+                if (members != null && members.Count > 0)
+                {
+                    userIds.AddRange(members.Select(f => f.UserId));
+                }
             }
 
             var weChatMemberList = new List<WeChatAuthResponseModel>();

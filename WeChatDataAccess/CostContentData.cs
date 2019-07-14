@@ -306,15 +306,15 @@ namespace WeChatDataAccess
         /// <summary>
         /// 获取余额统计数据
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <returns></returns>
-        public List<CanPayAcountModel> GetStatisticsCanPay(long userId)
+        public List<CanPayAcountModel> GetStatisticsCanPay(List<long> userIds)
         {
-            var select = @"	SELECT CostInOrOut, CostChannel, sum( cost ) CostCount,CostChannelName
-	FROM costcontent WHERE userid = @UserId and IsDel=@IsDel GROUP BY CostInOrOut, CostChannel ,CostChannelName";
+            var select = @"	SELECT CostInOrOut, CostChannel, sum( cost ) CostCount,CostChannelName,UserId
+	FROM costcontent WHERE userid in @UserIds and IsDel=@IsDel GROUP BY UserId,CostInOrOut, CostChannel ,CostChannelName";
             var param = new
             {
-                UserId = userId,
+                UserIds = userIds.ToArray(),
                 IsDel = FlagEnum.HadZore.GetHashCode()
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
@@ -329,11 +329,11 @@ namespace WeChatDataAccess
         /// </summary>
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="inOrOut"></param>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public List<CanPayAcountModel> GetStatisticsCostTypePay(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
+        public List<CanPayAcountModel> GetStatisticsCostTypePay(DateTime starTime, DateTime endTime, List<long> userIds, CostInOrOutEnum inOrOut, long channelId)
         {
             var select = @"SELECT
 	CostTypeName,
@@ -341,7 +341,7 @@ namespace WeChatDataAccess
 FROM
 	costcontent ";
             var groupby = " GROUP BY CostTypeName ORDER BY CostCount DESC";
-            var where = new StringBuilder("WHERE UserId = @UserId and IsDel=@IsDel ");
+            var where = new StringBuilder("WHERE UserId in @UserIds and IsDel=@IsDel ");
             where.Append(" AND SpendType!=2 ");
             where.Append(" AND CostInOrOut = @CostInOrOut  ");
             if (starTime > new DateTime(1900, 1, 1))
@@ -360,7 +360,7 @@ FROM
             }
             var param = new
             {
-                UserId = userId,
+                UserIds = userIds.ToArray(),
                 CostInOrOut = inOrOut.GetHashCode(),
                 StartTime = starTime,
                 EndTime = endTime,
@@ -425,11 +425,11 @@ FROM
         /// </summary>
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
-        /// <param name="userId"></param>
+        /// <param name="userIds"></param>
         /// <param name="inOrOut"></param>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public Dictionary<int, decimal> GetStatisticsCostMonth(DateTime starTime, DateTime endTime, long userId, CostInOrOutEnum inOrOut, long channelId)
+        public Dictionary<int, decimal> GetStatisticsCostMonth(DateTime starTime, DateTime endTime, List<long> userIds, CostInOrOutEnum inOrOut, long channelId)
         {
             var select = @"SELECT
 	CostYear,CostMonth,
@@ -437,7 +437,7 @@ FROM
 FROM 
 	costcontent ";
             var groupby = " GROUP BY CostYear,CostMonth ORDER BY CostYear desc,CostMonth desc";
-            var where = new StringBuilder("WHERE UserId = @UserId and IsDel=@IsDel ");
+            var where = new StringBuilder("WHERE UserId in @UserIds and IsDel=@IsDel ");
             where.Append(" AND SpendType!=2 ");
             where.Append(" AND CostInOrOut = @CostInOrOut  ");
             if (starTime > new DateTime(1900, 1, 1))
@@ -456,7 +456,7 @@ FROM
             }
             var param = new
             {
-                UserId = userId,
+                UserIds = userIds.ToArray(),
                 CostInOrOut = inOrOut.GetHashCode(),
                 StartTime = starTime,
                 EndTime = endTime,

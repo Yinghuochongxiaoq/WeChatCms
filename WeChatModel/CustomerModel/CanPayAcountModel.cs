@@ -30,5 +30,10 @@ namespace WeChatModel.CustomerModel
         /// 统计消费天
         /// </summary>
         public DateTime CostDay { get; set; }
+
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        public long UserId { get; set; }
     }
 }

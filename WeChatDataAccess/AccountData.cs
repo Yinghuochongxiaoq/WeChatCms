@@ -268,6 +268,7 @@ namespace WeChatDataAccess
                 {
                     var inId = conn.Insert<long, SysUser>(sysUser, transaction);
                     wechatUser.AccountId = inId;
+                    wechatUser.UpDateTime = DateTime.Now;
                     conn.Update(wechatUser, transaction);
                     transaction.Commit();
                     return inId;

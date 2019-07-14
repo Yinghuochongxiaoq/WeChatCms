@@ -67,5 +67,9 @@ namespace WeChatModel.DatabaseModel
         /// 是否关联了家庭0：未关联；1：已经关联
         /// </summary>
         public FlagEnum HadBindFamily { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpDateTime { get; set; }
     }
 }

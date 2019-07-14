@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dapper;
 using FreshCommonUtility.Dapper;
 using FreshCommonUtility.SqlHelper;
 using WeChatCmsCommon.EnumBusiness;
@@ -48,9 +47,44 @@ namespace WeChatDataAccess
                     {
                         foreach (var weChatAccountModel in weChatAccountModels)
                         {
-                            conn.Update(weChatAccountModel);
+                            conn.Update(weChatAccountModel, transaction);
                         }
                     }
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    if (Debugger.IsAttached)
+                    {
+                        Trace.WriteLine("事务处理失败：" + e.Message);
+                    }
+                    transaction.Rollback();
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 解除用户绑定
+        /// </summary>
+        /// <param name="familyModel"></param>
+        /// <param name="weChatAccountModel"></param>
+        /// <returns></returns>
+        public bool UnBindFamilyAndUser(WechatFamilyModel familyModel, WeChatAccountModel weChatAccountModel)
+        {
+            if (familyModel == null || weChatAccountModel == null)
+            {
+                return false;
+            }
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                IDbTransaction transaction = conn.BeginTransaction();
+
+                try
+                {
+                    conn.Update(familyModel, transaction);
+                    conn.Update(weChatAccountModel, transaction);
                     transaction.Commit();
                     return true;
                 }
@@ -82,6 +116,66 @@ namespace WeChatDataAccess
             {
                 return conn.GetList<WechatFamilyModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), FamilyCode = familyCode })
                     .ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取家庭成员
+        /// </summary>
+        /// <param name="familyCode"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public WechatFamilyModel GetFamilyMember(string familyCode, long userId)
+        {
+            if (string.IsNullOrEmpty(familyCode))
+            {
+                return null;
+            }
+
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                return conn.GetList<WechatFamilyModel>(new { UserId = userId, FamilyCode = familyCode })?.FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// 获取家庭成员列表
+        /// </summary>
+        /// <param name="familyCode"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<WeChatAccountModel> GetMembersAccount(string familyCode, long userId)
+        {
+            if (string.IsNullOrEmpty(familyCode))
+            {
+                return null;
+            }
+
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                return conn.Query<WeChatAccountModel>(@"SELECT
+	wa.AccountId,
+	wa.AvatarUrl,
+	wa.CreateTime,
+	wa.FamilyCode,
+	wa.Gender,
+	wa.HadBindFamily,
+	wa.Id,
+	wa.Id,
+	wa.IsDel,
+	wa.IsDel,
+	wa.NickName,
+	wa.OpenId,
+	wa.Remarks,
+	wf.UnBindTime UpdateTime 
+FROM
+	wechatfamily wf
+	LEFT JOIN wechataccount wa ON wa.AccountId = wf.UserId 
+WHERE
+	wf.FamilyCode = @FamilyCode 
+	AND wa.IsDel = @IsDel 
+	AND ( wf.IsDel = @IsDel OR wf.UserId = @CurrentUserId )", new
+                { IsDel = FlagEnum.HadZore.GetHashCode(), FamilyCode = familyCode, CurrentUserId = userId }).ToList();
             }
         }
     }
