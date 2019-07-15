@@ -1082,7 +1082,7 @@ namespace WeChatNoteCostApi.Controllers
         #region [8、获取用户的家庭成员]
 
         /// <summary>
-        /// 统计用户账户信息
+        /// 获取用户的家庭成员
         /// </summary>
         /// <returns></returns>
         [HttpGet]
