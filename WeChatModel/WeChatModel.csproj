@@ -98,6 +98,7 @@
     <Compile Include="CustomerModel\CanPayAcountModel.cs" />
     <Compile Include="DatabaseModel\CostChannelModel.cs" />
     <Compile Include="DatabaseModel\CostContentModel.cs" />
+    <Compile Include="DatabaseModel\CostNoticeModel.cs" />
     <Compile Include="DatabaseModel\CostTypeModel.cs" />
     <Compile Include="DatabaseModel\CustomercommentModel.cs" />
     <Compile Include="DatabaseModel\SysadvertisementModel.cs" />

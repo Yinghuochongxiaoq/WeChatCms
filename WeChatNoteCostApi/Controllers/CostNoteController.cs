@@ -1061,7 +1061,7 @@ namespace WeChatNoteCostApi.Controllers
             {
                 resultMode.Message = "用户信息获取失败";
             }
-            else if (weChatFamilyInfo.UnBindTime<DateTime.Now.AddDays(-3))
+            else if (weChatFamilyInfo.UnBindTime < DateTime.Now.AddDays(-3))
             {
                 resultMode.Message = "72小时时限已过，请让原家庭成员重新邀请吧~";
             }
@@ -1137,6 +1137,46 @@ namespace WeChatNoteCostApi.Controllers
             }
             return resultMode;
         }
+        #endregion
+
+        #region [9、获取首页滚动通知]
+
+        /// <summary>
+        /// 获取通知信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetHomePageNotice(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            var noticeList = new List<CostNoticeModel>
+            {
+                new CostNoticeModel
+                {
+                    Id=1, NoticeUrl = "", NoticeTitle = "公告：多地首套房贷利率上浮 热点城市渐迎零折扣时代"
+                }
+            };
+            resultMode.Data = new
+            {
+                noticeList
+            };
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
+
         #endregion
     }
 }
