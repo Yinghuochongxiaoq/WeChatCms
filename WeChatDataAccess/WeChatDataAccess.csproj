@@ -99,6 +99,7 @@
     <Compile Include="BaseData.cs" />
     <Compile Include="CostChannelData.cs" />
     <Compile Include="CostContentData.cs" />
+    <Compile Include="CostNoticeData.cs" />
     <Compile Include="CostTypeData.cs" />
     <Compile Include="CustomerCommentData.cs" />
     <Compile Include="DbLinkTestData.cs" />

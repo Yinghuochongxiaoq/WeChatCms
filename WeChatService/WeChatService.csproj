@@ -47,6 +47,7 @@
     <Compile Include="ContentService.cs" />
     <Compile Include="CostChannelService.cs" />
     <Compile Include="CostContentService.cs" />
+    <Compile Include="CostNoticeService.cs" />
     <Compile Include="CostTypeService.cs" />
     <Compile Include="CustomerCommentService.cs" />
     <Compile Include="DbLinkTestService.cs" />

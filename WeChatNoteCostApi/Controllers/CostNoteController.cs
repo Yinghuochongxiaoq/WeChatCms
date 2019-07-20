@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
-using FreshCommonUtility.Dynamic;
 using FreshCommonUtility.Enum;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
@@ -1162,13 +1161,8 @@ namespace WeChatNoteCostApi.Controllers
                 return resultMode;
             }
 
-            var noticeList = new List<CostNoticeModel>
-            {
-                new CostNoticeModel
-                {
-                    Id=1, NoticeUrl = "", NoticeTitle = "公告：多地首套房贷利率上浮 热点城市渐迎零折扣时代"
-                }
-            };
+            var server = new CostNoticeService();
+            var noticeList=server.GetCurrentTimeNoticeList(DateTime.Now);
             resultMode.Data = new
             {
                 noticeList
