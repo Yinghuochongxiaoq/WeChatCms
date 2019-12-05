@@ -661,7 +661,7 @@ namespace WeChatNoteCostApi.Controllers
             var server = new CostContentService();
             var userId = tempUserId.Value;
             var currentTime = DateTime.Now;
-            var endTime = new DateTime(currentTime.Year, currentTime.Month + 1, 1).AddSeconds(-1);
+            var endTime = new DateTime(currentTime.Year, currentTime.Month, 1).AddMonths(1).AddSeconds(-1);
             var pieStartTime = currentTime;
             //获取成员信息
             var userIds = new List<long> { userId };
@@ -732,7 +732,7 @@ namespace WeChatNoteCostApi.Controllers
             var server = new CostContentService();
             var userId = tempUserId.Value;
             var currentTime = DateTime.Now;
-            var endTime = new DateTime(currentTime.Year, currentTime.Month + 1, 1).AddSeconds(-1);
+            var endTime = new DateTime(currentTime.Year, currentTime.Month, 1).AddMonths(1).AddSeconds(-1);
             var pieStartTime = currentTime;
 
             //查询成员的信息
