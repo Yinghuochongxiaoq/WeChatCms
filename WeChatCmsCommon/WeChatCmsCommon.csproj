@@ -122,6 +122,7 @@
   <ItemGroup>
     <Compile Include="CheckCodeHelper\FilterWord.cs" />
     <Compile Include="CheckCodeHelper\YZMHelper.cs" />
+    <Compile Include="CustomerAttribute\CompressAttribute.cs" />
     <Compile Include="EnumBusiness\CostInOrOutEnum.cs" />
     <Compile Include="EnumBusiness\EnumBusinessPermission.cs" />
     <Compile Include="EnumBusiness\FlagEnum.cs" />
@@ -141,9 +142,7 @@
   <ItemGroup>
     <Content Include="lib\ICSharpCode.SharpZipLib.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CustomerAttribute\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.1\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.1\build\net45\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
