@@ -156,7 +156,7 @@ namespace WeChatDataAccess
                 return conn.Query<WeChatAccountModel>(@"SELECT
 	wa.AccountId,
 	wa.AvatarUrl,
-	wa.CreateTime,
+	wf.CreateTime,
 	wa.FamilyCode,
 	wa.Gender,
 	wa.HadBindFamily,
