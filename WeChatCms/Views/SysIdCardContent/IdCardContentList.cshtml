@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "客户列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+    <link href="@(ViewBag.RootNode)/Assets/css/PagerStyle.css" rel="stylesheet" type="text/css">
+}
+<div class="page-body">
+    <div class="widget widget-body">
+        <div class="panel panel-default">
+            <form class="panel-body" action="" id="form1">
+                <div class="form-inline control-left">
+                    <label>
+                        省份
+                        <select class="form-control input-sm" style="width: 75px"
+                                name="provinceCode" v-model="model.provinceCode" v-on:change="changeProvince(model.provinceCode)">
+                            <option v-for="item in provinceList" v-bind:value="item.code">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </label>
+                    <label>
+                        市：
+                        <select class="form-control input-sm" style="width: 100px"
+                                name="cityCode" v-model="model.cityCode" v-on:change="changeCity(model.cityCode)">
+                            <option v-for="item in cityList" v-bind:value="item.code">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </label>
+                    <label>
+                        区/县：
+                        <select class="form-control input-sm" style="width: 100px"
+                                name="costtype" v-model="model.countyCode">
+                            <option v-for="item in countyList" v-bind:value="item.code">
+                                {{item.name}}
+                            </option>
+                        </select>
+                    </label>
+                    <label>
+                        姓名：
+                        <input type="text" v-model="model.name" name="name"
+                               id="name" placeholder="姓名"
+                               class="form-control input-sm" style="min-width: 150px; width: 155px;">
+                    </label>
+                    <label>
+                        身份证号：
+                        <input type="text" name="cardNumber" v-model="model.cardNumber"
+                               id="cardNumber" placeholder="身份证号" maxlength="18"
+                               class="form-control input-sm" style="min-width: 150px; width: 165px;">
+                    </label>
+                    <button type="button" onclick="LoadingActivityResultDetailDate();"
+                            class="btn btn-success" title="查询" value="查询">
+                        查询<i class="fa fa-search"></i>
+                    </button>
+
+                    <button type="button" onclick="newIdCardInfo();" class="btn btn-success" title="新增" value="新增">新增<i class="fa fa-plus"></i></button>
+                </div>
+            </form>
+        </div>
+        <div id="resultTable">
+            <table class="table table-bordered  table-hover ">
+                <thead class="flip-content bordered-palegreen">
+                    <tr class="control-center">
+                        <th>姓名</th>
+                        <th>性别</th>
+                        <th>身份证号</th>
+                        <th>省</th>
+                        <th>区域</th>
+                        <th>城市</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="control-center" v-for="item of dataList">
+                        <td>{{item.Name}}</td>
+                        <td>{{vueTypeContent(item.Sex)}}</td>
+                        <td>{{item.CardNumber}}</td>
+                        <td>{{item.Province}}</td>
+                        <td>{{item.Area}}</td>
+                        <td>{{item.City}}</td>
+                        <td>{{item.Remarks}}</td>
+                        <td>
+                            <button type="button" v-on:click="vueEditContent(item.Id)"
+                                    class="btn btn-success" title="编辑" value="编辑">
+                                编辑<i class="fa fa-edit"></i>
+                            </button>
+                            <button type="button" v-on:click="vueDelContent(item.Id)"
+                                    class="btn btn-danger" title="删除" value="删除">
+                                删除<i class="fa fa-trash-o"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="pager">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--当前页码-->
+            <input type="hidden" id="currentPageIndex" value="1">
+        </div>
+    </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal inmodal" id="detailWindow" tabindex="-1"
+     role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="padding: 0px;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="margin-right: 10px;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+                </button>
+                <h3 class="modal-title">编辑客户信息</h3>
+            </div>
+            <form id="acForm">
+                <div class="modal-body form-horizontal"
+                     style="padding: 0px; background-color: #fff; min-height: 255px;">
+                    <div class="col-md-12" style="margin-top: 25px;">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">姓名：</label>
+                            <div class="col-sm-8">
+                                <input name="cost" id="cost" class="form-control input-sm"
+                                       type="text" placeholder="姓名" v-model="model.name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">身份证号：</label>
+                            <div class="col-sm-8">
+                                <input name="cardNumber" class="form-control input-sm"
+                                       type="text" v-model="model.cardNumber" placeholder="身份证号">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">备注：</label>
+                            <div class="col-sm-8">
+                                <input name="remarks" class="form-control input-sm"
+                                       type="text" v-model="model.remarks" placeholder="备注">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">
+                        <i class="fa fa-close"></i>关闭
+                    </button>
+                    <button type="button" onclick="saveIdCardInfo();" class="btn btn-primary">
+                        <i class="fa fa-save"></i>保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框end -->
+@section Script
+{
+    <script src="@(ViewBag.RootNode)/Assets/js/PagerView.js"></script>
+    <script src="@(ViewBag.RootNode)/Content/Scripts/CustomerComment/idcardcontent.js"></script>
+}

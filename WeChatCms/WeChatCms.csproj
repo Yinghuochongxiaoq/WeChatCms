@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -159,6 +159,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AdminControllerBase.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\SysIdCardContentController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\ControllerBase.cs" />
     <Compile Include="Controllers\CostNoteController.cs" />
@@ -378,6 +379,7 @@
     <Content Include="Content\Scripts\CostNote\costchannel.js" />
     <Content Include="Content\Scripts\CostNote\costtypeset.js" />
     <Content Include="Content\Scripts\CustomerComment\customercomment.js" />
+    <Content Include="Content\Scripts\CustomerComment\idcardcontent.js" />
     <Content Include="Content\Scripts\Echarts\echarts.js" />
     <Content Include="Content\Scripts\Echarts\echarts.min.js" />
     <Content Include="Content\Scripts\SysAdvertise\sysadvertise.js" />
@@ -724,6 +726,7 @@
     <Content Include="Views\CostNote\CostTypeSet.cshtml" />
     <Content Include="Views\CostNote\CostChannelAccount.cshtml" />
     <Content Include="Views\CostNote\CostStatistical.cshtml" />
+    <Content Include="Views\SysIdCardContent\IdCardContentList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WeChatCmsCommon\WeChatCmsCommon.csproj">

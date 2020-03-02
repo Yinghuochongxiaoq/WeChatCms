@@ -55,7 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceService.cs" />
     <Compile Include="SysAdvertiseService.cs" />
+    <Compile Include="SysAreaService.cs" />
     <Compile Include="SysDicService.cs" />
+    <Compile Include="SysIdCardContentService.cs" />
     <Compile Include="WechatAccountService.cs" />
     <Compile Include="WechatFamilyService.cs" />
   </ItemGroup>

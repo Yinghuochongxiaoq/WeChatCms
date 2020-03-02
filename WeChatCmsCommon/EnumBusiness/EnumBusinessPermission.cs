@@ -102,6 +102,12 @@ namespace WeChatCmsCommon.EnumBusiness
         /// </summary>
         [Description("留言列表")]
         CustomerCommentList = 5002,
+
+        /// <summary>
+        /// 收集身份证号码
+        /// </summary>
+        [Description("客户信息")]
+        SysIdCardContentList=5003,
         #endregion
 
         #region [6、消费记录]

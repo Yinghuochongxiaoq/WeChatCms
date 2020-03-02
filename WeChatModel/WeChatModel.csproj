@@ -102,8 +102,10 @@
     <Compile Include="DatabaseModel\CostTypeModel.cs" />
     <Compile Include="DatabaseModel\CustomercommentModel.cs" />
     <Compile Include="DatabaseModel\SysadvertisementModel.cs" />
+    <Compile Include="DatabaseModel\SysAreaModel.cs" />
     <Compile Include="DatabaseModel\Syscontent.cs" />
     <Compile Include="DatabaseModel\SysdictModel.cs" />
+    <Compile Include="DatabaseModel\SysIdCardContentModel.cs" />
     <Compile Include="DatabaseModel\SysresourceModel.cs" />
     <Compile Include="DatabaseModel\SysUser.cs" />
     <Compile Include="DatabaseModel\Sysusermenu.cs" />
