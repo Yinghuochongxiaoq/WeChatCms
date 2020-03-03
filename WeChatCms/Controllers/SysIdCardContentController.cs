@@ -222,5 +222,128 @@ namespace WeChatCms.Controllers
             }
             return Json(resultMode, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// 处理批量导入
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult BlockInputData()
+        {
+            var listInfoStr = new List<string>
+            {
+                //批量导入
+            };
+            var modelList = new List<SysIdCardContentModel>();
+            listInfoStr.ForEach(f =>
+            {
+                var itemModel = new SysIdCardContentModel
+                {
+                    CardNumber = f.Split('|')[1],
+                    Name = f.Split('|')[0],
+                    Remarks = f.Split('|')[2]
+                };
+                modelList.Add(itemModel);
+            });
+            var resultList = new List<ResponseBaseModel<SysIdCardContentModel>>();
+            modelList.ForEach(model =>
+            {
+                var resultMode = new ResponseBaseModel<SysIdCardContentModel>
+                {
+                    ResultCode = ResponceCodeEnum.Fail
+                };
+                if (model == null)
+                {
+                    resultMode.Message = "对象为空";
+                    resultList.Add(resultMode);
+                    return;
+                }
+                if (string.IsNullOrEmpty(model.Name))
+                {
+                    resultMode.Message = "姓名不能为空";
+                    resultMode.Data = model;
+                    resultList.Add(resultMode);
+                    return;
+                }
+                if (string.IsNullOrEmpty(model.CardNumber))
+                {
+                    resultMode.Message = "身份证号不能为空";
+                    resultMode.Data = model;
+                    resultList.Add(resultMode);
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(model.Remarks))
+                {
+                    var introduction = FilterHtmlHelper.NoHtml(model.Remarks);
+                    model.Remarks = introduction != null && introduction.Length > 200 ? introduction.Substring(0, 200) : introduction;
+                }
+
+                if (!IdCardValidatorHelper.CheckIdCard(model.CardNumber))
+                {
+                    resultMode.Message = "身份证号有效性验证不通过";
+                    resultMode.Data = model;
+                    resultList.Add(resultMode);
+                    return;
+                }
+
+                var cardModel = new IdCardNumber(model.CardNumber);
+                var newModel = new SysIdCardContentModel
+                {
+                    Id = model.Id,
+                    Age = cardModel.Age,
+                    CardNumber = cardModel.CardNumber,
+                    Name = model.Name,
+                    Remarks = model.Remarks,
+                    City = cardModel.City,
+                    Area = cardModel.Area,
+                    CreateTime = DateTime.Now,
+                    Province = cardModel.Province,
+                    Sex = cardModel.Sex == 1 ? SexEnum.Boy : SexEnum.Grill
+                };
+                var server = new SysIdCardContentService();
+
+                if (model.Id > 0)
+                {
+                    var oldModel = server.Get(model.Id);
+                    if (oldModel == null)
+                    {
+                        resultMode.Message = "不存在该内容记录";
+                        resultMode.Data = model;
+                        resultList.Add(resultMode);
+                        return;
+                    }
+
+                    newModel.CreateTime = oldModel.CreateTime;
+                }
+                else
+                {
+                    var hadAdd = server.GetByCardNumber(model.CardNumber);
+                    if (hadAdd != null && hadAdd.CardNumber == model.CardNumber)
+                    {
+                        resultMode.Message = "已经存在该身份证号码";
+                        resultMode.Data = model;
+                        resultList.Add(resultMode);
+                        return;
+                    }
+                }
+
+                try
+                {
+                    server.SaveModel(newModel);
+                    resultMode.ResultCode = ResponceCodeEnum.Success;
+                    resultMode.Message = "处理成功";
+                    resultMode.Data = model;
+                    resultList.Add(resultMode);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    resultMode.Message = "处理失败";
+                    resultMode.Data = model;
+                    resultList.Add(resultMode);
+                }
+            });
+            return Json(resultList, JsonRequestBehavior.AllowGet);
+        }
     }
 }
