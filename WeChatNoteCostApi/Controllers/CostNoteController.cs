@@ -1145,7 +1145,7 @@ namespace WeChatNoteCostApi.Controllers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet, AllowAnonymous]
         public ResponseBaseModel<dynamic> GetHomePageNotice(string token)
         {
             var resultMode = new ResponseBaseModel<dynamic>
@@ -1153,13 +1153,6 @@ namespace WeChatNoteCostApi.Controllers
                 ResultCode = ResponceCodeEnum.Fail,
                 Message = ""
             };
-            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
-            var tempUserId = userData?.AccountId;
-            if (tempUserId == null || tempUserId < 1)
-            {
-                resultMode.Message = "登录失效，请重新登录";
-                return resultMode;
-            }
 
             var server = new CostNoticeService();
             var noticeList=server.GetCurrentTimeNoticeList(DateTime.Now);

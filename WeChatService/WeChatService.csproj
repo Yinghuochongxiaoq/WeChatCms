@@ -51,6 +51,8 @@
     <Compile Include="CostTypeService.cs" />
     <Compile Include="CustomerCommentService.cs" />
     <Compile Include="DbLinkTestService.cs" />
+    <Compile Include="HumanHistoryResourceService.cs" />
+    <Compile Include="HumanHistoryDetailService.cs" />
     <Compile Include="MenuService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceService.cs" />

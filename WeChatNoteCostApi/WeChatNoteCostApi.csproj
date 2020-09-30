@@ -140,6 +140,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiControllerBase.cs" />
     <Compile Include="Controllers\CostNoteController.cs" />
+    <Compile Include="Controllers\HumanHistoryDetailController.cs" />
     <Compile Include="Filter\AuthFilterAttribute.cs" />
     <Compile Include="Filter\ExceptionFilter.cs" />
     <Compile Include="Global.asax.cs">

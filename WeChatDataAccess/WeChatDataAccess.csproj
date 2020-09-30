@@ -103,6 +103,8 @@
     <Compile Include="CostTypeData.cs" />
     <Compile Include="CustomerCommentData.cs" />
     <Compile Include="DbLinkTestData.cs" />
+    <Compile Include="HumanHistoryResourceData.cs" />
+    <Compile Include="HumanHistoryDetailData.cs" />
     <Compile Include="MenuData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceData.cs" />

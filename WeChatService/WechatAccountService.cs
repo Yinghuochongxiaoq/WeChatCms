@@ -75,6 +75,17 @@ namespace WeChatService
         }
 
         /// <summary>
+        /// 通过绑定的id获取用户信息
+        /// </summary>
+        /// <param name="accountIds"></param>
+        /// <returns></returns>
+        public List<WeChatAccountModel> GetByAccountIds(List<long> accountIds)
+        {
+            var data = _dataAccess.GetByAccountIds(accountIds);
+            return data;
+        }
+
+        /// <summary>
         /// 获取单个数据
         /// </summary>
         /// <param name="openId"></param>

@@ -65,6 +65,21 @@ namespace WeChatDataAccess
         }
 
         /// <summary>
+        /// 根据accountIds获取用户信息
+        /// </summary>
+        /// <param name="accountIds"></param>
+        /// <returns></returns>
+        public List<WeChatAccountModel> GetByAccountIds(List<long> accountIds)
+        {
+            if (accountIds == null || accountIds.Count < 1) return null;
+            using (var conn = SqlConnectionHelper.GetOpenConnection())
+            {
+                return conn.GetList<WeChatAccountModel>("where IsDel=@IsDel and AccountId in @AccountId", new
+                { IsDel = FlagEnum.HadZore.GetHashCode(), AccountId = accountIds.ToArray() }).ToList();
+            }
+        }
+
+        /// <summary>
         /// 删除表记录
         /// </summary>
         /// <param name="id"></param>
