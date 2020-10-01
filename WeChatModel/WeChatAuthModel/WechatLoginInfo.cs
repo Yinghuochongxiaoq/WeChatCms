@@ -10,5 +10,6 @@
         public string iv { get; set; }
         public string rawData { get; set; }
         public string signature { get; set; }
+        public string sys { get; set; }
     }
 }

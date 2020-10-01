@@ -29,7 +29,7 @@ namespace WeChatDataAccess
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
-                return conn.GetListPaged<T>(pageIndex, pageSize, where.ToString(), null, param)?.ToList();
+                return conn.GetListPaged<T>(pageIndex, pageSize, where.ToString(), "id desc", param)?.ToList();
             }
         }
 

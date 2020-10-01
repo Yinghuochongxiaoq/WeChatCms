@@ -40,7 +40,14 @@ namespace WeChatNoteCostApi.Controllers
             {
                 return new ResponseBaseModel<WeChatAuthResponseModel> { ResultCode = ResponceCodeEnum.Success, Message = "微信认证成功", Data = data };
             }
-            var weChatCheck = new WeChatAppDecrypt(AppConfigurationHelper.GetString("XcxAppID", ""), AppConfigurationHelper.GetString("XcxAppSecrect", ""));
+
+            var weChatCheck = new WeChatAppDecrypt(
+                string.IsNullOrEmpty(loginInfo.sys)
+                    ? AppConfigurationHelper.GetString("XcxAppID", "")
+                    : AppConfigurationHelper.GetString("XcxAppID" + loginInfo.sys),
+                string.IsNullOrEmpty(loginInfo.sys)
+                    ? AppConfigurationHelper.GetString("XcxAppSecrect", "")
+                    : AppConfigurationHelper.GetString("XcxAppSecrect" + loginInfo.sys, ""));
             var openIdAndSessionKeyModel = weChatCheck.DecodeOpenIdAndSessionKey(loginInfo);
             if (openIdAndSessionKeyModel == null)
             {
