@@ -101,6 +101,7 @@
     <Compile Include="DatabaseModel\CostNoticeModel.cs" />
     <Compile Include="DatabaseModel\CostTypeModel.cs" />
     <Compile Include="DatabaseModel\CustomercommentModel.cs" />
+    <Compile Include="DatabaseModel\DailyHistoryModel.cs" />
     <Compile Include="DatabaseModel\HumanstorydetailModel.cs" />
     <Compile Include="DatabaseModel\HumanstoryresourceModel.cs" />
     <Compile Include="DatabaseModel\SysadvertisementModel.cs" />

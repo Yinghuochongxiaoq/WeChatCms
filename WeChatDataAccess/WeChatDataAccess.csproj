@@ -102,6 +102,7 @@
     <Compile Include="CostNoticeData.cs" />
     <Compile Include="CostTypeData.cs" />
     <Compile Include="CustomerCommentData.cs" />
+    <Compile Include="DailyHistoryData.cs" />
     <Compile Include="DbLinkTestData.cs" />
     <Compile Include="HumanHistoryResourceData.cs" />
     <Compile Include="HumanHistoryDetailData.cs" />

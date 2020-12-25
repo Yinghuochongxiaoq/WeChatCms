@@ -50,6 +50,7 @@
     <Compile Include="CostNoticeService.cs" />
     <Compile Include="CostTypeService.cs" />
     <Compile Include="CustomerCommentService.cs" />
+    <Compile Include="DailyHistoryService.cs" />
     <Compile Include="DbLinkTestService.cs" />
     <Compile Include="HumanHistoryResourceService.cs" />
     <Compile Include="HumanHistoryDetailService.cs" />

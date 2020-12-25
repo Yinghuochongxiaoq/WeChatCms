@@ -1155,7 +1155,7 @@ namespace WeChatNoteCostApi.Controllers
             };
 
             var server = new CostNoticeService();
-            var noticeList=server.GetCurrentTimeNoticeList(DateTime.Now);
+            var noticeList = server.GetCurrentTimeNoticeList(DateTime.Now);
             resultMode.Data = new
             {
                 noticeList
@@ -1164,6 +1164,129 @@ namespace WeChatNoteCostApi.Controllers
             return resultMode;
         }
 
+        #endregion
+
+        #region [10、打卡日志信息]
+        /// <summary>
+        /// 获取打卡日志信息
+        /// </summary>
+        /// <param name="token">token</param>
+        /// <param name="year">年</param>
+        /// <param name="month">月</param>
+        /// <returns></returns>
+        [HttpGet, HttpPost, AllowAnonymous]
+        public ResponseBaseModel<dynamic> GetUserDailyHistoryList(string token, int year, int month)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var server = new DailyHistoryService();
+            var dailyList = server.GetDailyHistoryModels(tempUserId.Value, year, month);
+            var countNumber = dailyList.Sum(f => f.DailyNumber);
+            var resultList = dailyList.Select(r => new
+            {
+                id = r.Id,
+                dailyContent = r.DailyContent,
+                dailyDate = r.DailyDate.ToString("yyyy-MM-dd"),
+                dailyNumber = r.DailyNumber,
+                dailyYear = r.DailyYear,
+                dailyMonth = r.DailyMonth,
+                dailyDay = r.DailyDate.Day
+            }).ToList();
+            resultMode.Data = new
+            {
+                resultList,
+                countNumber
+            };
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 检测用户是否今日已经签到
+        /// </summary>
+        /// <param name="token">token</param>
+        /// <returns>今日签到结果</returns>
+        [HttpGet, HttpPost, AllowAnonymous]
+        public ResponseBaseModel<dynamic> CheckUserTodayDailySign(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            var server = new DailyHistoryService();
+            var now = DateTime.Now;
+            var dailyList = server.GetDailyHistoryModels(tempUserId.Value, now.Year, now.Month, now.Day);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            resultMode.Message = "成功";
+            resultMode.Data = new { single = dailyList.Count > 0 };
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 删除打卡签到记录
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> DeleteDetailHistoryInfo(string token, long id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (id < 1)
+            {
+                resultMode.Message = "参数错误";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+
+            var server = new DailyHistoryService();
+            var oldModel = server.GetDailyHistoryDetailInfo(id);
+            if (oldModel == null)
+            {
+                resultMode.Message = "记录不存在";
+                return resultMode;
+            }
+
+            if (oldModel.UserId != userId)
+            {
+                resultMode.Message = "不能修改他人记录";
+                return resultMode;
+            }
+            oldModel.IsDel = FlagEnum.HadOne;
+            oldModel.UpdateTime = DateTime.Now;
+            server.SaveModel(oldModel);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            return resultMode;
+        }
         #endregion
     }
 }
