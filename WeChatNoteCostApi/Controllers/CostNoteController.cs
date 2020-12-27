@@ -1212,6 +1212,54 @@ namespace WeChatNoteCostApi.Controllers
         }
 
         /// <summary>
+        /// 获取打卡日志信息
+        /// </summary>
+        /// <param name="token">token</param>
+        /// <param name="id">主键id</param>
+        /// <returns></returns>
+        [HttpGet, HttpPost, AllowAnonymous]
+        public ResponseBaseModel<dynamic> GetUserDailyHistoryInfoById(string token, long id)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            if (id < 1)
+            {
+                resultMode.Message = "参数错误";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+
+            var server = new DailyHistoryService();
+            var model = server.GetDailyHistoryDetailInfo(id);
+            if (model == null)
+            {
+                resultMode.Message = "记录不存在";
+                return resultMode;
+            }
+
+            if (model.UserId != userId)
+            {
+                resultMode.Message = "参数错误";
+                return resultMode;
+            }
+
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            resultMode.Message = "获取成功";
+            resultMode.Data = new { model.Id, model.DailyContent, model.DailyDate, model.DailyNumber };
+            return resultMode;
+        }
+
+        /// <summary>
         /// 检测用户是否今日已经签到
         /// </summary>
         /// <param name="token">token</param>
