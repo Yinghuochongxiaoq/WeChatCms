@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
+using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Enum;
+using Newtonsoft.Json.Linq;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -1174,7 +1176,7 @@ namespace WeChatNoteCostApi.Controllers
         /// <param name="year">年</param>
         /// <param name="month">月</param>
         /// <returns></returns>
-        [HttpGet, HttpPost, AllowAnonymous]
+        [HttpGet]
         public ResponseBaseModel<dynamic> GetUserDailyHistoryList(string token, int year, int month)
         {
             var resultMode = new ResponseBaseModel<dynamic>
@@ -1217,7 +1219,7 @@ namespace WeChatNoteCostApi.Controllers
         /// <param name="token">token</param>
         /// <param name="id">主键id</param>
         /// <returns></returns>
-        [HttpGet, HttpPost, AllowAnonymous]
+        [HttpGet]
         public ResponseBaseModel<dynamic> GetUserDailyHistoryInfoById(string token, long id)
         {
             var resultMode = new ResponseBaseModel<dynamic>
@@ -1264,7 +1266,7 @@ namespace WeChatNoteCostApi.Controllers
         /// </summary>
         /// <param name="token">token</param>
         /// <returns>今日签到结果</returns>
-        [HttpGet, HttpPost, AllowAnonymous]
+        [HttpGet]
         public ResponseBaseModel<dynamic> CheckUserTodayDailySign(string token)
         {
             var resultMode = new ResponseBaseModel<dynamic>
@@ -1285,6 +1287,53 @@ namespace WeChatNoteCostApi.Controllers
             resultMode.ResultCode = ResponceCodeEnum.Success;
             resultMode.Message = "成功";
             resultMode.Data = new { single = dailyList.Count > 0 };
+            return resultMode;
+        }
+
+        /// <summary>
+        /// 保存打卡信息
+        /// </summary>
+        /// <param name="jsonJObject">参数列表</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ResponseBaseModel<dynamic> AddDailyModel([FromBody]JObject jsonJObject)
+        {
+            string token = jsonJObject["token"].ToString();
+            long id = DataTypeConvertHelper.ToLong(jsonJObject["id"]);
+            decimal workNumber = DataTypeConvertHelper.ToDecimal(jsonJObject["workNumber"]);
+            string dailyTime = jsonJObject["dailyTime"].ToString();
+            string workContent = jsonJObject["workContent"].ToString();
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+
+            var dateTime = DataTypeConvertHelper.ToDateTime(dailyTime, new DateTime(1900, 1, 1));
+            if (dateTime < new DateTime(1900, 1, 1) || string.IsNullOrEmpty(workContent))
+            {
+                resultMode.Message = "打卡日期和工作内容不能为空";
+                return resultMode;
+            }
+
+            var server = new DailyHistoryService();
+            var dailyList = server.GetDailyHistoryModels(tempUserId.Value, dateTime.Year, dateTime.Month, dateTime.Day);
+            if (id < 1 && dailyList != null && dailyList.Count > 0)
+            {
+                resultMode.Message = "今日已打卡，无需重复打卡";
+                return resultMode;
+            }
+            var userId = tempUserId.Value;
+
+            server.SaveModel(id, workNumber, dateTime, workContent, userId);
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            resultMode.Message = "保存成功";
             return resultMode;
         }
 

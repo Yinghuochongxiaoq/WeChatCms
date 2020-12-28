@@ -31,15 +31,16 @@ namespace WeChatService
             }
             else
             {
-                model.Createtime = new DateTime();
+                model.Createtime = DateTime.Now;
             }
 
+            model.DailyDate = dailyDateTime;
             model.DailyContent = dailyContent.Length > 500 ? dailyContent.Substring(0, 500) : dailyContent;
             model.DailyMonth = dailyDateTime.Month;
             model.DailyNumber = number;
             model.DailyYear = dailyDateTime.Year;
             model.IsDel = FlagEnum.HadZore;
-            model.UpdateTime = new DateTime();
+            model.UpdateTime = DateTime.Now;
             model.UserId = userId;
             model.DailyDay = dailyDateTime.Day;
             return _dataAccess.SaveModel(model);
