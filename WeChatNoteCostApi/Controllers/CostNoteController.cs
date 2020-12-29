@@ -1329,6 +1329,12 @@ namespace WeChatNoteCostApi.Controllers
                 resultMode.Message = "今日已打卡，无需重复打卡";
                 return resultMode;
             }
+
+            if (id > 0 && dailyList != null && dailyList.Count > 0 && dailyList.Count(f => f.Id != id) > 0)
+            {
+                resultMode.Message = $"{dateTime:yyyy-MM-dd}已打卡，请前往打卡日历修改";
+                return resultMode;
+            }
             var userId = tempUserId.Value;
 
             server.SaveModel(id, workNumber, dateTime, workContent, userId);
