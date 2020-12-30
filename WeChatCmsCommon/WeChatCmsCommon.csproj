@@ -132,6 +132,7 @@
     <Compile Include="EnumBusiness\UserTypeEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\Fetch.cs.cs" />
+    <Compile Include="Unit\FtpUpLoadFiles.cs" />
     <Compile Include="Unit\RegExp.cs" />
     <Compile Include="Unit\StaticFileHelper.cs" />
   </ItemGroup>
