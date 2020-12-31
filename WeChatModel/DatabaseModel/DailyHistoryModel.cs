@@ -7,6 +7,7 @@
   |========================================================|
 **/
 using System;
+using System.Collections.Generic;
 using FreshCommonUtility.Dapper;
 using WeChatCmsCommon.EnumBusiness;
 
@@ -63,5 +64,19 @@ namespace WeChatModel.DatabaseModel
         /// DailyDay 时间日
         /// </summary>
         public Int32 DailyDay { get; set; }
+        /// <summary>
+        /// 记录涉及的资源
+        /// </summary>
+        public List<DailyStoryResourceModel> MediaList { get; set; }
+        /// <summary>
+        /// 用户昵称
+        /// </summary>
+        [IgnoreInsert, IgnoreUpdate, IgnoreSelect]
+        public string NikeName { get; set; }
+        /// <summary>
+        /// 用户头像
+        /// </summary>
+        [IgnoreInsert, IgnoreUpdate, IgnoreSelect]
+        public string HeadImageUrl { get; set; }
     }
 }

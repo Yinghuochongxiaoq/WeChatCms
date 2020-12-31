@@ -5,7 +5,9 @@ using System.Linq;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
 using FreshCommonUtility.DataConvert;
+using FreshCommonUtility.Dynamic;
 using FreshCommonUtility.Enum;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
@@ -1202,7 +1204,8 @@ namespace WeChatNoteCostApi.Controllers
                 dailyNumber = r.DailyNumber,
                 dailyYear = r.DailyYear,
                 dailyMonth = r.DailyMonth,
-                dailyDay = r.DailyDate.Day
+                dailyDay = r.DailyDate.Day,
+                mediaList=r.MediaList
             }).ToList();
             resultMode.Data = new
             {
@@ -1257,7 +1260,7 @@ namespace WeChatNoteCostApi.Controllers
 
             resultMode.ResultCode = ResponceCodeEnum.Success;
             resultMode.Message = "获取成功";
-            resultMode.Data = new { model.Id, model.DailyContent, model.DailyDate, model.DailyNumber };
+            resultMode.Data = new { model.Id, model.DailyContent, model.DailyDate, model.DailyNumber, model.MediaList };
             return resultMode;
         }
 
@@ -1296,13 +1299,16 @@ namespace WeChatNoteCostApi.Controllers
         /// <param name="jsonJObject">参数列表</param>
         /// <returns></returns>
         [HttpPost]
-        public ResponseBaseModel<dynamic> AddDailyModel([FromBody]JObject jsonJObject)
+        public ResponseBaseModel<dynamic> AddDailyModel([FromBody]DynamicDataEntity jsonJObject)
         {
-            string token = jsonJObject["token"].ToString();
-            long id = DataTypeConvertHelper.ToLong(jsonJObject["id"]);
-            decimal workNumber = DataTypeConvertHelper.ToDecimal(jsonJObject["workNumber"]);
-            string dailyTime = jsonJObject["dailyTime"].ToString();
-            string workContent = jsonJObject["workContent"].ToString();
+            string token = jsonJObject?["token"].ToString();
+            long id = DataTypeConvertHelper.ToLong(jsonJObject?["id"]);
+            decimal workNumber = DataTypeConvertHelper.ToDecimal(jsonJObject?["workNumber"]);
+            string dailyTime = jsonJObject?["dailyTime"].ToString();
+            string workContent = jsonJObject?["workContent"].ToString();
+            string mediaListStr = jsonJObject?["mediaList"].ToString();
+            var resourceModelList = JsonConvert.DeserializeObject<List<DailyStoryResourceModel>>(mediaListStr);
+
             var resultMode = new ResponseBaseModel<dynamic>
             {
                 ResultCode = ResponceCodeEnum.Fail,
@@ -1337,7 +1343,36 @@ namespace WeChatNoteCostApi.Controllers
             }
             var userId = tempUserId.Value;
 
-            server.SaveModel(id, workNumber, dateTime, workContent, userId);
+            var newId = server.SaveModel(id, workNumber, dateTime, workContent, userId);
+            var resourceIdList = new List<long>();
+            if (newId > 0)
+            {
+                var resourceServer = new DailyStoryResourceService();
+                resourceServer.DeleteResource(newId);
+                var index = 0;
+                resourceModelList?.ForEach(f =>
+                {
+                    var tmp = new DailyStoryResourceModel
+                    {
+                        CreateBy = userId,
+                        CreateTime = DateTime.Now,
+                        Duration = f.Duration,
+                        Height = f.Height,
+                        Size = f.Size,
+                        Sort = index++,
+                        StoryDetailId = newId,
+                        TempFilePath = f.TempFilePath,
+                        ThumbTempFilePath = f.ThumbTempFilePath,
+                        Type = f.Type,
+                        Width = f.Width,
+                        FullUrl = f.FullUrl,
+                        IsDel = FlagEnum.HadZore,
+                        Url = f.Url
+                    };
+                    var tempId = resourceServer.SaveModel(tmp);
+                    resourceIdList.Add(tempId);
+                });
+            }
             resultMode.ResultCode = ResponceCodeEnum.Success;
             resultMode.Message = "保存成功";
             return resultMode;

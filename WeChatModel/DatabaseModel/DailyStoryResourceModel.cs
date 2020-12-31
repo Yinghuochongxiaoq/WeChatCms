@@ -16,10 +16,10 @@ using WeChatCmsCommon.EnumBusiness;
 namespace WeChatModel.DatabaseModel
 {
     /// <summary>
-    /// humanstoryresource table in MySQL5
+    /// dailystoryresource table in MySQL5
     /// </summary>
-    [Table("humanstoryresource")]
-    public class HumanstoryresourceModel
+    [Table("dailystoryresource")]
+    public class DailyStoryResourceModel
     {
         /// <summary>
         /// Id 主键
@@ -74,5 +74,13 @@ namespace WeChatModel.DatabaseModel
         /// IsDel 1:启用；0：删除
         /// </summary>
         public FlagEnum IsDel { get; set; }
+        /// <summary>
+        /// 相对路径
+        /// </summary>
+        public String Url { get; set; }
+        /// <summary>
+        /// 全路径
+        /// </summary>
+        public String FullUrl { get; set; }
     }
 }
