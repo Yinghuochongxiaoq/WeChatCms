@@ -42,7 +42,7 @@ namespace WeChatDataAccess
             };
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
-                return conn.GetListPaged<SysdictModel>(pageIndex, pageSize, where.ToString(), null, param)?.ToList();
+                return conn.GetListPaged<SysdictModel>(pageIndex, pageSize, where.ToString(), " CreateTime desc", param)?.ToList();
             }
         }
 
@@ -135,8 +135,8 @@ namespace WeChatDataAccess
             using (var conn = SqlConnectionHelper.GetOpenConnection())
             {
                 return string.IsNullOrEmpty(type)
-                    ? conn.GetList<SysdictModel>(new { IsDel = FlagEnum.HadZore.GetHashCode() })?.ToList()
-                    : conn.GetList<SysdictModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), Type = type })?.ToList();
+                    ? conn.GetList<SysdictModel>(new { IsDel = FlagEnum.HadZore.GetHashCode() })?.OrderByDescending(f => f.CreateTime).ToList()
+                    : conn.GetList<SysdictModel>(new { IsDel = FlagEnum.HadZore.GetHashCode(), Type = type })?.OrderByDescending(f => f.CreateTime).ToList();
             }
         }
     }

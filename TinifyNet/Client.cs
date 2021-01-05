@@ -103,7 +103,7 @@ namespace TinifyNet
                     if (retries > 0) continue;
                     throw new ConnectionException("Timeout while connecting", err);
                 }
-                catch (System.Exception err)
+                catch (Exception err)
                 {
                     if (err.InnerException != null)
                     {
@@ -137,7 +137,7 @@ namespace TinifyNet
                         data
                     );
                 }
-                catch (System.Exception err)
+                catch (Exception err)
                 {
                     data = new
                     {

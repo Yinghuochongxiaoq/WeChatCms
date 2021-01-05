@@ -55,7 +55,7 @@ namespace WeChatCmsCommon.Unit
             {
                 return false;
             }
-
+            name = name.Replace("/", "");
             ftpPath = ftpPath.Replace("\\", "/");
             bool b = MakeDir(ftpPath);
             if (b == false)
@@ -83,6 +83,51 @@ namespace WeChatCmsCommon.Unit
                 }
                 stream.Close();
                 fs.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("因{0},无法完成上传", ex.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 上传文件到远程ftp
+        /// </summary>
+        /// <param name="ftpPath">ftp上的文件路径</param>
+        /// <param name="fileBytes">文件二进制</param>
+        /// <param name="name">文件名</param>
+        /// <returns></returns>
+        public bool UploadFile(string ftpPath, byte[] fileBytes, string name)
+        {
+            if (fileBytes == null || fileBytes.Length < 1)
+            {
+                return false;
+            }
+            ftpPath = ftpPath.Replace("\\", "/");
+            bool b = MakeDir(ftpPath);
+            if (b == false)
+            {
+                return false;
+            }
+
+            name = name.Replace("/", "");
+            var path = _ftpconstr + ftpPath + "/" + name;
+            try
+            {
+                var reqFtp = (FtpWebRequest)WebRequest.Create(new Uri(path));
+                reqFtp.UseBinary = true;
+                reqFtp.Credentials = new NetworkCredential(_ftpusername, _ftppassword);
+                reqFtp.KeepAlive = false;
+                reqFtp.Method = WebRequestMethods.Ftp.UploadFile;
+                reqFtp.ContentLength = fileBytes.Length;
+
+                var contentLen = fileBytes.Length;
+                var stream = reqFtp.GetRequestStream();
+
+                stream.Write(fileBytes, 0, contentLen);
+                stream.Close();
                 return true;
             }
             catch (Exception ex)

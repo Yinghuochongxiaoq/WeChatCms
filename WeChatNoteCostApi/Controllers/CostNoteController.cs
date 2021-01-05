@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using FreshCommonUtility.Cache;
 using FreshCommonUtility.DataConvert;
 using FreshCommonUtility.Dynamic;
 using FreshCommonUtility.Enum;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using WeChatCmsCommon.EnumBusiness;
 using WeChatModel;
 using WeChatModel.DatabaseModel;
@@ -1205,7 +1205,7 @@ namespace WeChatNoteCostApi.Controllers
                 dailyYear = r.DailyYear,
                 dailyMonth = r.DailyMonth,
                 dailyDay = r.DailyDate.Day,
-                mediaList=r.MediaList
+                mediaList = r.MediaList
             }).ToList();
             resultMode.Data = new
             {
@@ -1294,12 +1294,37 @@ namespace WeChatNoteCostApi.Controllers
         }
 
         /// <summary>
+        /// 获取图片上传的配置信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ResponseBaseModel<dynamic> GetUploadConfig(string token)
+        {
+            var resultMode = new ResponseBaseModel<dynamic>
+            {
+                ResultCode = ResponceCodeEnum.Fail,
+                Message = ""
+            };
+            var userData = RedisCacheHelper.Get<WeChatAccountModel>(RedisCacheKey.AuthTokenKey + token);
+            var tempUserId = userData?.AccountId;
+            if (tempUserId == null || tempUserId < 1)
+            {
+                resultMode.ResultCode = ResponceCodeEnum.NeedLogin;
+                resultMode.Message = "登录失效，请重新登录";
+                return resultMode;
+            }
+            resultMode.ResultCode = ResponceCodeEnum.Success;
+            resultMode.Message = "成功";
+            resultMode.Data = new { media_count = 3 };
+            return resultMode;
+        }
+        /// <summary>
         /// 保存打卡信息
         /// </summary>
         /// <param name="jsonJObject">参数列表</param>
         /// <returns></returns>
-        [HttpPost]
-        public ResponseBaseModel<dynamic> AddDailyModel([FromBody]DynamicDataEntity jsonJObject)
+        public async Task<ResponseBaseModel<dynamic>> AddDailyModel([FromBody]DynamicDataEntity jsonJObject)
         {
             string token = jsonJObject?["token"].ToString();
             long id = DataTypeConvertHelper.ToLong(jsonJObject?["id"]);
@@ -1307,7 +1332,8 @@ namespace WeChatNoteCostApi.Controllers
             string dailyTime = jsonJObject?["dailyTime"].ToString();
             string workContent = jsonJObject?["workContent"].ToString();
             string mediaListStr = jsonJObject?["mediaList"].ToString();
-            var resourceModelList = JsonConvert.DeserializeObject<List<DailyStoryResourceModel>>(mediaListStr);
+
+            var resourceModelList = string.IsNullOrEmpty(mediaListStr) ? new List<DailyStoryResourceModel>() : JsonConvert.DeserializeObject<List<DailyStoryResourceModel>>(mediaListStr);
 
             var resultMode = new ResponseBaseModel<dynamic>
             {
@@ -1343,35 +1369,62 @@ namespace WeChatNoteCostApi.Controllers
             }
             var userId = tempUserId.Value;
 
+            var resourceServer = new DailyStoryResourceService();
             var newId = server.SaveModel(id, workNumber, dateTime, workContent, userId);
-            var resourceIdList = new List<long>();
+            var resourceNewIdList = new List<long>();
+            var resourceOldList = new List<long>();
+            var resourceDbList = new List<long>();
             if (newId > 0)
             {
-                var resourceServer = new DailyStoryResourceService();
-                resourceServer.DeleteResource(newId);
+                var resourceList = resourceServer.GetDailyStoryResourceModels(new List<long> { newId });
+                if (resourceList != null) resourceDbList.AddRange(resourceList.Select(r => r.Id));
                 var index = 0;
                 resourceModelList?.ForEach(f =>
                 {
-                    var tmp = new DailyStoryResourceModel
+                    if (f.Id < 1)
                     {
-                        CreateBy = userId,
-                        CreateTime = DateTime.Now,
-                        Duration = f.Duration,
-                        Height = f.Height,
-                        Size = f.Size,
-                        Sort = index++,
-                        StoryDetailId = newId,
-                        TempFilePath = f.TempFilePath,
-                        ThumbTempFilePath = f.ThumbTempFilePath,
-                        Type = f.Type,
-                        Width = f.Width,
-                        FullUrl = f.FullUrl,
-                        IsDel = FlagEnum.HadZore,
-                        Url = f.Url
-                    };
-                    var tempId = resourceServer.SaveModel(tmp);
-                    resourceIdList.Add(tempId);
+                        var tmp = new DailyStoryResourceModel
+                        {
+                            CreateBy = userId,
+                            CreateTime = DateTime.Now,
+                            Duration = f.Duration,
+                            Height = f.Height,
+                            Size = f.Size,
+                            Sort = (resourceList != null && resourceList.Count > 0 ? resourceList.Max(r => r.Sort) : 0) + ++index,
+                            StoryDetailId = newId,
+                            TempFilePath = f.TempFilePath,
+                            ThumbTempFilePath = f.ThumbTempFilePath,
+                            Type = f.Type,
+                            Width = f.Width,
+                            FullUrl = f.FullUrl,
+                            IsDel = FlagEnum.HadZore,
+                            Url = f.Url
+                        };
+                        var tempId = resourceServer.SaveModel(tmp);
+                        resourceNewIdList.Add(tempId);
+                    }
+                    else
+                    {
+                        resourceOldList.Add(f.Id);
+                    }
                 });
+            }
+
+            //原来拥有图片信息
+            if (resourceDbList.Count > 0)
+            {
+                var deleteList = resourceDbList.Except(resourceOldList).ToList();
+                if (deleteList.Count > 0)
+                {
+                    //删除不需要的
+                    resourceServer.DeleteResourceById(deleteList);
+                }
+            }
+
+            //处理新加入的
+            if (resourceNewIdList.Count > 0)
+            {
+                await resourceServer.DealNewResourceAsync(resourceNewIdList);
             }
             resultMode.ResultCode = ResponceCodeEnum.Success;
             resultMode.Message = "保存成功";

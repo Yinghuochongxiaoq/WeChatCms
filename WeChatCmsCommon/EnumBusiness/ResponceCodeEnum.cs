@@ -16,6 +16,11 @@
         Fail = -1,
 
         /// <summary>
+        /// 需要登录
+        /// </summary>
+        NeedLogin = 201,
+
+        /// <summary>
         /// 404
         /// </summary>
         Page404 = 404,
@@ -23,6 +28,6 @@
         /// <summary>
         /// 500
         /// </summary>
-        Page500=500,
+        Page500 = 500,
     }
 }
