@@ -139,6 +139,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiControllerBase.cs" />
+    <Compile Include="Controllers\ConfigFunctionController.cs" />
     <Compile Include="Controllers\CostNoteController.cs" />
     <Compile Include="Filter\AuthFilterAttribute.cs" />
     <Compile Include="Filter\ExceptionFilter.cs" />
