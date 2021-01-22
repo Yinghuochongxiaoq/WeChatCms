@@ -36,10 +36,11 @@ namespace WeChatNoteCostApi.Controllers
                         title = "打卡记录",
                         link = "/pages/calendar/calendar"
                     },
-                    //new {
-                    //    title = "轻松一刻",
-                    //    link = "/pages/2048/2048"
-                    //},
+                    new {
+                        title = "轻松一刻",
+                        //link = "/pages/relax/relax?couldInGame=true"
+                        link = "/pages/relax/relax"
+                    },
                     new {
                         title = "关于我们",
                         link = "./about"
