@@ -21,5 +21,10 @@
         /// 缓存邀请码缓存key
         /// </summary>
         public static string InviteCodeKey = "GetInviteCode_";
+
+        /// <summary>
+        /// 小程序我的页面菜单
+        /// </summary>
+        public static string WeChatMinProgramMyPage = "WeChatMinProgramMyPage_";
     }
 }
