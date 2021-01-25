@@ -20,10 +20,10 @@ namespace WeChatNoteCostApi.Controllers
                 ResultCode = ResponceCodeEnum.Success,
                 Message = "",
                 Data = new List<dynamic>{
-                new {
-                    title = "账户设置",
-                    link = "/pages/costchannel/costchannel"
-                },
+                //new {
+                //    title = "账户设置",
+                //    link = "/pages/costchannel/costchannel"
+                //},
                     new {
                         title = "消费类型设置",
                         link = "/pages/costtype/costtype"
@@ -38,8 +38,8 @@ namespace WeChatNoteCostApi.Controllers
                     },
                     new {
                         title = "轻松一刻",
-                        //link = "/pages/relax/relax?couldInGame=true"
-                        link = "/pages/relax/relax"
+                        link = "/pages/relax/relax?couldInGame=true"
+                        //link = "/pages/relax/relax"
                     },
                     new {
                         title = "关于我们",
