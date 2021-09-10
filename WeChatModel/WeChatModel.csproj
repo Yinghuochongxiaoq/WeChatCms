@@ -95,7 +95,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseModel\CarnoticerealnameModel.cs" />
     <Compile Include="CustomerModel\CanPayAcountModel.cs" />
+    <Compile Include="DatabaseModel\CarnoticedetailModel.cs" />
+    <Compile Include="DatabaseModel\CarnoticeinfoModel.cs" />
     <Compile Include="DatabaseModel\CostChannelModel.cs" />
     <Compile Include="DatabaseModel\CostContentModel.cs" />
     <Compile Include="DatabaseModel\CostNoticeModel.cs" />

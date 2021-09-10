@@ -97,6 +97,9 @@
   <ItemGroup>
     <Compile Include="AccountData.cs" />
     <Compile Include="BaseData.cs" />
+    <Compile Include="CarNoticeDetailData.cs" />
+    <Compile Include="CarNoticeInfoData.cs" />
+    <Compile Include="CarNoticeRealNameData.cs" />
     <Compile Include="CostChannelData.cs" />
     <Compile Include="CostContentData.cs" />
     <Compile Include="CostNoticeData.cs" />
