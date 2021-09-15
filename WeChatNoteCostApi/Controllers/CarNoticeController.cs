@@ -313,7 +313,7 @@ namespace WeChatNoteCostApi.Controllers
             }
             else
             {
-                model.IsDel = FlagEnum.HadOne;
+                model.IsDel = FlagEnum.HadZore;
                 model.Carid = carId;
                 model.Createtime = DateTime.Now;
                 model.UserId = tempUserId.Value;
